@@ -46,6 +46,9 @@ namespace RecommenderSystem
                 InsertValuesToDictionary(userId, itemId, rating);
             }
 
+            PearsonMethod pm = new PearsonMethod();
+            pm.calcAverageRatingPerUser(userData);
+
             timer.Stop();
             TimeSpan elapsed = timer.Elapsed;
             Console.WriteLine("Loading data was completed successfully\nExection Time: {0}\n", elapsed.ToString("mm':'ss':'fff"));
@@ -66,7 +69,14 @@ namespace RecommenderSystem
         //returns the list of all items that the given user has rated in the dataset
         public List<string> GetRatedItems(string sUID)
         {
-            throw new NotImplementedException();
+            Dictionary<string, double> items;
+
+            if(userData.TryGetValue(sUID, out items))
+            {
+                return items.Keys.ToList();
+            }
+
+            return null;
         }
 
         //Returns a user-item rating that appears in the dataset (not predicted)

@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IPredictionMethod.cs" />
+    <Compile Include="PearsonMethod.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="RecommenderSystem.cs" />
   </ItemGroup>
