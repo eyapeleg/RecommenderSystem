@@ -23,6 +23,7 @@ namespace RecommenderSystem
             userData = new Dictionary<string, Dictionary<string, double>>();
             itemData = new Dictionary<string, Dictionary<string, double>>();
             pearson = new PearsonMethod(this); //TODO: consider getter/setter instead of that
+            cosine
         }
 
         //load a datatset 
@@ -49,7 +50,7 @@ namespace RecommenderSystem
             }
 
             //initialize data for each predict method 
-            pearson.calcAverageRatingPerUser(userData);
+            pearson.calcAverageRatingPerUser();
 
             timer.Stop();
             TimeSpan elapsed = timer.Elapsed;
@@ -97,7 +98,16 @@ namespace RecommenderSystem
         //predict a rating for a user item pair using the specified method
         public double PredictRating(PredictionMethod m, string sUID, string sIID)
         {
-            throw new NotImplementedException();
+            double rating = 0;
+
+            switch(m)
+            {
+                case PredictionMethod.Pearson:
+                    rating = pearson.PredictRating(sUID, sIID);
+                    break;
+            }
+
+            return rating;
         }
 
         //Compute MAE (mean absolute error) for a set of rating prediction methods over the same user-item pairs

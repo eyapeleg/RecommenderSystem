@@ -31,5 +31,10 @@ namespace RecommenderSystem
             }
             Console.WriteLine("Average rating calculation completed");
         }
+
+        internal double PredictRating(string sUID, string sIID)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
