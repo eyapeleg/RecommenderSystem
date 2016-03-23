@@ -7,18 +7,21 @@ namespace RecommenderSystem
 {
     public class PearsonMethod : IPredictionMethod
     {
-        Dictionary<string, double> averageRating;
+        private Dictionary<string, double> averageRating;
+        private RecommenderSystem recommenderSystem;
 
-        public PearsonMethod()
+        public PearsonMethod(RecommenderSystem recommenderSystem)
         {
+            // TODO: Complete member initialization
+            this.recommenderSystem = recommenderSystem;
             averageRating = new Dictionary<string, double>();
         }
 
-        internal void calcAverageRatingPerUser(Dictionary<string, Dictionary<string, double>> userData)
+        internal void calcAverageRatingPerUser()
         {
             Console.WriteLine("Calculate average rating per user...");
 
-            foreach (var user in userData)
+            foreach (var user in recommenderSystem.userData)
             {
                 string userId = user.Key;
                 Dictionary<string, double> items = user.Value;

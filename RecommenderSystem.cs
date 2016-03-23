@@ -13,7 +13,7 @@ namespace RecommenderSystem
         public enum PredictionMethod { Pearson, Cosine, Random };
         public Dictionary<string, Dictionary<string, double>> userData;
         public Dictionary<string, Dictionary<string, double>> itemData;
-        PearsonMethod pm;
+        private PearsonMethod pearson;
 
         //class members here
 
@@ -22,7 +22,7 @@ namespace RecommenderSystem
         {
             userData = new Dictionary<string, Dictionary<string, double>>();
             itemData = new Dictionary<string, Dictionary<string, double>>();
-            pm = new PearsonMethod(); //TODO remove the init from here
+            pearson = new PearsonMethod(this); //TODO: consider getter/setter instead of that
         }
 
         //load a datatset 
@@ -48,8 +48,8 @@ namespace RecommenderSystem
                 InsertValuesToDictionary(userId, itemId, rating);
             }
 
-            //TODO
-            pm.calcAverageRatingPerUser(userData);
+            //initialize data for each predict method 
+            pearson.calcAverageRatingPerUser(userData);
 
             timer.Stop();
             TimeSpan elapsed = timer.Elapsed;
