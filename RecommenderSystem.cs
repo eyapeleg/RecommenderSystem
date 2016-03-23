@@ -8,12 +8,13 @@ using System.Text.RegularExpressions;
 
 namespace RecommenderSystem
 {
-    class RecommenderSystem
+    public class RecommenderSystem
     {
         public enum PredictionMethod { Pearson, Cosine, Random };
         public Dictionary<string, Dictionary<string, double>> userData;
         public Dictionary<string, Dictionary<string, double>> itemData;
         private PearsonMethod pearson;
+        private CosineMethod cosine;
 
         //class members here
 
@@ -23,7 +24,7 @@ namespace RecommenderSystem
             userData = new Dictionary<string, Dictionary<string, double>>();
             itemData = new Dictionary<string, Dictionary<string, double>>();
             pearson = new PearsonMethod(this); //TODO: consider getter/setter instead of that
-            cosine
+            cosine = new CosineMethod(this);
         }
 
         //load a datatset 
