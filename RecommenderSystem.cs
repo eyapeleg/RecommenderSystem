@@ -72,7 +72,14 @@ namespace RecommenderSystem
         //Returns a user-item rating that appears in the dataset (not predicted)
         public double GetRating(string sUID, string sIID)
         {
-            throw new NotImplementedException();
+            Dictionary<string, double> items;
+            double rating; 
+
+            if(userData.TryGetValue(sUID, out items) && items.TryGetValue(sIID, out rating))
+            {
+                return rating;
+            }
+            return 0;
         }
 
         //predict a rating for a user item pair using the specified method
