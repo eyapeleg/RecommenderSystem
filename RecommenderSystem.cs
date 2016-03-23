@@ -1,19 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace RecommenderSystem
 {
     class RecommenderSystem
     {
         public enum PredictionMethod { Pearson, Cosine, Random };
+        public Dictionary<string, Dictionary<string, double>> userData;
+        public Dictionary<string, Dictionary<string, double>> itemData;
 
         //class members here
 
         //constructor
         public RecommenderSystem()
         {
+            userData = new Dictionary<string, Dictionary<string, double>>();
+            itemData = new Dictionary<string, Dictionary<string, double>>();
         }
 
         //load a datatset 
@@ -24,19 +31,36 @@ namespace RecommenderSystem
         //Do all precomputations here if needed
         public void Load(string sFileName)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Starting load data...");
+            //TODO: Remove stopwatch on submittion 
+            Stopwatch timer = Stopwatch.StartNew();
+
+            StreamReader objInput = new StreamReader(sFileName, System.Text.Encoding.Default);
+            while (!objInput.EndOfStream)
+            {
+                string line = objInput.ReadLine();
+                string[] split = System.Text.RegularExpressions.Regex.Split(line, "::", RegexOptions.None);
+                string userId = split[0];
+                string itemId = split[1];
+                double rating = Convert.ToDouble(split[2]);
+                InsertValuesToDictionary(userId, itemId, rating);
+            }
+
+            timer.Stop();
+            TimeSpan elapsed = timer.Elapsed;
+            Console.WriteLine("Loading data was completed successfully\nExection Time: {0}\n", elapsed.ToString("mm':'ss':'fff"));
         }
 
         //return a list of the ids of all the users in the dataset
         public List<string> GetAllUsers()
         {
-            throw new NotImplementedException();
+            return userData.Keys.ToList();
         }
 
         //returns a list of all the items in the dataset
         public List<string> GetAllItems()
         {
-            throw new NotImplementedException();
+            return itemData.Keys.ToList();
         }
 
         //returns the list of all items that the given user has rated in the dataset
@@ -63,5 +87,32 @@ namespace RecommenderSystem
         {
             throw new NotImplementedException();
         }
+
+        #region private methods
+        private void InsertValuesToDictionary(string userId, string itemId, double rating)
+        {
+            //insert values to user data dictionary
+            if (userData.ContainsKey(userId))
+            {
+                userData[userId].Add(itemId, rating);
+            }
+            else
+            {
+                var value = new Dictionary<string, double>() { { itemId, rating } };
+                userData.Add(userId, value);
+            }
+
+            //insert values to item data dictionary
+            if (itemData.ContainsKey(itemId))
+            {
+                itemData[itemId].Add(userId, rating);
+            }
+            else
+            {
+                var value = new Dictionary<string, double>() { { userId, rating } };
+                itemData.Add(itemId, value);
+            }
+        }
+        #endregion
     }
 }
