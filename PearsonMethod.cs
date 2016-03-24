@@ -3,38 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RecommenderSystem
+namespace Assignment1
 {
     public class PearsonMethod : IPredictionMethod
     {
-        private Dictionary<string, double> averageRating;
-        private RecommenderSystem recommenderSystem;
-
-        public PearsonMethod(RecommenderSystem recommenderSystem)
+        public double calculateSimilarity(PredictionVector xVector, PredictionVector yVector)
         {
-            // TODO: Complete member initialization
-            this.recommenderSystem = recommenderSystem;
-            averageRating = new Dictionary<string, double>();
-        }
+            double numeratorSum = 0.0;
+            double denumeratorXsquareSum = 0.0;
+            double denumeratorYsquareSum = 0.0;
 
-        internal void calcAverageRatingPerUser()
-        {
-            Console.WriteLine("Calculate average rating per user...");
+            foreach(KeyValuePair<string,double> xPoint in xVector){
+                if (!yVector.containsPoint(xPoint.Key))
+                    break;
 
-            foreach (var user in recommenderSystem.userData)
-            {
-                string userId = user.Key;
-                Dictionary<string, double> items = user.Value;
+                double yPointValue = yVector.getPoint(xPoint.Key);
+                double xPointValue = xPoint.Value;
+                
+                double xDelta = xPointValue-xVector.getAvg();
+                double yDelta = yPointValue - yVector.getAvg(); 
 
-                double avg = items.Values.Average();
-                averageRating.Add(userId, avg);
+                numeratorSum+= xDelta*yDelta;
+                denumeratorXsquareSum +=  xDelta*xDelta;
+                denumeratorYsquareSum +=  yDelta*yDelta;
             }
-            Console.WriteLine("Average rating calculation completed");
-        }
 
-        internal double PredictRating(string sUID, string sIID)
-        {
-            throw new NotImplementedException();
+            if (denumeratorXsquareSum==0.0)
+                throw new ArithmeticException("There is no intersection between the vectors");
+
+            return numeratorSum/(denumeratorXsquareSum*denumeratorXsquareSum);
+            }
+               
+
         }
-    }
 }
+

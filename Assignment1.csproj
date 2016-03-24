@@ -44,11 +44,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CosineMethod.cs" />
+    <Compile Include="DataLoader.cs" />
     <Compile Include="IPredictionMethod.cs" />
+    <Compile Include="Items.cs" />
     <Compile Include="PearsonMethod.cs" />
+    <Compile Include="PredictionMethod.cs" />
+    <Compile Include="PredictionVector.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="RandomMethod.cs" />
     <Compile Include="RecommenderSystem.cs" />
+    <Compile Include="SimilarityManager.cs" />
+    <Compile Include="User.cs" />
+    <Compile Include="Users.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
