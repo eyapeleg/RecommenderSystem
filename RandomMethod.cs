@@ -5,11 +5,22 @@ using System.Text;
 
 namespace Assignment1
 {
-    public class RandomMethod : IPredictionMethod
+    public class RandomMethod
     {
-        public double calculateSimilarity(PredictionVector xVector, PredictionVector yVector)
+        public double PredictRating(User u)
         {
-            throw new NotImplementedException();
+            var dist = u.getRatingDistribution();
+            double rand = new Random().NextDouble();
+
+            foreach (var rating in dist)
+            {
+                if (rand < rating.Value)
+                {
+                    return rating.Key;
+                }
+            }
+
+            return 0;
         }
     }
 }

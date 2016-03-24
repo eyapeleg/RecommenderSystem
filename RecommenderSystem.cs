@@ -10,7 +10,9 @@ namespace Assignment1
         public enum PredictionMethod { Pearson, Cosine, Random };
         private Users users;
         private Items items;
-
+        private PearsonMethod pearson;
+        private CosineMethod cosine;
+        private RandomMethod random;
         //class members here
 
         //constructor
@@ -18,6 +20,9 @@ namespace Assignment1
         {
             users = new Users();
             items = new Items();
+            pearson = new PearsonMethod();
+            cosine = new CosineMethod();
+            random = new RandomMethod();
         }
 
         public void Load(string sFileName)
@@ -26,6 +31,12 @@ namespace Assignment1
             Tuple<Users,Items> data = dataLoader.Load(sFileName);
             users = data.Item1;
             items = data.Item2;
+
+            //TODO: Remove after testing
+            User u1 = users.getUserById("1");
+            User u2 = users.getUserById("2");
+            cosine.calculateSimilarity(u1, u2);
+            double predict = random.PredictRating(u2);
         }
 
         //return a list of the ids of all the users in the dataset

@@ -12,10 +12,12 @@ namespace Assignment1
         private double sum;
         private int count;
         private string id;
+        private double squaredSum;
 
         public User(string userId)
         {
             sum = 0.0;
+            squaredSum = 0.0;
             count = 0;
             id = userId;
             itemsRatings = new Dictionary<string, double>();
@@ -26,12 +28,18 @@ namespace Assignment1
             return this.id;
         }
 
+        public double getSquaredSum()
+        {
+            return squaredSum;
+        }
+
         public void addItem(string item, double rating)
         {
             if (itemsRatings.ContainsKey(item))
                 throw new NotSupportedException("Item " + "[" + item + "]" + " already exists in the DB!");
 
             sum += rating;
+            squaredSum += Math.Pow(rating, 2);
             count++;
             itemsRatings.Add(item, rating);
         }
@@ -56,6 +64,17 @@ namespace Assignment1
                 return rating;
 
             return 0.0;
+        }
+
+        public Dictionary<double,double> getRatingDistribution()
+        {
+            double sum = 0.0;
+
+            double totalRatedItems = itemsRatings.Count();
+            var dict = itemsRatings.GroupBy(i => i.Value).ToDictionary(g => g.Key, g => g.Count() / totalRatedItems).ToDictionary(w=> w.Key, w => sum += w.Value);
+
+            return dict;
+
         }
 
         public override bool Equals(object obj)
