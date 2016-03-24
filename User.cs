@@ -18,6 +18,7 @@ namespace Assignment1
             sum = 0.0;
             count = 0;
             id = userId;
+            itemsRatings = new Dictionary<string, double>();
         }
 
         public string getId()
