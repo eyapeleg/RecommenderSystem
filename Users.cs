@@ -26,7 +26,7 @@ namespace Assignment1
         public User getUserById(string userId)
         {
             List<User> usersIdsList = users.Where(x => (x.getId()==userId)).ToList();
-            return usersIdsList.First();
+            return usersIdsList.FirstOrDefault();
         }
 
         public double GetRating(string userId, string itemId)
