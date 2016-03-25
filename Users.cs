@@ -7,15 +7,15 @@ namespace Assignment1
 {
     public class Users
     {
-        private ISet<User> users;
+        private Dictionary<string, User> users;
 
         public Users(){
-            users = new HashSet<User>();
+            users = new Dictionary<string, User>();
         }
 
 
         public List<string> GetAllUsers(){
-            return users.ToList().ConvertAll<string>(x => x.getId()).ToList();
+            return users.Keys.ToList();
         }
 
         public List<string> GetRatedItems(string userId)
@@ -25,8 +25,11 @@ namespace Assignment1
 
         public User getUserById(string userId)
         {
-            List<User> usersIdsList = users.Where(x => (x.getId()==userId)).ToList();
-            return usersIdsList.FirstOrDefault();
+            User user;
+            users.TryGetValue(userId, out user);
+
+            return user;
+
         }
 
         public double GetRating(string userId, string itemId)
@@ -40,11 +43,11 @@ namespace Assignment1
 
         public void addUser(string userId)
         {
-            User user = new User(userId);
-            if (users.Contains(user))
+            if (users.Keys.Contains(userId))
                 throw new NotSupportedException("Users " + "[" + userId + "]" + " already exists in the DB!");
 
-            users.Add(user);
+            User user = new User(userId);
+            users.Add(userId, user);
         }
 
         public void addItemToUser(string userId, string itemId, double rating){

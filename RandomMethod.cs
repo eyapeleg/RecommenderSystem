@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Assignment1
 {
-    public class RandomMethod
+    public class RandomMethod 
     {
         public double PredictRating(User u)
         {

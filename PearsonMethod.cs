@@ -7,34 +7,32 @@ namespace Assignment1
 {
     public class PearsonMethod : IPredictionMethod
     {
-        public double calculateSimilarity(PredictionVector xVector, PredictionVector yVector)
+        public double calculateSimilarity(User u1, User u2)
         {
             double numeratorSum = 0.0;
-            double denumeratorXsquareSum = 0.0;
-            double denumeratorYsquareSum = 0.0;
+            double denumeratorU1squareSum = 0.0;
+            double denumeratorU2squareSum = 0.0;
 
-            foreach(KeyValuePair<string,double> xPoint in xVector){
-                if (!yVector.containsPoint(xPoint.Key))
-                    break;
+            double u1_avg = u1.getAverageRatings();
+            double u2_avg = u2.getAverageRatings();
 
-                double yPointValue = yVector.getPoint(xPoint.Key);
-                double xPointValue = xPoint.Value;
-                
-                double xDelta = xPointValue-xVector.getAvg();
-                double yDelta = yPointValue - yVector.getAvg(); 
-
-                numeratorSum+= xDelta*yDelta;
-                denumeratorXsquareSum +=  xDelta*xDelta;
-                denumeratorYsquareSum +=  yDelta*yDelta;
+            //TODO - foreach user, get only similar users with at least one common rated item
+            var intersectList = u1.getRatedItems().Intersect(u2.getRatedItems());
+            foreach (var item in intersectList)
+            {
+                double u1_rating = u1.getRating(item);
+                double u2_rating = u2.getRating(item);
+                double u1_delta = (u1_rating - u1_avg);
+                double u2_delta = (u2_rating - u2_avg);
+                numeratorSum += u1_delta * u2_delta;
+                denumeratorU1squareSum += Math.Pow(u1_delta, 2);
+                denumeratorU2squareSum += Math.Pow(u2_delta, 2);
             }
+            if (intersectList.Count() == 0)
+                return 0;
 
-            if (denumeratorXsquareSum==0.0)
-                throw new ArithmeticException("There is no intersection between the vectors");
-
-            return numeratorSum/(denumeratorXsquareSum*denumeratorXsquareSum);
-            }
-               
-
+            return numeratorSum / (denumeratorU1squareSum * denumeratorU2squareSum);
         }
+    }
 }
 

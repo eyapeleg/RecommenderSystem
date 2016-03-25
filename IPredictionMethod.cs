@@ -7,6 +7,6 @@ namespace Assignment1
 {
     interface IPredictionMethod
     {
-        double calculateSimilarity(PredictionVector xVector, PredictionVector yVector);
+        double calculateSimilarity(User u1, User u2);
     }
 }
