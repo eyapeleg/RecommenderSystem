@@ -9,7 +9,7 @@ namespace Assignment1
     public class User
     {
         private Dictionary<string, double> itemsRatings;
-        private Dictionary<User, double> similarUsers; 
+        private UserSimilarities similarUsers; 
         private double sum;
         private int count;
         private string id;
@@ -22,7 +22,7 @@ namespace Assignment1
             count = 0;
             id = userId;
             itemsRatings = new Dictionary<string, double>();
-            similarUsers = new Dictionary<User, double>();
+            similarUsers = new UserSimilarities();
         }
 
         public string getId()
@@ -35,9 +35,9 @@ namespace Assignment1
             return squaredSum;
         }
 
-        public Dictionary<User, double> getSimilarUser()
+       /* public Dictionary<double, User> getSimilarUser(PredictionMethod method)
         {
-            return similarUsers.OrderByDescending(x => x.Value).ToDictionary(w => w.Key, w => w.Value);
+            return similarUsers.getSimilarUsers(method);
         }
 
         public void setSimilarUser(User uID, double w)
@@ -48,7 +48,7 @@ namespace Assignment1
             }
 
             similarUsers.Add(uID, w);
-        }
+        }*/
 
 
         public void addItem(string item, double rating)
@@ -95,7 +95,7 @@ namespace Assignment1
 
         }
 
-        public override bool Equals(object obj)
+        /*public override bool Equals(object obj)
         {
             if (obj == null || !obj.GetType().IsInstanceOfType(this.GetType()))
                 return false;
@@ -109,7 +109,7 @@ namespace Assignment1
             return false;
         }
 
-        //TODO - implement hash code
+        //TODO - implement hash code*/
 
     }
 }

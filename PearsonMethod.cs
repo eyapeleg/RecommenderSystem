@@ -10,8 +10,8 @@ namespace Assignment1
         public double calculateSimilarity(User u1, User u2)
         {
             double numeratorSum = 0.0;
-            double denumeratorU1squareSum = 0.0;
-            double denumeratorU2squareSum = 0.0;
+            double denumeratorU1sumSquare = 0.0;
+            double denumeratorU2sumSquare = 0.0;
 
             double u1_avg = u1.getAverageRatings();
             double u2_avg = u2.getAverageRatings();
@@ -25,13 +25,13 @@ namespace Assignment1
                 double u1_delta = (u1_rating - u1_avg);
                 double u2_delta = (u2_rating - u2_avg);
                 numeratorSum += u1_delta * u2_delta;
-                denumeratorU1squareSum += Math.Pow(u1_delta, 2);
-                denumeratorU2squareSum += Math.Pow(u2_delta, 2);
+                denumeratorU1sumSquare += Math.Pow(u1_delta, 2);
+                denumeratorU2sumSquare += Math.Pow(u2_delta, 2);
             }
             if (intersectList.Count() == 0)
                 return 0;
 
-            return numeratorSum / (denumeratorU1squareSum * denumeratorU2squareSum);
+            return numeratorSum / (denumeratorU1sumSquare * denumeratorU2sumSquare);
         }
     }
 }

@@ -7,6 +7,7 @@ namespace Assignment1
 {
     public class RecommenderSystem
     {
+        Dictionary<PredictionMethod, IPredictionMethod> predictionMethodsDictionary;
         public enum PredictionMethod { Pearson, Cosine, Random };
         private Users users;
         private Items items;
@@ -20,8 +21,11 @@ namespace Assignment1
         {
             users = new Users();
             items = new Items();
-            pearson = new PearsonMethod();
-            random = new RandomMethod();
+            
+            // todo - ad cosine random after debug
+            Dictionary<PredictionMethod, IPredictionMethod> predictionMethodsDictionary = new Dictionary<PredictionMethod, IPredictionMethod>(){
+                {PredictionMethod.Pearson,new PearsonMethod()}
+            };
         }
 
         public void Load(string sFileName)
@@ -31,13 +35,25 @@ namespace Assignment1
             users = data.Item1;
             items = data.Item2;
 
-            cosine = new CosineMethod(users, items);
-            cosine.calculateCosineSimilarity();
+            //cosine = new CosineMethod(users, items);
+            //cosine.calculateCosineSimilarity();
+
+            PearsonMethod pearson = new PearsonMethod();
+            User[] usersArray = users.getUsersArray();
+    
+            for(int i=0; i<usersArray.Count(); i++ ){
+                for(int j=i+1; j<usersArray.Count(); j++ ){
+                    foreach (IPredictionMethod method in predictionMethodsDictionary.Values){
+                        double similarity =method.calculateSimilarity(usersArray[i],usersArray[j]);  
+                        
+                    }
+                }
+            }
 
             //TODO: Only for testing- remove that before submittion         
-            User u2 = users.getUserById("2");
-            double predict = random.PredictRating(u2); //test RandomMethod
-            u2.getSimilarUser(); //test cosine similarity 
+            //User u2 = users.getUserById("2");
+            //double predict = random.PredictRating(u2); //test RandomMethod
+            //u2.getSimilarUser(); //test cosine similarity 
         }
 
         //return a list of the ids of all the users in the dataset
@@ -59,7 +75,7 @@ namespace Assignment1
         }
 
         //Returns a user-item rating that appears in the dataset (not predicted)
-        public double GetRating(string sUID, string sIID)
+        public double GetRating(string sUID, string sIID) 
         {
             return users.GetRating(sUID, sIID);
         }

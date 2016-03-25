@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Assignment1
 {
-    public class Users
+    public class Users : IEnumerable<User>
     {
         private Dictionary<string, User> users;
 
@@ -59,6 +59,20 @@ namespace Assignment1
             }
             else{
                 user.addItem(itemId, rating);
+            }
+        }
+
+        
+        public User[] getUsersArray()
+        {
+            return users.Values.ToArray();
+        }
+
+        public IEnumerator<User> GetEnumerator()
+        {
+            foreach (KeyValuePair<string,User> u in users)
+            {
+                yield return u.Value;
             }
         }
 
