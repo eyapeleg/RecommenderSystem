@@ -21,7 +21,6 @@ namespace Assignment1
             users = new Users();
             items = new Items();
             pearson = new PearsonMethod();
-            cosine = new CosineMethod();
             random = new RandomMethod();
         }
 
@@ -32,11 +31,13 @@ namespace Assignment1
             users = data.Item1;
             items = data.Item2;
 
-            //TODO: Remove after testing
-            User u1 = users.getUserById("1");
+            cosine = new CosineMethod(users, items);
+            cosine.calculateCosineSimilarity();
+
+            //TODO: Only for testing- remove that before submittion         
             User u2 = users.getUserById("2");
-            cosine.calculateSimilarity(u1, u2);
-            double predict = random.PredictRating(u2);
+            double predict = random.PredictRating(u2); //test RandomMethod
+            u2.getSimilarUser(); //test cosine similarity 
         }
 
         //return a list of the ids of all the users in the dataset
@@ -66,7 +67,20 @@ namespace Assignment1
         //predict a rating for a user item pair using the specified method
         public double PredictRating(PredictionMethod m, string sUID, string sIID)
         {
-            throw new NotImplementedException();
+            double rating = 0.0;
+            User u = users.getUserById(sUID);
+
+            switch(m)
+            {
+                case PredictionMethod.Cosine:
+                    rating = cosine.PredictRating(u, sIID);
+                    break;
+                case PredictionMethod.Pearson:
+                    break;
+                case PredictionMethod.Random:
+                    break;
+            }
+            return 0;//TODO: remove once all methods are implemented 
         }
 
         //Compute MAE (mean absolute error) for a set of rating prediction methods over the same user-item pairs

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Assignment1
 {
-    class Users
+    public class Users
     {
         private ISet<User> users;
 

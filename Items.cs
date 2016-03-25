@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Assignment1
 {
-    class Items
+    public class Items
     {
         private Dictionary<string, Dictionary<string, double>> items;
 
@@ -16,6 +16,14 @@ namespace Assignment1
         public List<string> GetAllItems()
         {
             return items.Keys.ToList();
+        }
+
+        public Dictionary<string, double> GetItemById(string sIID)
+        {
+            Dictionary<string, double> users;
+            items.TryGetValue(sIID, out users);
+
+            return users;
         }
 
         public void addUserToItems(string userId, string itemId, double rating)

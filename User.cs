@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace Assignment1
     public class User
     {
         private Dictionary<string, double> itemsRatings;
-
+        private Dictionary<User, double> similarUsers; 
         private double sum;
         private int count;
         private string id;
@@ -21,6 +22,7 @@ namespace Assignment1
             count = 0;
             id = userId;
             itemsRatings = new Dictionary<string, double>();
+            similarUsers = new Dictionary<User, double>();
         }
 
         public string getId()
@@ -32,6 +34,22 @@ namespace Assignment1
         {
             return squaredSum;
         }
+
+        public Dictionary<User, double> getSimilarUser()
+        {
+            return similarUsers.OrderByDescending(x => x.Value).ToDictionary(w => w.Key, w => w.Value);
+        }
+
+        public void setSimilarUser(User uID, double w)
+        {
+            if (similarUsers.ContainsKey(uID))
+            {
+                throw new NotSupportedException("User " + "[" + uID + "]" + " already exists in the similar users list!");
+            }
+
+            similarUsers.Add(uID, w);
+        }
+
 
         public void addItem(string item, double rating)
         {
