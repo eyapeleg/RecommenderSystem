@@ -5,8 +5,10 @@ using System.Text;
 
 namespace Assignment1
 {
-    interface IPredictionMethod
+    public interface IPredictionMethod
     {
         double calculateSimilarity(User u1, User u2);
+
+        PredictionMethod GetPredictionMethod();
     }
 }

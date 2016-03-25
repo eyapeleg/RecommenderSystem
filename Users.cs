@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,7 @@ namespace Assignment1
 
         public List<string> GetRatedItems(string userId)
         {
-            return getUserById(userId).getRatedItems();
+            return getUserById(userId).GetRatedItems();
         }
 
         public User getUserById(string userId)
@@ -38,7 +39,7 @@ namespace Assignment1
             if(user == null)
                 return 0.0;       
             
-            return user.getRating(itemId);   
+            return user.GetRating(itemId);   
         }
 
         public void addUser(string userId)
@@ -58,7 +59,7 @@ namespace Assignment1
                 addItemToUser(userId, itemId, rating);
             }
             else{
-                user.addItem(itemId, rating);
+                user.AddItem(itemId, rating);
             }
         }
 
@@ -76,8 +77,10 @@ namespace Assignment1
             }
         }
 
-    
-        
 
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }

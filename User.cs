@@ -9,7 +9,8 @@ namespace Assignment1
     public class User
     {
         private Dictionary<string, double> itemsRatings;
-        private UserSimilarities similarUsers; 
+        private UserSimilarities similarUsers;
+        private List<User> intersectUserList; 
         private double sum;
         private int count;
         private string id;
@@ -23,35 +24,36 @@ namespace Assignment1
             id = userId;
             itemsRatings = new Dictionary<string, double>();
             similarUsers = new UserSimilarities();
+            intersectUserList = new List<User>();
         }
 
-        public string getId()
+        public string GetId()
         {
-            return this.id;
+            return id;
         }
 
-        public double getSquaredSum()
+        public double GetSquaredSum()
         {
             return squaredSum;
         }
 
-       /* public Dictionary<double, User> getSimilarUser(PredictionMethod method)
+        public IEnumerable<KeyValuePair<double, User>> GetSimilarUser(PredictionMethod method)
         {
-            return similarUsers.getSimilarUsers(method);
+            return similarUsers.GetSimilarUsers(method);
         }
 
-        public void setSimilarUser(User uID, double w)
-        {
-            if (similarUsers.ContainsKey(uID))
-            {
-                throw new NotSupportedException("User " + "[" + uID + "]" + " already exists in the similar users list!");
-            }
+         //public void setSimilarUser(User uID, double w)
+         //{
+         //    if (similarUsers.ContainsKey(uID))
+         //    {
+         //        throw new NotSupportedException("User " + "[" + uID + "]" + " already exists in the similar users list!");
+         //    }
 
-            similarUsers.Add(uID, w);
-        }*/
+         //    similarUsers.Add(uID, w);
+         //}*/
 
 
-        public void addItem(string item, double rating)
+        public void AddItem(string item, double rating)
         {
             if (itemsRatings.ContainsKey(item))
                 throw new NotSupportedException("Item " + "[" + item + "]" + " already exists in the DB!");
@@ -62,19 +64,19 @@ namespace Assignment1
             itemsRatings.Add(item, rating);
         }
 
-        public double getAverageRatings()
+        public double GetAverageRatings()
         {
             return (sum / (double)count);
         }
 
 
-        public List<string> getRatedItems()
+        public List<string> GetRatedItems()
         {
             return itemsRatings.Keys.ToList();
         }
 
 
-        public double getRating(string sIID)
+        public double GetRating(string sIID)
         {
             double rating;
 
@@ -84,7 +86,7 @@ namespace Assignment1
             return 0.0;
         }
 
-        public Dictionary<double,double> getRatingDistribution()
+        public Dictionary<double,double> GetRatingDistribution()
         {
             double sum = 0.0;
 
@@ -111,5 +113,23 @@ namespace Assignment1
 
         //TODO - implement hash code*/
 
+        public void SetIntersectUserList(User user)
+        {
+            intersectUserList.Add(user);
+        }
+
+        internal void SetSimilarUser(PredictionMethod method, User u2, double similarity)
+        {
+            if (method != null)
+                switch (method)
+                {
+                    case PredictionMethod.Pearson:
+                        similarUsers.Add(PredictionMethod.Pearson, u2, similarity);
+                        break;
+                    case PredictionMethod.Cosine:
+                        similarUsers.Add(PredictionMethod.Cosine, u2, similarity);
+                        break;
+                }
+        }
     }
 }

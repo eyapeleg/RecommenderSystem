@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Assignment1
 {
-    class UserSimilarities
+    public class UserSimilarities
     {
         Dictionary<PredictionMethod, BoundedSortedDictionary<double,User>> userSimilarities;
 
@@ -14,20 +13,22 @@ namespace Assignment1
             userSimilarities = new Dictionary<PredictionMethod, BoundedSortedDictionary<double, User>>();
         }
 
-        public void add(PredictionMethod method, User user, double similarity)
+        public void Add(PredictionMethod method, User user, double similarity)
         {
             if (!userSimilarities.ContainsKey(method))
-                throw new NotSupportedException("Prediction method does not exist!");
-
+            {
+                //TODO Change the size of the similarity list to be generic
+                userSimilarities.Add(method, new BoundedSortedDictionary<double, User>(20));
+            }
             userSimilarities[method].add(similarity, user);
         }
 
-        public IEnumerable<KeyValuePair<double, User>> getSimilarUsers(PredictionMethod method)
+        public IEnumerable<KeyValuePair<double, User>> GetSimilarUsers(PredictionMethod method)
         {
             if (!userSimilarities.ContainsKey(method))
                 throw new NotSupportedException("Prediction method does not exist!");
 
-            return userSimilarities[method].getEnumerable();
+            return (IEnumerable<KeyValuePair<double, User>>) userSimilarities[method].AsEnumerable().GetEnumerator();
         }
     }
 }

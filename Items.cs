@@ -18,6 +18,11 @@ namespace Assignment1
             return items.Keys.ToList();
         }
 
+        public Dictionary<string, Dictionary<string, double>> GetUsersPerItemList()
+        {
+            return items;
+        }
+
         public Dictionary<string, double> GetItemById(string sIID)
         {
             Dictionary<string, double> users;

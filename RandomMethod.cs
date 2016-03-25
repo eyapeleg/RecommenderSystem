@@ -9,7 +9,7 @@ namespace Assignment1
     {
         public double PredictRating(User u)
         {
-            var dist = u.getRatingDistribution();
+            var dist = u.GetRatingDistribution();
             double rand = new Random().NextDouble();
 
             foreach (var rating in dist)

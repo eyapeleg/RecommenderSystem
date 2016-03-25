@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,7 +25,8 @@ namespace Assignment1
         }
 
         public void add(KeyValuePair<T,U> keyValuePair){
-            if (sortedDictionary.Count() < MAX_SIZE)
+            //TODO Check the behivor in case both users has the same similarity weight
+            if (sortedDictionary.Count() < MAX_SIZE && !sortedDictionary.ContainsKey(keyValuePair.Key))
             {
                 sortedDictionary.Add(keyValuePair.Key, keyValuePair.Value);
                 return;
@@ -44,10 +46,10 @@ namespace Assignment1
             return sortedDictionary.GetEnumerator();
         }
 
-        /*public IEnumerable<KeyValuePair<T, U>> getEnumerable()
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.sortedDictionary.AsEnumerable();
-        }*/
+            return GetEnumerator();
+        }
     }
 }
 

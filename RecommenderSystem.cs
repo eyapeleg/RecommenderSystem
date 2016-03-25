@@ -22,7 +22,7 @@ namespace Assignment1
             users = new Users();
             items = new Items();
             
-            Dictionary<PredictionMethod, IPredictionMethod> predictionMethodsDictionary = new Dictionary<PredictionMethod, IPredictionMethod>(){
+            predictionMethodsDictionary = new Dictionary<PredictionMethod, IPredictionMethod>(){
                 {PredictionMethod.Pearson,new PearsonMethod()} , {PredictionMethod.Cosine, new CosineMethod(users, items)}
             };
         }
@@ -36,23 +36,59 @@ namespace Assignment1
 
             //cosine = new CosineMethod(users, items);
             //cosine.calculateCosineSimilarity();
+            //var itemsArray = items.GetUsersPerItemList();
+            //Dictionary<string, string> intersectDictionary = new Dictionary<string, string>();
+            //for (int i = 0; i < itemsArray.Keys.Count; i++)
+            //{
+            //    var item1Users = itemsArray.ElementAt(i).Value.Keys;
+            //    for (int j = i + 1; j < itemsArray.Keys.Count; j++)
+            //    {
+            //        var item2Users = itemsArray.ElementAt(j).Value.Keys;
+            //        List<string> intersectList = item1Users.Intersect(item2Users).ToList();
+            //        for (int k = 0; k < intersectList.Count; k++)
+            //        {
+            //            string userId = intersectList.ElementAt(k);
+            //            for (int l = k+1; l < intersectList.Count; l++)
+            //            {
+            //                if (!intersectDictionary.Keys.Contains(userId))
+            //                    intersectDictionary.Add(userId, intersectList.ElementAt(l));
+            //                else
+            //                {
+            //                    intersectDictionary[userId] = intersectList.ElementAt(l);
+            //                }
+            //            }    
+            //        }
+            //    }
 
-            //PearsonMethod pearson = new PearsonMethod();
-            User[] usersArray = users.getUsersArray();
-    
-            for(int i=0; i<usersArray.Count(); i++ ){
-                for(int j=i+1; j<usersArray.Count(); j++ ){
-                    foreach (IPredictionMethod method in predictionMethodsDictionary.Values){
-                        double similarity = method.calculateSimilarity(usersArray[i],usersArray[j]);  
-                        
-                    }
-                }
-            }
+                //PearsonMethod pearson = new PearsonMethod();
+            //User[] usersArray = users.getUsersArray();
 
-            //TODO: Only for testing- remove that before submittion         
-            //User u2 = users.getUserById("2");
-            //double predict = random.PredictRating(u2); //test RandomMethod
-            //u2.getSimilarUser(); //test cosine similarity 
+            //for (int i = 0; i < usersArray.Length; i++)
+            //{
+            //    User u1 = usersArray[i];
+
+            //    for (int j = i + 1; j < usersArray.Length; j++)
+            //    {
+            //        User u2 = usersArray[j];
+            //        var commonRatedItems = usersArray[i].GetRatedItems().Intersect(usersArray[j].GetRatedItems());
+            //        if (commonRatedItems.Any())
+            //        {
+
+            //            u1.SetIntersectUserList(u2);
+            //            u2.SetIntersectUserList(u1);
+            //            Console.WriteLine("User [{0}] has intersection with User [{1}]", u1.GetId(), u2.GetId());
+            //            foreach (IPredictionMethod method in predictionMethodsDictionary.Values)
+            //            {
+            //                double similarity = method.calculateSimilarity(u1, u2);
+            //                if (similarity != 0)
+            //                {
+            //                    u1.SetSimilarUser(method.GetPredictionMethod(), u2, similarity);
+            //                    u2.SetSimilarUser(method.GetPredictionMethod(), u1, similarity);
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         //return a list of the ids of all the users in the dataset
@@ -88,7 +124,7 @@ namespace Assignment1
             switch(m)
             {
                 case PredictionMethod.Cosine:
-                    rating = cosine.PredictRating(u, sIID);
+                    //rating = cosine.PredictRating(u, sIID);
                     break;
                 case PredictionMethod.Pearson:
                     break;
