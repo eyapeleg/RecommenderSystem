@@ -22,9 +22,8 @@ namespace Assignment1
             users = new Users();
             items = new Items();
             
-            // todo - ad cosine random after debug
             Dictionary<PredictionMethod, IPredictionMethod> predictionMethodsDictionary = new Dictionary<PredictionMethod, IPredictionMethod>(){
-                {PredictionMethod.Pearson,new PearsonMethod()}
+                {PredictionMethod.Pearson,new PearsonMethod()} , {PredictionMethod.Cosine, new CosineMethod(users, items)}
             };
         }
 
@@ -38,13 +37,13 @@ namespace Assignment1
             //cosine = new CosineMethod(users, items);
             //cosine.calculateCosineSimilarity();
 
-            PearsonMethod pearson = new PearsonMethod();
+            //PearsonMethod pearson = new PearsonMethod();
             User[] usersArray = users.getUsersArray();
     
             for(int i=0; i<usersArray.Count(); i++ ){
                 for(int j=i+1; j<usersArray.Count(); j++ ){
                     foreach (IPredictionMethod method in predictionMethodsDictionary.Values){
-                        double similarity =method.calculateSimilarity(usersArray[i],usersArray[j]);  
+                        double similarity = method.calculateSimilarity(usersArray[i],usersArray[j]);  
                         
                     }
                 }
