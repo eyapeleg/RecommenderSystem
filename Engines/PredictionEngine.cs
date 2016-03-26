@@ -18,7 +18,7 @@ namespace Assignment1
                 sum += rating * thatUserSimilarity.Key;
             }
 
-            return (sum/(double)similarUsers.Count());
+            return (sum/similarUsers.Count);
         }
     }
 }

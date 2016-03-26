@@ -20,8 +20,8 @@ namespace Assignment1
             //Test the prediction algorithms
             //Console.WriteLine("Predicted rating of user 26291 to item 4535650 using Pearson is " + 
             //    Math.Round(rs.PredictRating(RecommenderSystem.PredictionMethod.Pearson, "26291", "4535650"), 4));
-            //Console.WriteLine("Predicted rating of user 32399 to item 0095953 using Cosine is " +
-            //    Math.Round(rs.PredictRating(RecommenderSystem.PredictionMethod.Cosine, "32399", "0095953"), 4));
+            Console.WriteLine("Predicted rating of user 32399 to item 0095953 using Cosine is " +
+                Math.Round(rs.PredictRating(RecommenderSystem.PredictionMethod.Cosine, "32399", "0095953"), 4));
 
             //TODO REMOVE
             Console.WriteLine("Predicted rating of user 2 to item 0369610 using Cosine is " +
