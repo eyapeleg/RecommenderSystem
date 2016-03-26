@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Assignment1;
+using RecommenderSystem;
 using System.Collections;
 using System.Collections.Generic;
 
