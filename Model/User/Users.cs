@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Assignment1
+namespace RecommenderSystem
 {
     public class Users : IEnumerable<User>
     {

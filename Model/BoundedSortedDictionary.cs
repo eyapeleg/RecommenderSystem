@@ -6,7 +6,7 @@ using System.Text;
 using System.Runtime.CompilerServices;
 
 
-namespace Assignment1
+namespace RecommenderSystem
 {
     public class BoundedSortedList<K, V> where K : IComparable<K> 
 

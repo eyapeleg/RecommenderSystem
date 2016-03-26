@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Assignment1
+namespace RecommenderSystem
 {
     class DataLoaderEngine
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Assignment1
+namespace RecommenderSystem
 {
     class PredictionEngine
     {
@@ -19,6 +19,22 @@ namespace Assignment1
             }
 
             return (sum/similarUsers.Count);
+        }
+
+        public double PredictRating(User user)
+        {
+            var dist = user.GetRatingDistribution();
+            double rand = new Random().NextDouble();
+
+            foreach (var rating in dist)
+            {
+                if (rand < rating.Value)
+                {
+                    return rating.Key;
+                }
+            }
+
+            return 0;
         }
     }
 }

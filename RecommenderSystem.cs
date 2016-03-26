@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Assignment1
+namespace RecommenderSystem
 {
     public class RecommenderSystem
     {
@@ -81,8 +81,13 @@ namespace Assignment1
 
             IPredictionMethod predictionMethod= predictionMethodsDictionary[m];
 
-            IList<KeyValuePair<double, User>> similarUsers = similarityEngine.calculateSimilarity(predictionMethod, user);
-            return predictionEngine.predictRating(user, sIID, similarUsers);
+            if (m != PredictionMethod.Random)
+            {
+                IList<KeyValuePair<double, User>> similarUsers = similarityEngine.calculateSimilarity(predictionMethod, user);
+                return predictionEngine.predictRating(user, sIID, similarUsers);
+            }
+            
+            return predictionEngine.PredictRating(users.getUserById(sUID));
         }
 
         //Compute MAE (mean absolute error) for a set of rating prediction methods over the same user-item pairs
