@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Assignment1
 {
-    public class RandomMethod:IPredictionMethod
+    public class RandomMethod : IPredictionMethod
     {
-        public double calculateSimilarity(User u1, User u2)
+        public double calculateSimilarity(User u1, User u2, List<string> intersectList = null)
         {
             var dist = u1.GetRatingDistribution();
             double rand = new Random().NextDouble();

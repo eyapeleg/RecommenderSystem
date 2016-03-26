@@ -35,10 +35,10 @@ namespace Assignment1
                 double similarity;
                 if (!thisUser.Equals(thatUser))
                 {
-                    var commonItems = thatUser.GetRatedItems().Intersect(thisUser.GetRatedItems()); //check if both users rated at least one common item 
-                    if (commonItems.Any())
+                    List<string> intersectList = thatUser.GetRatedItems().Intersect(thisUser.GetRatedItems()).ToList(); //check if both users rated at least one common item 
+                    if (intersectList.Any())
                     {
-                        similarity = predictionMethod.calculateSimilarity(thisUser, thatUser);
+                        similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, intersectList);
                         if (similarity != 0) //in some cases the users rate their common item the same as their average then we can get here zero
                         {
                             similarUsers.add(similarity, thatUser);

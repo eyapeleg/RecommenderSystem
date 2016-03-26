@@ -7,20 +7,17 @@ namespace Assignment1
 {
     public class PearsonMethod : IPredictionMethod
     {
-        public double calculateSimilarity(User u1, User u2)
+        public double calculateSimilarity(User u1, User u2, List<string> intersectList)
         {
+            if (intersectList.Count() < 5)
+                return 0.0;
+
             double numeratorSum = 0.0;
             double denumeratorU1SumSquare = 0.0;
             double denumeratorU2SumSquare = 0.0;
 
             double u1Avg = u1.GetAverageRatings();
             double u2Avg = u2.GetAverageRatings();
-
-            //TODO - foreach user, get only similar users with at least one common rated item
-            var intersectList = u1.GetRatedItems().Intersect(u2.GetRatedItems());
-         
-            if (intersectList.Count() < 5)
-                return 0.0;
 
             foreach (var item in intersectList)
             {
