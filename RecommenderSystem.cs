@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Assignment1
 {
@@ -11,85 +14,36 @@ namespace Assignment1
         public enum PredictionMethod { Pearson, Cosine, Random };
         private Users users;
         private Items items;
-        private PearsonMethod pearson;
-        private CosineMethod cosine;
-        private RandomMethod random;
-        //class members here
+        private SimilarityCalculator similarityManager;
+        private PredictionCalculator predictionCalculator;
+        private ILogger logger;
 
-        //constructor
+        private int MAX_SIMILAR_USERS;
+
         public RecommenderSystem()
         {
             users = new Users();
             items = new Items();
-            
+
+            logger = new DebugLogger();
             predictionMethodsDictionary = new Dictionary<PredictionMethod, IPredictionMethod>(){
-                {PredictionMethod.Pearson,new PearsonMethod()} , {PredictionMethod.Cosine, new CosineMethod(users, items)}
+                {PredictionMethod.Pearson,new PearsonMethod()},
+                {PredictionMethod.Cosine, new PearsonMethod()},
+                {PredictionMethod.Random, new PearsonMethod()}
             };
+
+            MAX_SIMILAR_USERS = 30;
+            predictionCalculator = new PredictionCalculator();
         }
 
         public void Load(string sFileName)
         {
             DataLoader dataLoader = new DataLoader();
-            Tuple<Users,Items> data = dataLoader.Load(sFileName);
+            Tuple<Users, Items> data = dataLoader.Load(sFileName);
             users = data.Item1;
             items = data.Item2;
-
-            //cosine = new CosineMethod(users, items);
-            //cosine.calculateCosineSimilarity();
-            //var itemsArray = items.GetUsersPerItemList();
-            //Dictionary<string, string> intersectDictionary = new Dictionary<string, string>();
-            //for (int i = 0; i < itemsArray.Keys.Count; i++)
-            //{
-            //    var item1Users = itemsArray.ElementAt(i).Value.Keys;
-            //    for (int j = i + 1; j < itemsArray.Keys.Count; j++)
-            //    {
-            //        var item2Users = itemsArray.ElementAt(j).Value.Keys;
-            //        List<string> intersectList = item1Users.Intersect(item2Users).ToList();
-            //        for (int k = 0; k < intersectList.Count; k++)
-            //        {
-            //            string userId = intersectList.ElementAt(k);
-            //            for (int l = k+1; l < intersectList.Count; l++)
-            //            {
-            //                if (!intersectDictionary.Keys.Contains(userId))
-            //                    intersectDictionary.Add(userId, intersectList.ElementAt(l));
-            //                else
-            //                {
-            //                    intersectDictionary[userId] = intersectList.ElementAt(l);
-            //                }
-            //            }    
-            //        }
-            //    }
-
-                //PearsonMethod pearson = new PearsonMethod();
-            //User[] usersArray = users.getUsersArray();
-
-            //for (int i = 0; i < usersArray.Length; i++)
-            //{
-            //    User u1 = usersArray[i];
-
-            //    for (int j = i + 1; j < usersArray.Length; j++)
-            //    {
-            //        User u2 = usersArray[j];
-            //        var commonRatedItems = usersArray[i].GetRatedItems().Intersect(usersArray[j].GetRatedItems());
-            //        if (commonRatedItems.Any())
-            //        {
-
-            //            u1.SetIntersectUserList(u2);
-            //            u2.SetIntersectUserList(u1);
-            //            Console.WriteLine("User [{0}] has intersection with User [{1}]", u1.GetId(), u2.GetId());
-            //            foreach (IPredictionMethod method in predictionMethodsDictionary.Values)
-            //            {
-            //                double similarity = method.calculateSimilarity(u1, u2);
-            //                if (similarity != 0)
-            //                {
-            //                    u1.SetSimilarUser(method.GetPredictionMethod(), u2, similarity);
-            //                    u2.SetSimilarUser(method.GetPredictionMethod(), u1, similarity);
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-        }
+            similarityManager = new SimilarityCalculator(users, MAX_SIMILAR_USERS, logger);
+        }          
 
         //return a list of the ids of all the users in the dataset
         public List<string> GetAllUsers()
@@ -110,7 +64,7 @@ namespace Assignment1
         }
 
         //Returns a user-item rating that appears in the dataset (not predicted)
-        public double GetRating(string sUID, string sIID) 
+        public double GetRating(string sUID, string sIID)
         {
             return users.GetRating(sUID, sIID);
         }
@@ -118,20 +72,18 @@ namespace Assignment1
         //predict a rating for a user item pair using the specified method
         public double PredictRating(PredictionMethod m, string sUID, string sIID)
         {
+            
             double rating = 0.0;
-            User u = users.getUserById(sUID);
+            User user = users.getUserById(sUID);
 
-            switch(m)
-            {
-                case PredictionMethod.Cosine:
-                    //rating = cosine.PredictRating(u, sIID);
-                    break;
-                case PredictionMethod.Pearson:
-                    break;
-                case PredictionMethod.Random:
-                    break;
-            }
-            return 0;//TODO: remove once all methods are implemented 
+            if (!predictionMethodsDictionary.ContainsKey(m))
+                throw new ArgumentException("Method "+"["+m.ToString()+"]"+" does not exist!" );
+
+            IPredictionMethod predictionMethod= predictionMethodsDictionary[m];
+
+        
+            Dictionary<double, User> similarUsers = similarityManager.calculateSimilarity(predictionMethod, user);
+            return predictionCalculator.calculatePrediction(user, sIID, similarUsers);
         }
 
         //Compute MAE (mean absolute error) for a set of rating prediction methods over the same user-item pairs
@@ -140,5 +92,6 @@ namespace Assignment1
         {
             throw new NotImplementedException();
         }
+
     }
 }

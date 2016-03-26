@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.CompilerServices;
+
 
 namespace Assignment1
 {
@@ -18,12 +20,14 @@ namespace Assignment1
             this.sortedDictionary = new SortedDictionary<T, U>();
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void add(T key, U value)
         {
             KeyValuePair<T, U> keyValuePair = new KeyValuePair<T, U>(key,value);
             add(keyValuePair);
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void add(KeyValuePair<T,U> keyValuePair){
             //TODO Check the behivor in case both users has the same similarity weight
             if (sortedDictionary.Count() < MAX_SIZE && !sortedDictionary.ContainsKey(keyValuePair.Key))
@@ -50,6 +54,12 @@ namespace Assignment1
         {
             return GetEnumerator();
         }
+
+        public Dictionary<T, U> getSimilarUsers()
+        {
+            return sortedDictionary.ToDictionary( x => x.Key, x=>x.Value);
+        }
+
     }
 }
 

@@ -43,22 +43,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoundedSortedDictionary.cs" />
-    <Compile Include="CosineMethod.cs" />
-    <Compile Include="DataLoader.cs" />
-    <Compile Include="IPredictionMethod.cs" />
-    <Compile Include="Items.cs" />
-    <Compile Include="PearsonMethod.cs" />
-    <Compile Include="PredictionMethod.cs" />
+    <Compile Include="Model\BoundedSortedDictionary.cs" />
+    <Compile Include="Logger\DebugLogger.cs" />
+    <Compile Include="Logger\ILogger.cs" />
+    <Compile Include="Logger\InfoLogger.cs" />
+    <Compile Include="Calculator\PredictionCalculator.cs" />
+    <Compile Include="PredictionMethods\CosineMethod.cs" />
+    <Compile Include="Calculator\DataLoader.cs" />
+    <Compile Include="PredictionMethods\IPredictionMethod.cs" />
+    <Compile Include="Model\Item\Items.cs" />
+    <Compile Include="PredictionMethods\PearsonMethod.cs" />
+    <Compile Include="PredictionMethods\PredictionMethod.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="RandomMethod.cs" />
+    <Compile Include="PredictionMethods\RandomMethod.cs" />
     <Compile Include="RecommenderSystem.cs" />
-    <Compile Include="UserSimilarities.cs" />
-    <Compile Include="User.cs" />
-    <Compile Include="Users.cs" />
+    <Compile Include="Calculator\SimilarityCalculator.cs" />
+    <Compile Include="Model\User\UserSimilarities.cs" />
+    <Compile Include="Model\User\User.cs" />
+    <Compile Include="Model\User\Users.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="similarityCalcualtionBU.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

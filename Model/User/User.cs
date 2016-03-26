@@ -9,8 +9,8 @@ namespace Assignment1
     public class User
     {
         private Dictionary<string, double> itemsRatings;
-        private UserSimilarities similarUsers;
-        private List<User> intersectUserList; 
+        //private UserSimilarities similarUsers;
+        //private List<User> intersectUserList;  //TODO - verify
         private double sum;
         private int count;
         private string id;
@@ -23,8 +23,10 @@ namespace Assignment1
             count = 0;
             id = userId;
             itemsRatings = new Dictionary<string, double>();
-            similarUsers = new UserSimilarities();
-            intersectUserList = new List<User>();
+            //ISet<PredictionMethod> methods = new HashSet<PredictionMethod>();
+            //methods.Add(PredictionMethod.Pearson);
+            //similarUsers = new UserSimilarities(methods);
+            //intersectUserList = new List<User>();
         }
 
         public string GetId()
@@ -37,10 +39,10 @@ namespace Assignment1
             return squaredSum;
         }
 
-        public IEnumerable<KeyValuePair<double, User>> GetSimilarUser(PredictionMethod method)
-        {
-            return similarUsers.GetSimilarUsers(method);
-        }
+        //public IEnumerable<KeyValuePair<double, User>> GetSimilarUser(PredictionMethod method)
+        //{
+        //    return similarUsers.GetSimilarUsers(method);
+        //}
 
          //public void setSimilarUser(User uID, double w)
          //{
@@ -97,7 +99,7 @@ namespace Assignment1
 
         }
 
-        /*public override bool Equals(object obj)
+        public override bool Equals(object obj)
         {
             if (obj == null || !obj.GetType().IsInstanceOfType(this.GetType()))
                 return false;
@@ -105,7 +107,7 @@ namespace Assignment1
             if (obj == this)
                 return true;
 
-            if (((User)obj).getId().Equals(this.getId()))
+            if (((User)obj).GetId().Equals(this.GetId()))
                 return true;
 
             return false;
@@ -113,23 +115,18 @@ namespace Assignment1
 
         //TODO - implement hash code*/
 
-        public void SetIntersectUserList(User user)
-        {
-            intersectUserList.Add(user);
-        }
-
-        internal void SetSimilarUser(PredictionMethod method, User u2, double similarity)
-        {
-            if (method != null)
-                switch (method)
-                {
-                    case PredictionMethod.Pearson:
-                        similarUsers.Add(PredictionMethod.Pearson, u2, similarity);
-                        break;
-                    case PredictionMethod.Cosine:
-                        similarUsers.Add(PredictionMethod.Cosine, u2, similarity);
-                        break;
-                }
-        }
+        //public void SetIntersectUserList(User user) //TODO - verify
+        //{
+        //    intersectUserList.Add(user);
+        //}
+        //
+        //internal void addSimilarUser(PredictionMethod method, User u2, double similarity)
+        //{
+        //    if (method != null)
+        //        similarUsers.Add(method, u2, similarity);
+        //    else
+        //        throw new NotSupportedException("Prediction method doesn't exist!");
+        //         
+        //}
     }
 }

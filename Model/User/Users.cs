@@ -64,9 +64,9 @@ namespace Assignment1
         }
 
         
-        public User[] getUsersArray()
+        public string[] getUsersArray()
         {
-            return users.Values.ToArray();
+            return users.Keys.ToArray();
         }
 
         public IEnumerator<User> GetEnumerator()

@@ -8,19 +8,20 @@ namespace Assignment1
     {
         Dictionary<PredictionMethod, BoundedSortedDictionary<double,User>> userSimilarities;
 
-        public UserSimilarities()
+        public UserSimilarities(ISet<PredictionMethod> predictionMethods)
         {
             userSimilarities = new Dictionary<PredictionMethod, BoundedSortedDictionary<double, User>>();
+            foreach (PredictionMethod predictionMethod in predictionMethods)
+            {
+                //TODO Change the size of the similarity list to be generic
+                userSimilarities.Add(predictionMethod, new BoundedSortedDictionary<double, User>(20));
+            }
+            
         }
 
         public void Add(PredictionMethod method, User user, double similarity)
         {
-            if (!userSimilarities.ContainsKey(method))
-            {
-                //TODO Change the size of the similarity list to be generic
-                userSimilarities.Add(method, new BoundedSortedDictionary<double, User>(20));
-            }
-            userSimilarities[method].add(similarity, user);
+              userSimilarities[method].add(similarity, user);
         }
 
         public IEnumerable<KeyValuePair<double, User>> GetSimilarUsers(PredictionMethod method)
