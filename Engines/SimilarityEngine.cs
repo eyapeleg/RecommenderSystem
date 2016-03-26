@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Assignment1
 {
-    class SimilarityEngine
+    public class SimilarityEngine
     {
         private Users users;
         private ILogger logger;
@@ -21,14 +21,14 @@ namespace Assignment1
             this.MAX_SIMILAR_USERS = maxSimilarUsers;
         }
 
-        public Dictionary<double, User> calculateSimilarity(IPredictionMethod predictionMethod, User thisUser)
+        public List<KeyValuePair<double, User>> calculateSimilarity(IPredictionMethod predictionMethod, User thisUser)
         {
             if (predictionMethod == null || thisUser == null)
                 throw new ArgumentNullException("IPredictionMethod predictionMethod, User thisUser must both be not null!");
 
             logger.info("calcualting similarity for user " + "[" + thisUser.GetId() + "]");
             Stopwatch timer = Stopwatch.StartNew();
-            BoundedSortedDictionary<double, User> similarUsers = new BoundedSortedDictionary<double, User>(MAX_SIMILAR_USERS);
+            BoundedSortedList<double, User> similarUsers = new BoundedSortedList<double, User>(MAX_SIMILAR_USERS);
 
             foreach (var thatUser in users)
             {
@@ -67,7 +67,7 @@ namespace Assignment1
             timer.Stop();
             logger.debug("Similarity calculation time for user" + " [" + thisUser.GetId() + "] " + timer.Elapsed);
 
-            return similarUsers.getSimilarUsers();
+            return similarUsers.getList();
         }
     }
 }

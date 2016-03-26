@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Assignment1
 {
-    interface ILogger
+    public interface ILogger
     {
         void debug(string msg);
         void info(string msg);

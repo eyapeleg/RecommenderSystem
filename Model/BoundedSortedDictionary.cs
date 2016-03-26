@@ -8,56 +8,39 @@ using System.Runtime.CompilerServices;
 
 namespace Assignment1
 {
-    class BoundedSortedDictionary<T, U> :IEnumerable<KeyValuePair<T, U>> where T : IComparable<T> 
+    public class BoundedSortedList<K, V> where K : IComparable<K> 
 
     {
-        private SortedDictionary<T, U> sortedDictionary;
+        private SortedList<K, V> sortedList;
         private int MAX_SIZE;
 
-        public BoundedSortedDictionary(int maxSize)
+        public BoundedSortedList(int maxSize)
         {
             this.MAX_SIZE = maxSize;
-            this.sortedDictionary = new SortedDictionary<T, U>();
+            this.sortedList = new SortedList<K,V>();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void add(T key, U value)
+        public void add(K key, V value)
         {
-            KeyValuePair<T, U> keyValuePair = new KeyValuePair<T, U>(key,value);
-            add(keyValuePair);
-        }
-
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void add(KeyValuePair<T,U> keyValuePair){
-            //TODO Check the behivor in case both users has the same similarity weight
-            if (sortedDictionary.Count() < MAX_SIZE && !sortedDictionary.ContainsKey(keyValuePair.Key))
+            if (sortedList.Count < MAX_SIZE)
             {
-                sortedDictionary.Add(keyValuePair.Key, keyValuePair.Value);
+                sortedList.Add(key, value);
                 return;
             }
 
-            if (keyValuePair.Key.CompareTo(sortedDictionary.Keys.First()) > 0 )
+            if (key.CompareTo(sortedList.Keys.First()) > 0)
             {
-                sortedDictionary.Remove(sortedDictionary.Keys.First());
-                add(keyValuePair);
+                sortedList.Remove(sortedList.Keys.First());
+                add(key,value);
             }
 
             return;
         }
 
-        public IEnumerator<KeyValuePair<T, U>> GetEnumerator()
+        public List<KeyValuePair<K, V>> getList()
         {
-            return sortedDictionary.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public Dictionary<T, U> getSimilarUsers()
-        {
-            return sortedDictionary.ToDictionary( x => x.Key, x=>x.Value);
+            return sortedList.ToList();
         }
 
     }

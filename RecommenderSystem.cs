@@ -23,7 +23,7 @@ namespace Assignment1
 
         public RecommenderSystem()
         {
-            logger = new DebugLogger();
+            logger = new InfoLogger();
             dataLoaderEngine = new DataLoaderEngine(logger);
             predictionEngine = new PredictionEngine();
 
@@ -80,8 +80,8 @@ namespace Assignment1
                 throw new ArgumentException("Method "+"["+m.ToString()+"]"+" does not exist!" );
 
             IPredictionMethod predictionMethod= predictionMethodsDictionary[m];
-        
-            Dictionary<double, User> similarUsers = similarityEngine.calculateSimilarity(predictionMethod, user);
+
+            IList<KeyValuePair<double, User>> similarUsers = similarityEngine.calculateSimilarity(predictionMethod, user);
             return predictionEngine.predictRating(user, sIID, similarUsers);
         }
 

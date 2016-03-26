@@ -18,6 +18,10 @@ namespace Assignment1
 
             //TODO - foreach user, get only similar users with at least one common rated item
             var intersectList = u1.GetRatedItems().Intersect(u2.GetRatedItems());
+         
+            if (intersectList.Count() < 5)
+                return 0.0;
+
             foreach (var item in intersectList)
             {
                 double u1_rating = u1.GetRating(item);
@@ -28,8 +32,8 @@ namespace Assignment1
                 denumeratorU1SumSquare += Math.Pow(u1_delta, 2);
                 denumeratorU2SumSquare += Math.Pow(u2_delta, 2);
             }
-            if (!intersectList.Any() || denumeratorU1SumSquare == 0 || denumeratorU2SumSquare == 0)
-                return 0;
+            if (denumeratorU1SumSquare == 0 || denumeratorU2SumSquare == 0)
+                return 0.0;
 
             return numeratorSum / (Math.Sqrt(denumeratorU1SumSquare) * Math.Sqrt(denumeratorU2SumSquare));
         }
