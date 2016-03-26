@@ -18,19 +18,19 @@ namespace Assignment1
             Console.WriteLine("The predicted rating of user 17678 for item 2101441 is " + rs.GetRating("17678", "2101441"));
 
             //Test the prediction algorithms
-            //Console.WriteLine("Predicted rating of user 26291 to item 4535650 using Pearson is " + 
-            //    Math.Round(rs.PredictRating(RecommenderSystem.PredictionMethod.Pearson, "26291", "4535650"), 4));
+            Console.WriteLine("Predicted rating of user 26291 to item 4535650 using Pearson is " +
+                Math.Round(rs.PredictRating(RecommenderSystem.PredictionMethod.Pearson, "1", "04227202"), 4));
             Console.WriteLine("Predicted rating of user 32399 to item 0095953 using Cosine is " +
-                Math.Round(rs.PredictRating(RecommenderSystem.PredictionMethod.Cosine, "32399", "0095953"), 4));
+                Math.Round(rs.PredictRating(RecommenderSystem.PredictionMethod.Cosine, "1", "04227202"), 4));
 
             //TODO REMOVE
             Console.WriteLine("Predicted rating of user 2 to item 0369610 using Cosine is " +
-                Math.Round(rs.PredictRating(RecommenderSystem.PredictionMethod.Cosine, "2", "0369610"), 4));
+                Math.Round(rs.PredictRating(RecommenderSystem.PredictionMethod.Cosine, "1", "04227202"), 4));
             
 
             //END TODO
             Console.WriteLine("Predicted rating of user 9434 to item 1321870 using Random is " +
-                Math.Round(rs.PredictRating(RecommenderSystem.PredictionMethod.Random, "9434", "1321870"), 4));
+                Math.Round(rs.PredictRating(RecommenderSystem.PredictionMethod.Random, "1", "0068646"), 4));
             
             //Compute MAE over the same u,i pairs for a set of algorithms
             List<RecommenderSystem.PredictionMethod> lMethods = new List<RecommenderSystem.PredictionMethod>();
