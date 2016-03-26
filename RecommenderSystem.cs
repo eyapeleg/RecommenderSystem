@@ -14,35 +14,36 @@ namespace Assignment1
         public enum PredictionMethod { Pearson, Cosine, Random };
         private Users users;
         private Items items;
-        private SimilarityCalculator similarityManager;
-        private PredictionCalculator predictionCalculator;
+        private SimilarityEngine similarityEngine;
+        private DataLoaderEngine dataLoaderEngine;
+        private PredictionEngine predictionEngine;
         private ILogger logger;
 
         private int MAX_SIMILAR_USERS;
 
         public RecommenderSystem()
         {
-            users = new Users();
-            items = new Items();
-
             logger = new DebugLogger();
-            predictionMethodsDictionary = new Dictionary<PredictionMethod, IPredictionMethod>(){
-                {PredictionMethod.Pearson,new PearsonMethod()},
-                {PredictionMethod.Cosine, new PearsonMethod()},
-                {PredictionMethod.Random, new PearsonMethod()}
-            };
+            dataLoaderEngine = new DataLoaderEngine(logger);
+            predictionEngine = new PredictionEngine();
 
             MAX_SIMILAR_USERS = 30;
-            predictionCalculator = new PredictionCalculator();
+            predictionMethodsDictionary = new Dictionary<PredictionMethod, IPredictionMethod>(){
+                {PredictionMethod.Pearson,new PearsonMethod()},
+                {PredictionMethod.Cosine, new PearsonMethod()}, //TODO - modify to the corresponding method
+                {PredictionMethod.Random, new PearsonMethod()} //TODO - modify to the corresponding method
+            };
+
+            
         }
 
         public void Load(string sFileName)
         {
-            DataLoader dataLoader = new DataLoader();
-            Tuple<Users, Items> data = dataLoader.Load(sFileName);
+            
+            Tuple<Users, Items> data = dataLoaderEngine.Load(sFileName);
             users = data.Item1;
             items = data.Item2;
-            similarityManager = new SimilarityCalculator(users, MAX_SIMILAR_USERS, logger);
+            similarityEngine = new SimilarityEngine(users, MAX_SIMILAR_USERS, logger);
         }          
 
         //return a list of the ids of all the users in the dataset
@@ -73,17 +74,15 @@ namespace Assignment1
         public double PredictRating(PredictionMethod m, string sUID, string sIID)
         {
             
-            double rating = 0.0;
-            User user = users.getUserById(sUID);
+             User user = users.getUserById(sUID);
 
             if (!predictionMethodsDictionary.ContainsKey(m))
                 throw new ArgumentException("Method "+"["+m.ToString()+"]"+" does not exist!" );
 
             IPredictionMethod predictionMethod= predictionMethodsDictionary[m];
-
         
-            Dictionary<double, User> similarUsers = similarityManager.calculateSimilarity(predictionMethod, user);
-            return predictionCalculator.calculatePrediction(user, sIID, similarUsers);
+            Dictionary<double, User> similarUsers = similarityEngine.calculateSimilarity(predictionMethod, user);
+            return predictionEngine.predictRating(user, sIID, similarUsers);
         }
 
         //Compute MAE (mean absolute error) for a set of rating prediction methods over the same user-item pairs

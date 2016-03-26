@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace Assignment1
 {
-    class SimilarityCalculator
+    class SimilarityEngine
     {
         private Users users;
         private ILogger logger;
         private int MAX_SIMILAR_USERS;
 
-        public SimilarityCalculator(Users users ,int maxSimilarUsers , ILogger logger)
+        public SimilarityEngine(Users users ,int maxSimilarUsers , ILogger logger)
         {
             this.users = users;
             this.logger = logger;

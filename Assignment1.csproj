@@ -47,9 +47,9 @@
     <Compile Include="Logger\DebugLogger.cs" />
     <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Logger\InfoLogger.cs" />
-    <Compile Include="Calculator\PredictionCalculator.cs" />
+    <Compile Include="Engines\PredictionEngine.cs" />
     <Compile Include="PredictionMethods\CosineMethod.cs" />
-    <Compile Include="Calculator\DataLoader.cs" />
+    <Compile Include="Engines\DataLoaderEngine.cs" />
     <Compile Include="PredictionMethods\IPredictionMethod.cs" />
     <Compile Include="Model\Item\Items.cs" />
     <Compile Include="PredictionMethods\PearsonMethod.cs" />
@@ -57,8 +57,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="PredictionMethods\RandomMethod.cs" />
     <Compile Include="RecommenderSystem.cs" />
-    <Compile Include="Calculator\SimilarityCalculator.cs" />
-    <Compile Include="Model\User\UserSimilarities.cs" />
+    <Compile Include="Engines\SimilarityEngine.cs" />
     <Compile Include="Model\User\User.cs" />
     <Compile Include="Model\User\Users.cs" />
   </ItemGroup>

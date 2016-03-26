@@ -5,10 +5,10 @@ using System.Text;
 
 namespace Assignment1
 {
-    class PredictionCalculator
+    class PredictionEngine
     {
         //TODO - check logic
-        public double calculatePrediction(User thisUser, string itemId, Dictionary<double, User> similarUsers)
+        public double predictRating(User thisUser, string itemId, Dictionary<double, User> similarUsers)
         {
             double sum = 0.0;
             double rating;

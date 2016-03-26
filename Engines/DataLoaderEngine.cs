@@ -8,15 +8,22 @@ using System.Text.RegularExpressions;
 
 namespace Assignment1
 {
-    class DataLoader
+    class DataLoaderEngine
     {
+        ILogger logger;
+
+        public DataLoaderEngine(ILogger logger)
+        {
+            this.logger = logger;
+        }
+
         public Tuple<Users,Items> Load(string sFileName)
         {
 
             Users users = new Users();
             Items items = new Items();
 
-            Console.WriteLine("Starting load data...");
+            logger.info("Starting load data...");
             //TODO: Remove stopwatch on submittion 
             Stopwatch timer = Stopwatch.StartNew();
 
@@ -29,6 +36,7 @@ namespace Assignment1
                 string itemId = split[1];
                 double rating = Convert.ToDouble(split[2]);
 
+                logger.debug("read user"+" ["+userId+"]"+" itemId"+" ["+itemId+"]"+" rating"+" ["+rating+"]");
                 users.addItemToUser(userId, itemId, rating);
                 items.addUserToItems(userId, itemId, rating);
             }
@@ -38,7 +46,7 @@ namespace Assignment1
 
             timer.Stop();
             TimeSpan elapsed = timer.Elapsed;
-            Console.WriteLine("Loading data was completed successfully\nExection Time: {0}\n", elapsed.ToString("mm':'ss':'fff"));
+            logger.info("Loading data was completed successfully\nExection Time: "+elapsed.ToString("mm':'ss':'fff"));
 
             return Tuple.Create<Users, Items>(users, items);
         }
