@@ -51,6 +51,14 @@ namespace Assignment1
             users.Add(userId, user);
         }
 
+        public void addUser(User user)
+        {
+            if (users.Keys.Contains(user.GetId()))
+                throw new NotSupportedException("Users " + "[" + user.GetId() + "]" + " already exists in the DB!");
+
+            users.Add(user.GetId(), user);
+        }
+
         public void addItemToUser(string userId, string itemId, double rating){
             User user = getUserById(userId);
             
