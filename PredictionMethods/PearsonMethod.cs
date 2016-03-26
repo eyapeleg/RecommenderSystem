@@ -31,7 +31,7 @@ namespace Assignment1
             if (!intersectList.Any() || denumeratorU1SumSquare == 0 || denumeratorU2SumSquare == 0)
                 return 0;
 
-            return numeratorSum / (denumeratorU1SumSquare * denumeratorU2SumSquare);
+            return numeratorSum / (Math.Sqrt(denumeratorU1SumSquare) * Math.Sqrt(denumeratorU2SumSquare));
         }
 
         public PredictionMethod GetPredictionMethod()

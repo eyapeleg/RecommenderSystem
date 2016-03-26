@@ -31,7 +31,7 @@ namespace Assignment1
             predictionMethodsDictionary = new Dictionary<PredictionMethod, IPredictionMethod>(){
                 {PredictionMethod.Pearson,new PearsonMethod()},
                 {PredictionMethod.Cosine, new CosineMethod()}, //TODO - modify to the corresponding method
-                {PredictionMethod.Random, new PearsonMethod()} //TODO - modify to the corresponding method
+                {PredictionMethod.Random, new RandomMethod()} //TODO - modify to the corresponding method
             };
 
             
@@ -74,7 +74,7 @@ namespace Assignment1
         public double PredictRating(PredictionMethod m, string sUID, string sIID)
         {
             
-             User user = users.getUserById(sUID);
+            User user = users.getUserById(sUID);
 
             if (!predictionMethodsDictionary.ContainsKey(m))
                 throw new ArgumentException("Method "+"["+m.ToString()+"]"+" does not exist!" );
