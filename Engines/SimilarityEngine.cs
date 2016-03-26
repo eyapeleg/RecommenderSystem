@@ -32,7 +32,8 @@ namespace Assignment1
 
             Parallel.ForEach<User>(users, thatUser =>
             {
-                if (!thisUser.Equals(thisUser)){
+                if (!thisUser.Equals(thatUser))
+                {
                     //logger.debug("calcualting similarity for user " + "[" + thisUser.GetId().ToString() + "]" + " with user " + "[" + thatUser.GetId().ToString() + "]");
                     double similarity = predictionMethod.calculateSimilarity(thisUser, thatUser);
                     if (similarity != 0)

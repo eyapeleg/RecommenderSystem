@@ -101,7 +101,7 @@ namespace Assignment1
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !obj.GetType().IsInstanceOfType(this.GetType()))
+            if (obj == null || !this.GetType().Name.Equals(obj.GetType().Name))
                 return false;
 
             if (obj == this)
