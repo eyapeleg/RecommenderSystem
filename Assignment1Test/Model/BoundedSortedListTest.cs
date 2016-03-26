@@ -37,9 +37,9 @@ namespace Assignment1Test
             boundedList.add("first", 1.1);
             boundedList.add("second", 1.1);
 
-            List<KeyValuePair<double, string>> expected = new List<KeyValuePair<double, string>>(){
-                new KeyValuePair<double,string>(1.1,"first"),
-                new KeyValuePair<double,string>(1.1,"second")
+            List<KeyValuePair<string, double>> expected = new List<KeyValuePair<string, double>>(){
+                new KeyValuePair<string,double>("first", 1.1),
+                new KeyValuePair<string,double>("second",1.1)
             };
 
             List<KeyValuePair<string, double>> actual = boundedList.getList();

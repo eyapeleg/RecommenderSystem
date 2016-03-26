@@ -6,7 +6,7 @@ using System.Text;
 
 namespace RecommenderSystem
 {
-    public class User
+    public class User : IComparable<User>
     {
         private Dictionary<string, double> itemsRatings;
         //private UserSimilarities similarUsers;
@@ -97,6 +97,11 @@ namespace RecommenderSystem
 
             return dict;
 
+        }
+
+        public int CompareTo(User other)
+        {
+            return id.CompareTo(other.id);
         }
 
         public override bool Equals(object obj)
