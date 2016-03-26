@@ -83,7 +83,7 @@ namespace RecommenderSystem
 
             if (m != PredictionMethod.Random)
             {
-                IList<KeyValuePair<double, User>> similarUsers = similarityEngine.calculateSimilarity(predictionMethod, user);
+                IList<KeyValuePair<User, double>> similarUsers = similarityEngine.calculateSimilarity(predictionMethod, user);
                 return predictionEngine.predictRating(user, sIID, similarUsers);
             }
             

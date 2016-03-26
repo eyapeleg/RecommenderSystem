@@ -9,7 +9,7 @@ namespace RecommenderSystem
     {
         public double calculateSimilarity(User u1, User u2, List<string> intersectList = null)
         {
-            //this calss is not supported for random method
+            //this method is not supported for random method
             return -1;
         }
         

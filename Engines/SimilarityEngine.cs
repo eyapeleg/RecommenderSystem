@@ -21,14 +21,14 @@ namespace RecommenderSystem
             this.MAX_SIMILAR_USERS = maxSimilarUsers;
         }
 
-        public List<KeyValuePair<double, User>> calculateSimilarity(IPredictionMethod predictionMethod, User thisUser)
+        public List<KeyValuePair<User,double>> calculateSimilarity(IPredictionMethod predictionMethod, User thisUser)
         {
             if (predictionMethod == null || thisUser == null)
                 throw new ArgumentNullException("IPredictionMethod predictionMethod, User thisUser must both be not null!");
 
             logger.info("calcualting similarity for user " + "[" + thisUser.GetId() + "]");
             Stopwatch timer = Stopwatch.StartNew();
-            BoundedSortedList<double, User> similarUsers = new BoundedSortedList<double, User>(MAX_SIMILAR_USERS);
+            BoundedSortedList<User, double> similarUsers = new BoundedSortedList<User, double>(MAX_SIMILAR_USERS);
 
             foreach (var thatUser in users)
             {
@@ -41,7 +41,7 @@ namespace RecommenderSystem
                         similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, intersectList);
                         if (similarity != 0) //in some cases the users rate their common item the same as their average then we can get here zero
                         {
-                            similarUsers.add(similarity, thatUser);
+                            similarUsers.add(thatUser, similarity);
                         }
                     }
                 }

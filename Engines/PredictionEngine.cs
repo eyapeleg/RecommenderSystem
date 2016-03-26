@@ -8,14 +8,14 @@ namespace RecommenderSystem
     class PredictionEngine
     {
         //TODO - check logic
-        public double predictRating(User thisUser, string itemId, IList<KeyValuePair<double, User>> similarUsers)
+        public double predictRating(User thisUser, string itemId, IList<KeyValuePair<User, double>> similarUsers)
         {
             double sum = 0.0;
             double rating;
-            foreach (KeyValuePair<double,User> thatUserSimilarity in similarUsers)
+            foreach (KeyValuePair<User, double> thatUserSimilarity in similarUsers)
             {
-                rating = thatUserSimilarity.Value.GetRating(itemId);
-                sum += rating * thatUserSimilarity.Key;
+                rating = thatUserSimilarity.Key.GetRating(itemId);
+                sum += rating * thatUserSimilarity.Value;
             }
 
             return (sum/similarUsers.Count);

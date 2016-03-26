@@ -8,31 +8,30 @@ using System.Runtime.CompilerServices;
 
 namespace RecommenderSystem
 {
-    public class BoundedSortedList<K, V> where K : IComparable<K> 
-
+    public class BoundedSortedList<K, V> where V : IComparable<V>
     {
-        private SortedList<K, V> sortedList;
+        private SortedSet<Pair<K, V>> sortedSet;
         private int MAX_SIZE;
 
         public BoundedSortedList(int maxSize)
         {
             this.MAX_SIZE = maxSize;
-            this.sortedList = new SortedList<K,V>();
+            this.sortedSet = new SortedSet<Pair<K, V>>();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void add(K key, V value)
         {
-            if (sortedList.Count < MAX_SIZE)
+            if (sortedSet.Count < MAX_SIZE)
             {
-                sortedList.Add(key, value);
+                sortedSet.Add(new Pair<K, V>(key, value));
                 return;
             }
 
-            if (key.CompareTo(sortedList.Keys.First()) > 0)
+            if (value.CompareTo(sortedSet.First().v) > 0)
             {
-                sortedList.Remove(sortedList.Keys.First());
-                add(key,value);
+                sortedSet.Remove(sortedSet.First());
+                add(key, value);
             }
 
             return;
@@ -40,7 +39,25 @@ namespace RecommenderSystem
 
         public List<KeyValuePair<K, V>> getList()
         {
-            return sortedList.ToList();
+           List<Pair<K, V>> list = sortedSet.ToList();
+           return list.ConvertAll(pair => new KeyValuePair<K, V>(pair.k, pair.v));
+        }
+
+        private class Pair<K, V> : IComparable<Pair<K, V>> where V : IComparable<V>
+        {
+            public K k;
+            public V v;
+
+            public Pair(K k, V v)
+            {
+                this.k = k;
+                this.v = v;
+            }
+
+            public int CompareTo(Pair<K, V> that)
+            {
+                return this.v.CompareTo(that.v);
+            }
         }
 
     }
