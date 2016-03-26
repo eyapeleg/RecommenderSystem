@@ -30,7 +30,7 @@ namespace Assignment1
             MAX_SIMILAR_USERS = 30;
             predictionMethodsDictionary = new Dictionary<PredictionMethod, IPredictionMethod>(){
                 {PredictionMethod.Pearson,new PearsonMethod()},
-                {PredictionMethod.Cosine, new PearsonMethod()}, //TODO - modify to the corresponding method
+                {PredictionMethod.Cosine, new CosineMethod()}, //TODO - modify to the corresponding method
                 {PredictionMethod.Random, new PearsonMethod()} //TODO - modify to the corresponding method
             };
 
