@@ -52,7 +52,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Engines\SimilarityEngineTest.cs" />
-    <Compile Include="Model\BoundedSortedListTest.cs" />
+    <Compile Include="Model\Users\UsersSimilarityTest.cs" />
+    <Compile Include="Model\Collections\BoundedSortedCollectionTest.cs" />
+    <Compile Include="Model\Collections\ValueComparablePairTest.cs" />
     <Compile Include="PredictionMethods\PearsonMethodTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -62,6 +64,7 @@
       <Name>Assignment1</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

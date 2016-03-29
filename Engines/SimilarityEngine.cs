@@ -28,7 +28,7 @@ namespace RecommenderSystem
 
             logger.info("calcualting similarity for user " + "[" + thisUser.GetId() + "]");
             Stopwatch timer = Stopwatch.StartNew();
-            BoundedSortedList<User, double> similarUsers = new BoundedSortedList<User, double>(MAX_SIMILAR_USERS);
+            UsersSimilarity similarUsers = new UsersSimilarity(MAX_SIMILAR_USERS);
 
             foreach (var thatUser in users)
             {
@@ -67,7 +67,7 @@ namespace RecommenderSystem
             timer.Stop();
             logger.debug("Similarity calculation time for user" + " [" + thisUser.GetId() + "] " + timer.Elapsed);
 
-            return similarUsers.getList();
+            return similarUsers.AsList();
         }
     }
 }

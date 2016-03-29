@@ -31,9 +31,9 @@ namespace Assignment1Test
             user2.AddItem("item7", 1);
 
             PearsonMethod PearsonMethod = new PearsonMethod();
-            string expetected = String.Format("{0:0.000}",-0.4325);
+            string expetected = String.Format("{0:0.00}",-0.4325);
             List<string> intersectList = user1.GetRatedItems().Intersect(user2.GetRatedItems()).ToList();
-            string acutal = String.Format("{0:0.000}",PearsonMethod.calculateSimilarity(user1, user2,intersectList));
+            string acutal = String.Format("{0:0.00}",PearsonMethod.calculateSimilarity(user1, user2,intersectList));
             Assert.AreEqual(expetected,acutal);
         }
     }

@@ -43,11 +43,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\BoundedSortedDictionary.cs" />
+    <Compile Include="Model\Collections\BoundedSortedCollection.cs" />
     <Compile Include="Logger\DebugLogger.cs" />
     <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Logger\InfoLogger.cs" />
     <Compile Include="Engines\PredictionEngine.cs" />
+    <Compile Include="Model\Collections\ValueComparablePair.cs" />
+    <Compile Include="Model\Users\UsersSimilarity.cs" />
     <Compile Include="PredictionMethods\CosineMethod.cs" />
     <Compile Include="Engines\DataLoaderEngine.cs" />
     <Compile Include="PredictionMethods\IPredictionMethod.cs" />
@@ -58,8 +60,8 @@
     <Compile Include="PredictionMethods\RandomMethod.cs" />
     <Compile Include="RecommenderSystem.cs" />
     <Compile Include="Engines\SimilarityEngine.cs" />
-    <Compile Include="Model\User\User.cs" />
-    <Compile Include="Model\User\Users.cs" />
+    <Compile Include="Model\Users\User.cs" />
+    <Compile Include="Model\Users\Users.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

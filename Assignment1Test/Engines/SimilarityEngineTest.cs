@@ -49,9 +49,9 @@ namespace Assignment1Test.Engines
             users.addUser(sameUserValues);
             
             SimilarityEngine similarityEngine = new SimilarityEngine(users,1,logger);
-            List<KeyValuePair<double, User>> actual = similarityEngine.calculateSimilarity(new PearsonMethod(), user);
-            List<KeyValuePair<double, User>> expected = new List<KeyValuePair<double, User>>(){
-                new KeyValuePair<double, User>(1.0,sameUserValues)
+            List<KeyValuePair<User, double>> actual = similarityEngine.calculateSimilarity(new PearsonMethod(), user);
+            List<KeyValuePair<User, double>> expected = new List<KeyValuePair<User, double>>(){
+                new KeyValuePair<User, double>(sameUserValues, 1.0)
             };
             CollectionAssert.AreEqual(expected, actual);
 
