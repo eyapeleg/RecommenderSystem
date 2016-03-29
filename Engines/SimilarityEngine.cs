@@ -35,8 +35,11 @@ namespace RecommenderSystem
                 double similarity;
                 if (!thisUser.Equals(thatUser))
                 {
-                    List<string> intersectList = thatUser.GetRatedItems().Intersect(thisUser.GetRatedItems()).ToList(); //check if both users rated at least one common item 
-                    if (intersectList.Any())
+                    var thatUserList = thatUser.GetRatedItems();
+                    var thisUserList = thisUser.GetRatedItems();
+
+                    List<string> intersectList = thatUserList.Intersect(thisUserList).ToList(); //check if both users rated at least one common item 
+                    if (intersectList.Any() && thatUserList.Count > 1 && thisUserList.Count > 1)
                     {
                         similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, intersectList);
                         if (similarity > 0) //in some cases the users rate their common item the same as their average then we can get here zero
@@ -50,16 +53,16 @@ namespace RecommenderSystem
             //Parallel.ForEach(users, thatUser =>
             //{
             //    double similarity;
-            //    if (!thisUser.Equals(thisUser))
+            //    if (!thatUser.Equals(thisUser))
             //    {
-            //        var commonItems = thatUser.GetRatedItems().Intersect(thisUser.GetRatedItems()); //check if both users rated at least one common item 
+            //        List<string> commonItems = thatUser.GetRatedItems().Intersect(thisUser.GetRatedItems()).ToList(); //check if both users rated at least one common item 
             //        if (commonItems.Any())
             //        {
-            //            //logger.debug("calcualting similarity for user " + "[" + thisUser.GetId().ToString() + "]" + " with user " + "[" + thatUser.GetId().ToString() + "]");
-            //            similarity = predictionMethod.calculateSimilarity(thisUser, thatUser);
+            //            logger.debug("calcualting similarity for user " + "[" + thisUser.GetId().ToString() + "]" + " with user " + "[" + thatUser.GetId().ToString() + "]");
+            //            similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItems);
             //            if (similarity != 0) //in some cases the users rate their common item the same as their average then we can get here zero
             //            {
-            //                similarUsers.add(similarity, thatUser); 
+            //                similarUsers.add(thatUser, similarity);
             //            }
             //        }
             //    }
