@@ -9,8 +9,8 @@ namespace RecommenderSystem
     {
         public double calculateSimilarity(User u1, User u2, List<string> intersectList)
         {
-            if (intersectList.Count() < 5)
-                return 0.0;
+            //if (intersectList.Count() < 5)
+            //    return 0.0;
 
             double numeratorSum = 0.0;
             double denumeratorU1SumSquare = 0.0;

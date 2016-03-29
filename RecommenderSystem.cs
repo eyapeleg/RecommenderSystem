@@ -94,8 +94,55 @@ namespace RecommenderSystem
         //cTrials specifies the number of user-item pairs to be tested
         public Dictionary<PredictionMethod, double> ComputeMAE(List<PredictionMethod> lMethods, int cTrials)
         {
-            throw new NotImplementedException();
-        }
+            List<KeyValuePair<string, string>> testedUserItem = new List<KeyValuePair<string, string>>();
+            Random rnd = new Random();
+            Dictionary<PredictionMethod, double> maeResult = new Dictionary<PredictionMethod, double>();
 
+            int totalUsers = users.Count();
+
+            do
+            {
+                int userIdx = rnd.Next(0, totalUsers - 1);
+                var testedUser = users.ElementAt(userIdx);
+                var testedUserId = testedUser.GetId();
+                var ratedItems = testedUser.GetRatedItems();
+                int itemIdx = rnd.Next(0, ratedItems.Count);
+                var testedItemId = ratedItems.ElementAt(itemIdx);
+
+                var keyValuePair = new KeyValuePair<string, string>(testedUserId, testedItemId);
+
+                if (!testedUserItem.Contains(keyValuePair))
+                {
+                    testedUserItem.Add(new KeyValuePair<string, string>(testedUserId, testedItemId));
+                }
+            } while (testedUserItem.Count != cTrials);
+
+            foreach (var testedObject in testedUserItem)
+            {
+                double actual = users.getUserById(testedObject.Key).GetRating(testedObject.Value);
+                foreach (var lMethod in lMethods)
+                {
+                    double predicted = PredictRating(lMethod, testedObject.Key, testedObject.Value);
+                    double error = Math.Abs(predicted - actual);
+
+                    if (!maeResult.ContainsKey(lMethod))
+                    {
+                        maeResult.Add(lMethod, error);
+                    }
+                    else
+                    {
+                        maeResult[lMethod] += error;
+                    }
+                }
+            }
+
+            foreach (var lMethod in lMethods)
+            {
+                logger.info(String.Format("Method: {0}, Error: {1}", lMethod, maeResult[lMethod]));
+                maeResult[lMethod] = maeResult[lMethod]/cTrials;
+            }
+            
+            return maeResult;
+        }
     }
 }

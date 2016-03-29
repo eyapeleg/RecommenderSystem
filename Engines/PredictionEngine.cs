@@ -10,6 +10,12 @@ namespace RecommenderSystem
         //TODO - check logic
         public double predictRating(User thisUser, string itemId, IList<KeyValuePair<User, double>> similarUsers)
         {
+            //no similar users to this user
+            if (similarUsers.Count == 0)
+            {
+                return 0;
+            }
+
             double sum = 0.0;
             double rating;
             foreach (KeyValuePair<User, double> thatUserSimilarity in similarUsers)

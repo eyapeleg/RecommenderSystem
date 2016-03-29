@@ -26,7 +26,7 @@ namespace RecommenderSystem
             if (predictionMethod == null || thisUser == null)
                 throw new ArgumentNullException("IPredictionMethod predictionMethod, User thisUser must both be not null!");
 
-            logger.info("calcualting similarity for user " + "[" + thisUser.GetId() + "]");
+            logger.debug("calcualting similarity for user " + "[" + thisUser.GetId() + "]");
             Stopwatch timer = Stopwatch.StartNew();
             UsersSimilarity similarUsers = new UsersSimilarity(MAX_SIMILAR_USERS);
 
@@ -39,7 +39,7 @@ namespace RecommenderSystem
                     if (intersectList.Any())
                     {
                         similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, intersectList);
-                        if (similarity != 0) //in some cases the users rate their common item the same as their average then we can get here zero
+                        if (similarity > 0) //in some cases the users rate their common item the same as their average then we can get here zero
                         {
                             similarUsers.add(thatUser, similarity);
                         }

@@ -36,7 +36,7 @@ namespace RecommenderSystem
                 string itemId = split[1];
                 double rating = Convert.ToDouble(split[2]);
 
-                //logger.debug("read user"+" ["+userId+"]"+" itemId"+" ["+itemId+"]"+" rating"+" ["+rating+"]");
+                logger.debug("read user"+" ["+userId+"]"+" itemId"+" ["+itemId+"]"+" rating"+" ["+rating+"]");
                 users.addItemToUser(userId, itemId, rating);
                 items.addUserToItems(userId, itemId, rating);
             }
