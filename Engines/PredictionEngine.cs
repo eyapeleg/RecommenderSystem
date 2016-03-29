@@ -24,7 +24,7 @@ namespace RecommenderSystem
                 sum += rating * thatUserSimilarity.Value;
             }
 
-            return (sum/similarUsers.Count);
+            return  thisUser.GetAverageRatings() + (sum / similarUsers.Count);
         }
 
         public double PredictRating(User user)
