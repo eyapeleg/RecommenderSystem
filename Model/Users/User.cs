@@ -117,5 +117,11 @@ namespace RecommenderSystem
         //        throw new NotSupportedException("Prediction method doesn't exist!");
         //         
         //}
+        public double GetRandomRate()
+        {
+            Random rnd = new Random();
+            var idx = rnd.Next(0,itemsRatings.Count);
+            return itemsRatings.ElementAt(idx).Value;
+        }
     }
 }

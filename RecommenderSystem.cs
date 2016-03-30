@@ -75,15 +75,16 @@ namespace RecommenderSystem
         {
             
             User user = users.getUserById(sUID);
+            var candidateUsers = items.GetItemById(sIID).Keys.ToList();
 
             if (!predictionMethodsDictionary.ContainsKey(m))
-                throw new ArgumentException("Method "+"["+m.ToString()+"]"+" does not exist!" );
+                throw new ArgumentException(string.Format("Method " + "[{0}]" + " does not exist!", m) );
 
-            IPredictionMethod predictionMethod= predictionMethodsDictionary[m];
+            IPredictionMethod predictionMethod = predictionMethodsDictionary[m];
 
             if (m != PredictionMethod.Random)
             {
-                IList<KeyValuePair<User, double>> similarUsers = similarityEngine.calculateSimilarity(predictionMethod, user);
+                IList<KeyValuePair<User, double>> similarUsers = similarityEngine.calculateSimilarity(predictionMethod, user, candidateUsers);
                 return predictionEngine.predictRating(user, sIID, similarUsers);
             }
             

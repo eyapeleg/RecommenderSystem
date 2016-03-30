@@ -21,7 +21,7 @@ namespace RecommenderSystem
             this.MAX_SIMILAR_USERS = maxSimilarUsers;
         }
 
-        public List<KeyValuePair<User,double>> calculateSimilarity(IPredictionMethod predictionMethod, User thisUser)
+        public List<KeyValuePair<User, double>> calculateSimilarity(IPredictionMethod predictionMethod, User thisUser, List<string> candidateUsers)
         {
             if (predictionMethod == null || thisUser == null)
                 throw new ArgumentNullException("IPredictionMethod predictionMethod, User thisUser must both be not null!");
@@ -31,19 +31,19 @@ namespace RecommenderSystem
             UsersSimilarity similarUsers = new UsersSimilarity(MAX_SIMILAR_USERS);
             var thisUserList = thisUser.GetRatedItems();
 
-            foreach (var thatUser in users)
+            foreach (var user in candidateUsers)
             {
-                double similarity;
+                User thatUser = users.getUserById(user);
                 if (!thisUser.Equals(thatUser))
                 {
                     var thatUserList = thatUser.GetRatedItems();
 
                     List<string> commonItemsList = thatUserList.Intersect(thisUserList).ToList(); //check if both users rated at least one common item 
-                    //TODO decide about the size of the common items list
+                    //TODO decide about threshold
                     if (commonItemsList.Count > 0 && thatUserList.Count > 0 && thisUserList.Count > 0)
                     {
-                        similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItemsList);
-                        if (similarity > 0) //in some cases the users rate their common item the same as their average then we can get here zero
+                        var similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItemsList);
+                        if (similarity > 0.1) //in some cases the users rate their common item the same as their average then we can get here zero
                         {
                             similarUsers.add(thatUser, similarity);
                         }

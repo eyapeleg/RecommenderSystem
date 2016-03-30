@@ -10,33 +10,32 @@ namespace RecommenderSystem
         //TODO - check logic
         public double predictRating(User thisUser, string itemId, IList<KeyValuePair<User, double>> similarUsers)
         {
+            double sum = 0.0;
+            double rating;
+            double avgRating;
+            double sumWeights = 0.0;
+
             //no similar users to this user
             if (similarUsers.Count == 0)
             {
-                return 0;
+                return thisUser.GetRandomRate();
             }
 
-            int count = 0;
-
-            double sum = 0.0;
-            double rating;
             foreach (KeyValuePair<User, double> thatUserSimilarity in similarUsers)
             {
+                double w = thatUserSimilarity.Value;
+                sumWeights += w;
                 //TODO check with guy the expected behivor
                 rating = thatUserSimilarity.Key.GetRating(itemId);
-                if (rating > 0)
-                {
-                    sum += rating * thatUserSimilarity.Value;
-                    count++;
-                }
+                avgRating = thatUserSimilarity.Key.GetAverageRatings();
+
+
+                sum += w * (rating - avgRating);
             }
 
-            if (count == 0) //none of the similiar users rate the item
-            {
-                return 0;
-            }
 
-            return sum / count;
+
+            return thisUser.GetAverageRatings() + (sum / sumWeights);
         }
 
         public double PredictRating(User user)
