@@ -29,6 +29,7 @@ namespace RecommenderSystem
             logger.debug("calcualting similarity for user " + "[" + thisUser.GetId() + "]");
             Stopwatch timer = Stopwatch.StartNew();
             UsersSimilarity similarUsers = new UsersSimilarity(MAX_SIMILAR_USERS);
+            var thisUserList = thisUser.GetRatedItems();
 
             foreach (var thatUser in users)
             {
@@ -36,12 +37,12 @@ namespace RecommenderSystem
                 if (!thisUser.Equals(thatUser))
                 {
                     var thatUserList = thatUser.GetRatedItems();
-                    var thisUserList = thisUser.GetRatedItems();
 
-                    List<string> intersectList = thatUserList.Intersect(thisUserList).ToList(); //check if both users rated at least one common item 
-                    if (intersectList.Any() && thatUserList.Count > 1 && thisUserList.Count > 1)
+                    List<string> commonItemsList = thatUserList.Intersect(thisUserList).ToList(); //check if both users rated at least one common item 
+                    //TODO decide about the size of the common items list
+                    if (commonItemsList.Count > 0 && thatUserList.Count > 0 && thisUserList.Count > 0)
                     {
-                        similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, intersectList);
+                        similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItemsList);
                         if (similarity > 0) //in some cases the users rate their common item the same as their average then we can get here zero
                         {
                             similarUsers.add(thatUser, similarity);

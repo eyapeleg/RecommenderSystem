@@ -16,15 +16,27 @@ namespace RecommenderSystem
                 return 0;
             }
 
+            int count = 0;
+
             double sum = 0.0;
             double rating;
             foreach (KeyValuePair<User, double> thatUserSimilarity in similarUsers)
             {
+                //TODO check with guy the expected behivor
                 rating = thatUserSimilarity.Key.GetRating(itemId);
-                sum += rating * thatUserSimilarity.Value;
+                if (rating > 0)
+                {
+                    sum += rating * thatUserSimilarity.Value;
+                    count++;
+                }
             }
 
-            return  thisUser.GetAverageRatings() + (sum / similarUsers.Count);
+            if (count == 0) //none of the similiar users rate the item
+            {
+                return 0;
+            }
+
+            return sum / count;
         }
 
         public double PredictRating(User user)

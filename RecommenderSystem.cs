@@ -97,6 +97,7 @@ namespace RecommenderSystem
             List<KeyValuePair<string, string>> testedUserItem = new List<KeyValuePair<string, string>>();
             Random rnd = new Random();
             Dictionary<PredictionMethod, double> maeResult = new Dictionary<PredictionMethod, double>();
+            Dictionary<PredictionMethod, int> countDictionary = new Dictionary<PredictionMethod, int>();
 
             int totalUsers = users.Count();
 
@@ -123,23 +124,27 @@ namespace RecommenderSystem
                 foreach (var lMethod in lMethods)
                 {
                     double predicted = PredictRating(lMethod, testedObject.Key, testedObject.Value);
-                    double error = Math.Abs(predicted - actual);
+                    if (predicted != 0) //take only cases where we got prediction
+                    {
+                        double error = Math.Abs(predicted - actual);
 
-                    if (!maeResult.ContainsKey(lMethod))
-                    {
-                        maeResult.Add(lMethod, error);
-                    }
-                    else
-                    {
-                        maeResult[lMethod] += error;
-                    }
+                        if (!maeResult.ContainsKey(lMethod))
+                        {
+                            maeResult.Add(lMethod, error);
+                            countDictionary.Add(lMethod, 1);
+                        }
+                        else
+                        {
+                            maeResult[lMethod] += error;
+                            countDictionary[lMethod]++;
+                        }
+                    } 
                 }
             }
 
             foreach (var lMethod in lMethods)
             {
-                logger.info(String.Format("Method: {0}, Error: {1}", lMethod, maeResult[lMethod]));
-                maeResult[lMethod] = maeResult[lMethod]/cTrials;
+                maeResult[lMethod] = maeResult[lMethod] / countDictionary[lMethod];
             }
             
             return maeResult;

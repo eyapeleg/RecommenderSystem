@@ -39,22 +39,6 @@ namespace RecommenderSystem
             return squaredSum;
         }
 
-        //public IEnumerable<KeyValuePair<double, User>> GetSimilarUser(PredictionMethod method)
-        //{
-        //    return similarUsers.GetSimilarUsers(method);
-        //}
-
-         //public void setSimilarUser(User uID, double w)
-         //{
-         //    if (similarUsers.ContainsKey(uID))
-         //    {
-         //        throw new NotSupportedException("User " + "[" + uID + "]" + " already exists in the similar users list!");
-         //    }
-
-         //    similarUsers.Add(uID, w);
-         //}*/
-
-
         public void AddItem(string item, double rating)
         {
             if (itemsRatings.ContainsKey(item))

@@ -20,7 +20,7 @@ namespace RecommenderSystem
             if (!intersectList.Any())
                 return 0;
 
-            double cos = dotProduct/(Math.Sqrt(u1.GetSquaredSum())*(Math.Sqrt(u2.GetSquaredSum())));
+            double cos = dotProduct/(Math.Sqrt(u1.GetSquaredSum())*Math.Sqrt(u2.GetSquaredSum()));
             return cos;
         }
 
