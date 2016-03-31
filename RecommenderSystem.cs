@@ -103,6 +103,7 @@ namespace RecommenderSystem
 
             int totalUsers = users.Count();
 
+            //create <userId,ItemId> test set
             do
             {
                 int userIdx = rnd.Next(0, totalUsers - 1);
@@ -126,8 +127,8 @@ namespace RecommenderSystem
                 foreach (var lMethod in lMethods)
                 {
                     double predicted = PredictRating(lMethod, testedObject.Key, testedObject.Value);
-                    if (predicted != 0) //take only cases where we got prediction
-                    {
+                        
+
                         double error = Math.Abs(predicted - actual);
 
                         if (!maeResult.ContainsKey(lMethod))
@@ -140,7 +141,6 @@ namespace RecommenderSystem
                             maeResult[lMethod] += error;
                             countDictionary[lMethod]++;
                         }
-                    } 
                 }
             }
 

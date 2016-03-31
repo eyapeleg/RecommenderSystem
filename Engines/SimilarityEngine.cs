@@ -40,7 +40,7 @@ namespace RecommenderSystem
 
                     List<string> commonItemsList = thatUserList.Intersect(thisUserList).ToList(); //check if both users rated at least one common item 
                     //TODO decide about threshold
-                    if (commonItemsList.Count > 0 && thatUserList.Count > 0 && thisUserList.Count > 0)
+                    if (commonItemsList.Count > 1 && thatUserList.Count > 0 && thisUserList.Count > 0)
                     {
                         var similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItemsList);
                         if (similarity > 0.1) //in some cases the users rate their common item the same as their average then we can get here zero
