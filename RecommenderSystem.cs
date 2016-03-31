@@ -77,6 +77,12 @@ namespace RecommenderSystem
             User user = users.getUserById(sUID);
             var candidateUsers = items.GetItemById(sIID).Keys.ToList();
 
+            //in case the current user is the only one that predict this item return the random rating
+            if(candidateUsers.Count == 1 && candidateUsers.Contains(user.GetId()))
+            {
+                return user.GetRandomRate();
+            }
+
             if (!predictionMethodsDictionary.ContainsKey(m))
                 throw new ArgumentException(string.Format("Method " + "[{0}]" + " does not exist!", m) );
 
@@ -127,20 +133,18 @@ namespace RecommenderSystem
                 foreach (var lMethod in lMethods)
                 {
                     double predicted = PredictRating(lMethod, testedObject.Key, testedObject.Value);
-                        
-
-                        double error = Math.Abs(predicted - actual);
-
-                        if (!maeResult.ContainsKey(lMethod))
-                        {
-                            maeResult.Add(lMethod, error);
-                            countDictionary.Add(lMethod, 1);
-                        }
-                        else
-                        {
-                            maeResult[lMethod] += error;
-                            countDictionary[lMethod]++;
-                        }
+                    double error = Math.Abs(predicted - actual);
+                    
+                    if (!maeResult.ContainsKey(lMethod))
+                    {
+                        maeResult.Add(lMethod, error);
+                        countDictionary.Add(lMethod, 1);
+                    }
+                    else
+                    {
+                        maeResult[lMethod] += error;
+                        countDictionary[lMethod]++;
+                    }
                 }
             }
 
