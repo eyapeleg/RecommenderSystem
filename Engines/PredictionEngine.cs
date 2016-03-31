@@ -38,20 +38,21 @@ namespace RecommenderSystem
             return thisUser.GetAverageRatings() + (numerator / denominator);
         }
 
-        public double PredictRating(User user)
-        {
-            var dist = user.GetRatingDistribution();
-            double rand = new Random().NextDouble();
+        //TODO remove before submission
+        //public double PredictRating(User user)
+        //{
+        //    var dist = user.GetRatingDistribution();
+        //    double rand = new Random().NextDouble();
 
-            foreach (var rating in dist)
-            {
-                if (rand < rating.Value)
-                {
-                    return rating.Key;
-                }
-            }
+        //    foreach (var rating in dist)
+        //    {
+        //        if (rand < rating.Value)
+        //        {
+        //            return rating.Key;
+        //        }
+        //    }
 
-            return 0;
-        }
+        //    return 0;
+        //}
     }
 }

@@ -120,7 +120,7 @@ namespace RecommenderSystem
         public double GetRandomRate()
         {
             Random rnd = new Random();
-            var idx = rnd.Next(0,itemsRatings.Count);
+            var idx = rnd.Next(0,itemsRatings.Count - 1);
             return itemsRatings.ElementAt(idx).Value;
         }
     }

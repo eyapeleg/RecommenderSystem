@@ -77,8 +77,8 @@ namespace RecommenderSystem
             User user = users.getUserById(sUID);
             var candidateUsers = items.GetItemById(sIID).Keys.ToList();
 
-            //in case the current user is the only one that predict this item return the random rating
-            if(candidateUsers.Count == 1 && candidateUsers.Contains(user.GetId()))
+            //in case the current user is the only one that predict this item return the random rating or otherwise if the current user has only one rated item
+            if((candidateUsers.Count == 1 && candidateUsers.Contains(user.GetId())) || user.GetRatedItems().Count < 2)
             {
                 return user.GetRandomRate();
             }
@@ -94,8 +94,9 @@ namespace RecommenderSystem
                 double prediction = predictionEngine.predictRating(user, sIID, similarUsers);
                 return prediction > 10 ? 10 : prediction; 
             }
-            
-            return predictionEngine.PredictRating(users.getUserById(sUID));
+
+            return users.getUserById(sUID).GetRandomRate();
+            //return predictionEngine.PredictRating(users.getUserById(sUID));
         }
 
         //Compute MAE (mean absolute error) for a set of rating prediction methods over the same user-item pairs
@@ -107,16 +108,21 @@ namespace RecommenderSystem
             Dictionary<PredictionMethod, double> maeResult = new Dictionary<PredictionMethod, double>();
             Dictionary<PredictionMethod, int> countDictionary = new Dictionary<PredictionMethod, int>();
 
-            int totalUsers = users.Count();
-
             //create <userId,ItemId> test set
             do
             {
-                int userIdx = rnd.Next(0, totalUsers - 1);
+                int userIdx = rnd.Next(users.Count());
                 var testedUser = users.ElementAt(userIdx);
                 var testedUserId = testedUser.GetId();
                 var ratedItems = testedUser.GetRatedItems();
-                int itemIdx = rnd.Next(0, ratedItems.Count);
+
+                //choose only users that rated more than one item
+                if (ratedItems.Count < 2)
+                {
+                    continue;
+                }
+
+                int itemIdx = rnd.Next(ratedItems.Count);
                 var testedItemId = ratedItems.ElementAt(itemIdx);
 
                 var keyValuePair = new KeyValuePair<string, string>(testedUserId, testedItemId);

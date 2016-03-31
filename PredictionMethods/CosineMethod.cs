@@ -17,8 +17,10 @@ namespace RecommenderSystem
                 double u2Rating = u2.GetRating(item);
                 dotProduct += u1Rating*u2Rating;
             }
+
+            //todo check that condition
             if (!intersectList.Any())
-                return 0;
+                u1.GetRandomRate();
 
             double cos = dotProduct/(Math.Sqrt(u1.GetSquaredSum())*Math.Sqrt(u2.GetSquaredSum()));
             return cos;
