@@ -12,10 +12,10 @@ namespace RecommenderSystem
             //this method is not supported for random method
             return -1;
         }
-        
-        public PredictionMethod GetPredictionMethod()
+
+        public RecommenderSystem.PredictionMethod GetPredictionMethod()
         {
-            return PredictionMethod.Random;
+            return RecommenderSystem.PredictionMethod.Random;
         }
     }
 }

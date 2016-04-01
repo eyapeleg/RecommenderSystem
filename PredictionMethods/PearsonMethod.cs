@@ -35,9 +35,9 @@ namespace RecommenderSystem
             return numeratorSum / (Math.Sqrt(denumeratorU1SumSquare) * Math.Sqrt(denumeratorU2SumSquare));
         }
 
-        public PredictionMethod GetPredictionMethod()
+        public RecommenderSystem.PredictionMethod GetPredictionMethod()
         {
-            return PredictionMethod.Pearson;
+            return RecommenderSystem.PredictionMethod.Pearson;
         }
     }
 }

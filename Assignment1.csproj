@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Engines\EvaluationEngine.cs" />
     <Compile Include="Model\Collections\BoundedSortedCollection.cs" />
     <Compile Include="Logger\DebugLogger.cs" />
     <Compile Include="Logger\ILogger.cs" />
@@ -55,7 +56,7 @@
     <Compile Include="PredictionMethods\IPredictionMethod.cs" />
     <Compile Include="Model\Item\Items.cs" />
     <Compile Include="PredictionMethods\PearsonMethod.cs" />
-    <Compile Include="PredictionMethods\PredictionMethod.cs" />
+    <Compile Include="PredictionMethods\PredictionMethodsMapping.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="PredictionMethods\RandomMethod.cs" />
     <Compile Include="RecommenderSystem.cs" />

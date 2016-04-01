@@ -52,6 +52,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Engines\SimilarityEngineTest.cs" />
+    <Compile Include="Engines\UserItemTestSet.cs" />
     <Compile Include="Model\Users\UsersSimilarityTest.cs" />
     <Compile Include="Model\Collections\BoundedSortedCollectionTest.cs" />
     <Compile Include="Model\Collections\ValueComparablePairTest.cs" />

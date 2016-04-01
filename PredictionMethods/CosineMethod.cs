@@ -26,9 +26,9 @@ namespace RecommenderSystem
             return cos;
         }
 
-        public PredictionMethod GetPredictionMethod()
+        public RecommenderSystem.PredictionMethod GetPredictionMethod()
         {
-            return PredictionMethod.Cosine;
+            return RecommenderSystem.PredictionMethod.Cosine;
         }
     }
 }

@@ -5,10 +5,22 @@ using System.Text;
 
 namespace RecommenderSystem
 {
-    class PredictionEngine
+    public class PredictionEngine
     {
-        //TODO - check logic
-        public double predictRating(User thisUser, string itemId, IList<KeyValuePair<User, double>> similarUsers)
+        private Users users;
+        private Items items;
+        private PredictionMethodsMapping predictionMethodsMapping;
+        private SimilarityEngine similarityEngine;
+
+        public PredictionEngine(Users users, Items items, PredictionMethodsMapping predictionMethodsMapping, SimilarityEngine similarityEngine)
+        {
+            this.users = users;
+            this.items = items;
+            this.predictionMethodsMapping = predictionMethodsMapping;
+            this.similarityEngine = similarityEngine;
+        }
+        
+        private double calculateRating(User thisUser, string itemId, IList<KeyValuePair<User, double>> similarUsers)
         {
             double numerator = 0.0;
             double rating;
@@ -33,26 +45,32 @@ namespace RecommenderSystem
                 numerator += w * (rating - avgRating);
             }
 
-
-
             return thisUser.GetAverageRatings() + (numerator / denominator);
         }
 
-        //TODO remove before submission
-        //public double PredictRating(User user)
-        //{
-        //    var dist = user.GetRatingDistribution();
-        //    double rand = new Random().NextDouble();
 
-        //    foreach (var rating in dist)
-        //    {
-        //        if (rand < rating.Value)
-        //        {
-        //            return rating.Key;
-        //        }
-        //    }
+        public double PredictRating(RecommenderSystem.PredictionMethod m, User user, string sIID)
+        {
 
-        //    return 0;
-        //}
+            var candidateUsers = items.GetItemById(sIID).Keys.ToList();
+
+            //in case the current user is the only one that predict this item return the random rating or otherwise if the current user has only one rated item
+            if ((candidateUsers.Count == 1 && candidateUsers.Contains(user.GetId())) || user.GetRatedItems().Count < 2)
+            {
+                return user.GetRandomRate();
+            }
+
+            IPredictionMethod predictionMethod = predictionMethodsMapping.getPredictionMethod(m);
+
+            if (m != RecommenderSystem.PredictionMethod.Random)
+            {
+                IList<KeyValuePair<User, double>> similarUsers = similarityEngine.calculateSimilarity(predictionMethod, user, candidateUsers);
+                double prediction = calculateRating(user, sIID, similarUsers);
+                return prediction > 10 ? 10 : prediction;
+            }
+
+            return user.GetRandomRate();
+        }
+
     }
 }

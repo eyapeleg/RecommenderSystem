@@ -215,6 +215,9 @@ FakesAssemblies/
 # Node.js Tools for Visual Studio
 .ntvs_analysis.dat
 
+# Recommender System
+*.dat
+
 # Visual Studio 6 build log
 *.plg
 
