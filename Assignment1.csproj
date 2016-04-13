@@ -45,12 +45,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engines\EvaluationEngine.cs" />
+    <Compile Include="Engines\MatrixFactorizationEngine.cs" />
     <Compile Include="Model\Collections\BoundedSortedCollection.cs" />
     <Compile Include="Logger\DebugLogger.cs" />
     <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Logger\InfoLogger.cs" />
     <Compile Include="Engines\PredictionEngine.cs" />
     <Compile Include="Model\Collections\ValueComparablePair.cs" />
+    <Compile Include="Model\Item\Item.cs" />
     <Compile Include="Model\Users\UsersSimilarity.cs" />
     <Compile Include="PredictionMethods\CosineMethod.cs" />
     <Compile Include="Engines\DataLoaderEngine.cs" />

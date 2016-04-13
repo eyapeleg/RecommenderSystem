@@ -23,10 +23,6 @@ namespace RecommenderSystem
             count = 0;
             id = userId;
             itemsRatings = new Dictionary<string, double>();
-            //ISet<PredictionMethod> methods = new HashSet<PredictionMethod>();
-            //methods.Add(PredictionMethod.Pearson);
-            //similarUsers = new UserSimilarities(methods);
-            //intersectUserList = new List<User>();
         }
 
         public string GetId()
@@ -102,21 +98,6 @@ namespace RecommenderSystem
             return false;
         }
 
-        //TODO - implement hash code*/
-
-        //public void SetIntersectUserList(User user) //TODO - verify
-        //{
-        //    intersectUserList.Add(user);
-        //}
-        //
-        //internal void addSimilarUser(PredictionMethod method, User u2, double similarity)
-        //{
-        //    if (method != null)
-        //        similarUsers.Add(method, u2, similarity);
-        //    else
-        //        throw new NotSupportedException("Prediction method doesn't exist!");
-        //         
-        //}
         public double GetRandomRate()
         {
             Random rnd = new Random();

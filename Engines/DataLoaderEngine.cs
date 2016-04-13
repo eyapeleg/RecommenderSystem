@@ -38,7 +38,7 @@ namespace RecommenderSystem
 
                 logger.debug("read user"+" ["+userId+"]"+" itemId"+" ["+itemId+"]"+" rating"+" ["+rating+"]");
                 users.addItemToUser(userId, itemId, rating);
-                items.addUserToItems(userId, itemId, rating);
+                items.addUserToItem(userId, itemId, rating);
             }
 
             //initialize data for each predict method 
@@ -55,6 +55,8 @@ namespace RecommenderSystem
         {
             Dictionary<string, Tuple<Users, Items>> result = new Dictionary<string, Tuple<Users, Items>>();
             Random rnd = new Random();
+
+            //initialize test/train sets
             var trainUsers = new Users();
             var testUsers = new Users();
             var trainItems = new Items();
@@ -66,7 +68,7 @@ namespace RecommenderSystem
             StreamReader objInput = new StreamReader(sFileName, Encoding.Default);
             int linesCount = File.ReadAllLines(sFileName).Count();
             int testSize = (int)  (linesCount * (1 - dTrainSetSize));
-            int count = 0;
+            int tSize = 0;
 
             while (!objInput.EndOfStream)
             {
@@ -81,33 +83,34 @@ namespace RecommenderSystem
                 logger.debug("read user" + " [" + userId + "]" + " itemId" + " [" + itemId + "]" + " rating" + " [" + rating + "]");
 
                 //with probablity of 0.5, assign the user to train/test set
-                if (nextDouble <= 0.5 && count < testSize)
+                if (nextDouble <= 0.5 && tSize < testSize)
                 {
+                    //TODO Change the set type to ENUM
                     if (!result.ContainsKey("test"))
                     {
                         testUsers.addItemToUser(userId, itemId, rating);
-                        testItems.addUserToItems(userId, itemId, rating);
+                        testItems.addUserToItem(userId, itemId, rating);
                         result.Add("test", new Tuple<Users, Items>(testUsers, testItems));
                     }
                     else
                     {
                         result["test"].Item1.addItemToUser(userId, itemId, rating);
-                        result["test"].Item2.addUserToItems(userId, itemId, rating);
+                        result["test"].Item2.addUserToItem(userId, itemId, rating);
                     }
-                    count++;
+                    tSize++;
                 }
                 else
                 {
                     if (!result.ContainsKey("train"))
                     {
                         trainUsers.addItemToUser(userId, itemId, rating);
-                        trainItems.addUserToItems(userId, itemId, rating);
+                        trainItems.addUserToItem(userId, itemId, rating);
                         result.Add("train", new Tuple<Users, Items>(trainUsers, trainItems));
                     }
                     else
                     {
                         result["train"].Item1.addItemToUser(userId, itemId, rating);
-                        result["train"].Item2.addUserToItems(userId, itemId, rating);
+                        result["train"].Item2.addUserToItem(userId, itemId, rating);
                     }
                 }
             }

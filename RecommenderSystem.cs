@@ -15,10 +15,19 @@ namespace RecommenderSystem
         private Users users;
         private Items items;
 
+        //TODO: decide how to formalize that part
+        private Users trainUsers;
+        private Items trainItems;
+        private Users testUsers;
+        private Items testItems;
+
+        private double averageTrainRating;
+
         private SimilarityEngine similarityEngine;
         private DataLoaderEngine dataLoaderEngine;
         private PredictionEngine predictionEngine;
         private EvaluationEngine evaluationEngine;
+        private MatrixFactorizationEngine matrixFactorizationEngine;
 
         private ILogger logger;
 
@@ -48,13 +57,16 @@ namespace RecommenderSystem
         public void Load(string sFileName, double dTrainSetSize)
         {
             Dictionary<string, Tuple<Users, Items>> data = dataLoaderEngine.Load(sFileName, dTrainSetSize);
-            Tuple<Users, Items> trainData = data["train"];
-            Tuple<Users, Items> testData = data["test"];
+            trainUsers = data["train"].Item1;
+            trainItems = data["train"].Item2;
+            testUsers = data["test"].Item1;
+            testItems = data["test"].Item2;
+            CalculateAverageRatingForTrainingSet();
         }
 
         public void TrainBaseModel(int cFeatures)
         {
-            throw new NotImplementedException();
+            this.matrixFactorizationEngine = new MatrixFactorizationEngine(trainUsers, trainItems, cFeatures);
         }
         public void TrainStereotypes(int cStereotypes)
         {
@@ -94,7 +106,8 @@ namespace RecommenderSystem
         public double PredictRating(PredictionMethod m, string sUID, string sIID)
         {
             User user = users.getUserById(sUID);
-            return predictionEngine.PredictRating(m, user, sIID);
+            Item item = items.GetItemById(sIID);
+            return predictionEngine.PredictRating(m, user, item);
         }
 
         //Compute MAE (mean absolute error) for a set of rating prediction methods over the same user-item pairs
@@ -113,6 +126,13 @@ namespace RecommenderSystem
         public Dictionary<PredictionMethod, double> ComputeRMSE(List<PredictionMethod> lMethods, out Dictionary<PredictionMethod, Dictionary<PredictionMethod, double>> dConfidence)
         {
             throw new NotImplementedException();
+        }
+
+        public void CalculateAverageRatingForTrainingSet()
+        {
+            double sum = trainUsers.Sum(user => user.GetAverageRatings());
+
+            this.averageTrainRating = sum / trainUsers.Count();
         }
     }
 }

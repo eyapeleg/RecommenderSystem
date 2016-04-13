@@ -49,10 +49,9 @@ namespace RecommenderSystem
         }
 
 
-        public double PredictRating(RecommenderSystem.PredictionMethod m, User user, string sIID)
+        public double PredictRating(RecommenderSystem.PredictionMethod m, User user, Item item)
         {
-
-            var candidateUsers = items.GetItemById(sIID).Keys.ToList();
+            var candidateUsers = item.GetRatingUsers();
 
             //in case the current user is the only one that predict this item return the random rating or otherwise if the current user has only one rated item
             if ((candidateUsers.Count == 1 && candidateUsers.Contains(user.GetId())) || user.GetRatedItems().Count < 2)
@@ -65,7 +64,7 @@ namespace RecommenderSystem
             if (m != RecommenderSystem.PredictionMethod.Random)
             {
                 IList<KeyValuePair<User, double>> similarUsers = similarityEngine.calculateSimilarity(predictionMethod, user, candidateUsers);
-                double prediction = calculateRating(user, sIID, similarUsers);
+                double prediction = calculateRating(user, item.GetId(), similarUsers);
                 return prediction > 10 ? 10 : prediction;
             }
 

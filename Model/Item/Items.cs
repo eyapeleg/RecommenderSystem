@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace RecommenderSystem
 {
-    public class Items
+    public class Items : IEnumerable<Item>
     {
-        private Dictionary<string, Dictionary<string, double>> items;
+        private Dictionary<string, Item> items;
 
         public Items(){
-            items = new Dictionary<string, Dictionary<string, double>>();
+            items = new Dictionary<string, Item>();
         }
 
         public List<string> GetAllItems()
@@ -18,30 +19,50 @@ namespace RecommenderSystem
             return items.Keys.ToList();
         }
 
-        public Dictionary<string, Dictionary<string, double>> GetUsersPerItemList()
+        public Item GetItemById(string itemId)
         {
-            return items;
+            Item item;
+            items.TryGetValue(itemId, out item);
+
+            return item;
         }
 
-        public Dictionary<string, double> GetItemById(string sIID)
+        public void addUserToItem(string userId, string itemId, double rating)
         {
-            Dictionary<string, double> users;
-            items.TryGetValue(sIID, out users);
+            Item item = GetItemById(itemId);
 
-            return users;
-        }
-
-        public void addUserToItems(string userId, string itemId, double rating)
-        {
-            if (items.ContainsKey(itemId))
+            if (item == null)
             {
-                items[itemId].Add(userId, rating);
+                addItem(itemId);
+                addUserToItem(userId, itemId, rating);
             }
             else
             {
-                var value = new Dictionary<string, double>() { { userId, rating } };
-                items.Add(itemId, value);
+                item.AddUser(userId, rating);
             }
+        }
+
+        public void addItem(string itemId)
+        {
+            if (items.Keys.Contains(itemId))
+                throw new NotSupportedException("Item " + "[" + itemId + "]" + " already exists in the DB!");
+
+            Item item = new Item(itemId);
+            items.Add(itemId, item);
+        }
+
+        public IEnumerator<Item> GetEnumerator()
+        {
+            foreach (KeyValuePair<string, Item> item in items)
+            {
+                yield return item.Value;
+            }
+        }
+
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
     }

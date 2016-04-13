@@ -54,10 +54,13 @@ namespace RecommenderSystem
 
             foreach (var testedObject in userItemTestSet)
             {
-                double actual = testedObject.Key.GetRating(testedObject.Value);
+                Item item = new Item(testedObject.Value);
+                User user = testedObject.Key;
+                
+                double actual = user.GetRating(testedObject.Value);
                 foreach (var lMethod in lMethods)
                 {
-                    double predicted = predictionEngine.PredictRating(lMethod, testedObject.Key, testedObject.Value);
+                    double predicted = predictionEngine.PredictRating(lMethod, user, item);
                     double error = Math.Abs(predicted - actual);
 
                     if (!maeResult.ContainsKey(lMethod))
