@@ -50,17 +50,6 @@ namespace RecommenderSystem
             Dictionary<string, Tuple<Users, Items>> data = dataLoaderEngine.Load(sFileName, dTrainSetSize);
             Tuple<Users, Items> trainData = data["train"];
             Tuple<Users, Items> testData = data["test"];
-
-            //TODO: Remove before submission - validate the size of the test set
-            //int count = 0;
-            //for (int i = 0; i < testData.Item1.Count(); i++)
-            //{
-            //    var items = testData.Item1.ElementAt(i).GetRatedItems();
-            //    for (int j = 0; j < items.Count; j++)
-            //    {
-            //        count++;
-            //    }
-            //}
         }
 
         public void TrainBaseModel(int cFeatures)

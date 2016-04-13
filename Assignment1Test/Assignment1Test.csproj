@@ -51,6 +51,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="DataLoader\DataLoaderTest.cs" />
     <Compile Include="Engines\SimilarityEngineTest.cs" />
     <Compile Include="Model\Users\UsersSimilarityTest.cs" />
     <Compile Include="Model\Collections\BoundedSortedCollectionTest.cs" />

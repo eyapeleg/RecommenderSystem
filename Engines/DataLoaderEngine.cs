@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace RecommenderSystem
 {
-    class DataLoaderEngine
+    public class DataLoaderEngine
     {
         ILogger logger;
 
@@ -112,6 +112,13 @@ namespace RecommenderSystem
                 }
             }
             return result;
+        }
+
+        public int GetDataSetSize(string sFileName)
+        {
+            StreamReader objInput = new StreamReader(sFileName, Encoding.Default);
+            int linesCount = File.ReadAllLines(sFileName).Count();
+            return linesCount;
         }
 
 
