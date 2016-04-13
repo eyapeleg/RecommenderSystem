@@ -10,7 +10,7 @@ namespace RecommenderSystem
 {
     public class RecommenderSystem
     {
-        public enum PredictionMethod { Pearson, Cosine, Random };
+        public enum PredictionMethod { Pearson, Cosine, Random, BaseModel, Stereotypes };
         PredictionMethodsMapping predictionMethodsMapping;
         private Users users;
         private Items items;
@@ -37,14 +37,40 @@ namespace RecommenderSystem
 
         public void Load(string sFileName)
         {
-            
             Tuple<Users, Items> data = dataLoaderEngine.Load(sFileName);
             users = data.Item1;
             items = data.Item2;
             similarityEngine = new SimilarityEngine(users, MAX_SIMILAR_USERS, logger);
             predictionEngine = new PredictionEngine(users, items, predictionMethodsMapping, similarityEngine);
             evaluationEngine = new EvaluationEngine(predictionEngine, users);
-        }          
+        }
+
+        public void Load(string sFileName, double dTrainSetSize)
+        {
+            Dictionary<string, Tuple<Users, Items>> data = dataLoaderEngine.Load(sFileName, dTrainSetSize);
+            Tuple<Users, Items> trainData = data["train"];
+            Tuple<Users, Items> testData = data["test"];
+
+            //TODO: Remove before submission - validate the size of the test set
+            //int count = 0;
+            //for (int i = 0; i < testData.Item1.Count(); i++)
+            //{
+            //    var items = testData.Item1.ElementAt(i).GetRatedItems();
+            //    for (int j = 0; j < items.Count; j++)
+            //    {
+            //        count++;
+            //    }
+            //}
+        }
+
+        public void TrainBaseModel(int cFeatures)
+        {
+            throw new NotImplementedException();
+        }
+        public void TrainStereotypes(int cStereotypes)
+        {
+            throw new NotImplementedException();
+        }
 
         //return a list of the ids of all the users in the dataset
         public List<string> GetAllUsers()
@@ -70,6 +96,11 @@ namespace RecommenderSystem
             return users.GetRating(sUID, sIID);
         }
 
+        public Dictionary<double, int> GetRatingsHistogram(string sUID)
+        {
+            throw new NotImplementedException();
+        }
+
         //predict a rating for a user item pair using the specified method
         public double PredictRating(PredictionMethod m, string sUID, string sIID)
         {
@@ -83,6 +114,16 @@ namespace RecommenderSystem
         {
             List<KeyValuePair<User, string>> userItemTestSet = evaluationEngine.createTestSet(cTrials);
             return evaluationEngine.ComputeMAE(lMethods, userItemTestSet);
+        }
+
+        public Dictionary<PredictionMethod, double> ComputeRMSE(List<PredictionMethod> lMethods, int cTrials)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Dictionary<PredictionMethod, double> ComputeRMSE(List<PredictionMethod> lMethods, out Dictionary<PredictionMethod, Dictionary<PredictionMethod, double>> dConfidence)
+        {
+            throw new NotImplementedException();
         }
     }
 }
