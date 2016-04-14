@@ -63,7 +63,6 @@ namespace RecommenderSystem
             }
         }
 
-        
         public string[] getUsersArray()
         {
             return users.Keys.ToArray();
@@ -77,10 +76,21 @@ namespace RecommenderSystem
             }
         }
 
-
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
+
+        public void RemoveUserById(string userId)
+        {
+            if (users.ContainsKey(userId))
+            {
+                users.Remove(userId);
+            }
+        }
+    }
+
+    public interface IDatasetType
+    {
     }
 }

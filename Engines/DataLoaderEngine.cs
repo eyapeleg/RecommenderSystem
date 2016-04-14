@@ -11,6 +11,7 @@ namespace RecommenderSystem
     public class DataLoaderEngine
     {
         ILogger logger;
+        private int datasetSize;
 
         public DataLoaderEngine(ILogger logger)
         {
@@ -30,6 +31,7 @@ namespace RecommenderSystem
             StreamReader objInput = new StreamReader(sFileName, Encoding.Default);
             while (!objInput.EndOfStream)
             {
+                datasetSize++;
                 string line = objInput.ReadLine();
                 string[] split = System.Text.RegularExpressions.Regex.Split(line, "::", RegexOptions.None);
                 string userId = split[0];
@@ -41,9 +43,6 @@ namespace RecommenderSystem
                 items.addUserToItem(userId, itemId, rating);
             }
 
-            //initialize data for each predict method 
-            //pearson.calcAverageRatingPerUser();
-
             timer.Stop();
             TimeSpan elapsed = timer.Elapsed;
             logger.info("Loading data was completed successfully\nExection Time: "+elapsed.ToString("mm':'ss':'fff"));
@@ -51,76 +50,16 @@ namespace RecommenderSystem
             return Tuple.Create<Users, Items>(users, items);
         }
 
-        public Dictionary<string, Tuple<Users, Items>> Load(string sFileName, double dTrainSetSize)
+        public Dictionary<RecommenderSystem.DatasetType, Tuple<Users, Items>> Load(string sFileName, double dTrainSetSize)
         {
-            Dictionary<string, Tuple<Users, Items>> result = new Dictionary<string, Tuple<Users, Items>>();
-            Random rnd = new Random();
-
-            //initialize test/train sets
-            var trainUsers = new Users();
-            var testUsers = new Users();
-            var trainItems = new Items();
-            var testItems = new Items();
-
-            logger.info("Starting load data - train/test split...");
-            Stopwatch timer = Stopwatch.StartNew();
-
-            StreamReader objInput = new StreamReader(sFileName, Encoding.Default);
-            int linesCount = File.ReadAllLines(sFileName).Count();
-            int testSize = (int)  (linesCount * (1 - dTrainSetSize));
-            int tSize = 0;
-
-            while (!objInput.EndOfStream)
-            {
-                var nextDouble = rnd.NextDouble();
-
-                string line = objInput.ReadLine();
-                string[] split = Regex.Split(line, "::", RegexOptions.None);
-                string userId = split[0];
-                string itemId = split[1];
-                double rating = Convert.ToDouble(split[2]);
-
-                logger.debug("read user" + " [" + userId + "]" + " itemId" + " [" + itemId + "]" + " rating" + " [" + rating + "]");
-
-                //with probablity of 0.5, assign the user to train/test set
-                if (nextDouble <= 0.5 && tSize < testSize)
-                {
-                    //TODO Change the set type to ENUM
-                    if (!result.ContainsKey("test"))
-                    {
-                        testUsers.addItemToUser(userId, itemId, rating);
-                        testItems.addUserToItem(userId, itemId, rating);
-                        result.Add("test", new Tuple<Users, Items>(testUsers, testItems));
-                    }
-                    else
-                    {
-                        result["test"].Item1.addItemToUser(userId, itemId, rating);
-                        result["test"].Item2.addUserToItem(userId, itemId, rating);
-                    }
-                    tSize++;
-                }
-                else
-                {
-                    if (!result.ContainsKey("train"))
-                    {
-                        trainUsers.addItemToUser(userId, itemId, rating);
-                        trainItems.addUserToItem(userId, itemId, rating);
-                        result.Add("train", new Tuple<Users, Items>(trainUsers, trainItems));
-                    }
-                    else
-                    {
-                        result["train"].Item1.addItemToUser(userId, itemId, rating);
-                        result["train"].Item2.addUserToItem(userId, itemId, rating);
-                    }
-                }
-            }
-            return result;
+            Tuple<Users, Items> data = Load(sFileName);
+            var splitUsers = DataUtils.DataSplit(dTrainSetSize, datasetSize, data, RecommenderSystem.DatasetType.Test, RecommenderSystem.DatasetType.Train);
+            return splitUsers;
         }
 
         public int GetDataSetSize(string sFileName)
         {
-            StreamReader objInput = new StreamReader(sFileName, Encoding.Default);
-            int linesCount = File.ReadAllLines(sFileName).Count();
+            int linesCount = File.ReadAllLines(sFileName).Length;
             return linesCount;
         }
 

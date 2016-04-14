@@ -95,7 +95,7 @@ namespace RecommenderSystem
                 User user = userItemTuple.Item1;
                 Item item = userItemTuple.Item2;
 
-                actualRating = user.GetRating(item.GetId());
+                actualRating = user.GetRating(item.GetId()); //TODO - take only items that user rated
                 predictedRating = model.getPrediction(user, item);
 
                 sse += Math.Pow(actualRating - predictedRating, 2);

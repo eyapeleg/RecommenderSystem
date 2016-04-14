@@ -104,5 +104,10 @@ namespace RecommenderSystem
             var idx = rnd.Next(0,itemsRatings.Count - 1);
             return itemsRatings.ElementAt(idx).Value;
         }
+
+        public void RemoveItemById(string itemId)
+        {
+            itemsRatings.Remove(itemId);
+        }
     }
 }

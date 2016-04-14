@@ -11,6 +11,7 @@ namespace RecommenderSystem
     public class RecommenderSystem
     {
         public enum PredictionMethod { Pearson, Cosine, Random, BaseModel, Stereotypes };
+        public enum DatasetType { Train, Test, Validation};
         PredictionMethodsMapping predictionMethodsMapping;
         private Users users;
         private Items items;
@@ -33,6 +34,7 @@ namespace RecommenderSystem
 
         private int MAX_SIMILAR_USERS;
         private int NUM_OF_TRIALS;
+        private int dsSize;
 
         public RecommenderSystem()
         {
@@ -56,19 +58,23 @@ namespace RecommenderSystem
 
         public void Load(string sFileName, double dTrainSetSize)
         {
-            Dictionary<string, Tuple<Users, Items>> data = dataLoaderEngine.Load(sFileName, dTrainSetSize);
-            trainUsers = data["train"].Item1;
-            trainItems = data["train"].Item2;
-            testUsers = data["test"].Item1;
-            testItems = data["test"].Item2;
+            Dictionary<DatasetType, Tuple<Users, Items>> data = dataLoaderEngine.Load(sFileName, dTrainSetSize);
+            this.dsSize = dataLoaderEngine.GetDataSetSize(sFileName);
+
+            trainUsers = data[DatasetType.Train].Item1;
+            testUsers = data[DatasetType.Test].Item1;
+            trainItems = data[DatasetType.Train].Item2;
+            testItems = data[DatasetType.Test].Item2;
+
+            //calculate the overall average rating 
             CalculateAverageRatingForTrainingSet();
             evaluationEngine = new EvaluationEngine(users);
         }
 
         public void TrainBaseModel(int cFeatures)
         {
-            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine(users, items);
-            matrixFactorizationEngine.train(10, 0.2); //TODO - modify hard coded parameters
+            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine(trainUsers, trainItems, dsSize);
+            matrixFactorizationEngine.train(cFeatures, averageTrainRating); //TODO - modify the average rating to be only on the small train set
         }
 
         public void TrainStereotypes(int cStereotypes)
