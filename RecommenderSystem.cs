@@ -66,8 +66,10 @@ namespace RecommenderSystem
 
         public void TrainBaseModel(int cFeatures)
         {
-            this.matrixFactorizationEngine = new MatrixFactorizationEngine(trainUsers, trainItems, cFeatures);
+            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine();
+            matrixFactorizationEngine.train(trainUsers, trainItems, 10, 0.2); //TODO - modify hard coded parameters
         }
+
         public void TrainStereotypes(int cStereotypes)
         {
             throw new NotImplementedException();

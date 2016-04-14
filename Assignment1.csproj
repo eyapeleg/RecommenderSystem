@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\RandomGenerator.cs" />
     <Compile Include="Engines\EvaluationEngine.cs" />
     <Compile Include="Engines\MatrixFactorizationEngine.cs" />
     <Compile Include="Model\Collections\BoundedSortedCollection.cs" />
@@ -53,6 +54,9 @@
     <Compile Include="Engines\PredictionEngine.cs" />
     <Compile Include="Model\Collections\ValueComparablePair.cs" />
     <Compile Include="Model\Item\Item.cs" />
+    <Compile Include="Model\Matrix\MatrixFactorizationModelFactory.cs" />
+    <Compile Include="Model\Matrix\Matrix.cs" />
+    <Compile Include="Model\Matrix\MatrixFactorizationModel.cs" />
     <Compile Include="Model\Users\UsersSimilarity.cs" />
     <Compile Include="PredictionMethods\CosineMethod.cs" />
     <Compile Include="Engines\DataLoaderEngine.cs" />

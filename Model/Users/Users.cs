@@ -29,7 +29,7 @@ namespace RecommenderSystem
             User user;
             users.TryGetValue(userId, out user);
 
-            return user;
+            return user; //TODO add exception
 
         }
 
