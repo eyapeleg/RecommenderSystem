@@ -51,7 +51,7 @@ namespace RecommenderSystem
             items = data.Item2;
             similarityEngine = new SimilarityEngine(users, MAX_SIMILAR_USERS, logger);
             predictionEngine = new PredictionEngine(users, items, predictionMethodsMapping, similarityEngine);
-            evaluationEngine = new EvaluationEngine(predictionEngine, users);
+            evaluationEngine = new EvaluationEngine(users);
         }
 
         public void Load(string sFileName, double dTrainSetSize)
@@ -62,12 +62,13 @@ namespace RecommenderSystem
             testUsers = data["test"].Item1;
             testItems = data["test"].Item2;
             CalculateAverageRatingForTrainingSet();
+            evaluationEngine = new EvaluationEngine(users);
         }
 
         public void TrainBaseModel(int cFeatures)
         {
-            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine();
-            matrixFactorizationEngine.train(trainUsers, trainItems, 10, 0.2); //TODO - modify hard coded parameters
+            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine(users, items);
+            matrixFactorizationEngine.train(10, 0.2); //TODO - modify hard coded parameters
         }
 
         public void TrainStereotypes(int cStereotypes)
@@ -117,7 +118,7 @@ namespace RecommenderSystem
         public Dictionary<PredictionMethod, double> ComputeMAE(List<PredictionMethod> lMethods, int cTrials)
         {
             List<KeyValuePair<User, string>> userItemTestSet = evaluationEngine.createTestSet(cTrials);
-            return evaluationEngine.ComputeMAE(lMethods, userItemTestSet);
+            return evaluationEngine.ComputeMAE(predictionEngine,lMethods, userItemTestSet); //TODO - verify that prediction engine is not null
         }
 
         public Dictionary<PredictionMethod, double> ComputeRMSE(List<PredictionMethod> lMethods, int cTrials)

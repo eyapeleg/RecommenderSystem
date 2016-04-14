@@ -6,7 +6,7 @@ using System.Text;
 
 namespace RecommenderSystem
 {
-    class MatrixFactorizationModel : IEnumerable<Tuple<User,Item>>
+    public class MatrixFactorizationModel : IEnumerable<Tuple<User,Item>>
     {
         private Matrix<User> p;
         private Matrix<Item> q;

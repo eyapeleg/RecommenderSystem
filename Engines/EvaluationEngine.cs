@@ -7,12 +7,10 @@ namespace RecommenderSystem
 {
     public class EvaluationEngine
     {
-        private PredictionEngine predictionEngine;
         private Users users;
 
-        public EvaluationEngine(PredictionEngine predictionEngine, Users users)
+        public EvaluationEngine(Users users)
         {
-            this.predictionEngine = predictionEngine;
             this.users = users;
         }
 
@@ -47,7 +45,7 @@ namespace RecommenderSystem
             return userItemTestSet;
         }
 
-        public Dictionary<RecommenderSystem.PredictionMethod, double> ComputeMAE(List<RecommenderSystem.PredictionMethod> lMethods, List<KeyValuePair<User, string>> userItemTestSet)
+        public Dictionary<RecommenderSystem.PredictionMethod, double> ComputeMAE(PredictionEngine predictionEngine, List<RecommenderSystem.PredictionMethod> lMethods, List<KeyValuePair<User, string>> userItemTestSet)
         {
             Dictionary<RecommenderSystem.PredictionMethod, int> countDictionary = new Dictionary<RecommenderSystem.PredictionMethod, int>();
             Dictionary<RecommenderSystem.PredictionMethod, double> maeResult = new Dictionary<RecommenderSystem.PredictionMethod, double>();
@@ -82,6 +80,29 @@ namespace RecommenderSystem
             }
 
             return maeResult;
+        }
+
+        public double computeRMSE(MatrixFactorizationModel model)
+        {
+
+            double sse = 0;
+            double actualRating;
+            double predictedRating;
+            int n = 0;
+
+            foreach (Tuple<User, Item> userItemTuple in model)
+            {
+                User user = userItemTuple.Item1;
+                Item item = userItemTuple.Item2;
+
+                actualRating = user.GetRating(item.GetId());
+                predictedRating = model.getPrediction(user, item);
+
+                sse += Math.Pow(actualRating - predictedRating, 2);
+                n++;
+            }
+
+            return Math.Sqrt(sse / n);
         }
     }
 }
