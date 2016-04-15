@@ -85,7 +85,7 @@ namespace RecommenderSystem
             Users validatationUsers = data[RecommenderSystem.DatasetType.Validation].Item1;
             Items validatationItems = data[RecommenderSystem.DatasetType.Validation].Item2;
 
-            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine(trainUsers, trainItems,validatationUsers,validatationItems);
+            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine(users, items, trainUsers, trainItems,validatationUsers,validatationItems);
             matrixFactorizationEngine.train(cFeatures, averageTrainRating); //TODO - modify the average rating to be only on the small train set
         }
 

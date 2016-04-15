@@ -10,13 +10,17 @@ namespace RecommenderSystem
         private const double yRate = 0.05; //TODO - rename
         private const double lambdaRate = 0.05; //TODO - rename
         private const double minErrorThreshold = 1.0; //TODO - evalute the appropriate error threshold 
+        private Users users;
+        private Items items;
         private Users trainUsers;
         private Items trainItems;
         private Users validationUsers;
         private Items validationItems;
 
-        public MatrixFactorizationEngine(Users trainUsers, Items trainItems, Users validationUsers, Items validationItems)
+        public MatrixFactorizationEngine(Users users, Items items, Users trainUsers, Items trainItems, Users validationUsers, Items validationItems)
         {
+            this.users = users;
+            this.items = items;
             this.trainUsers = trainUsers;
             this.trainItems = trainItems;
             this.validationUsers = validationUsers;
@@ -26,7 +30,7 @@ namespace RecommenderSystem
         public MatrixFactorizationModel train(int k, double miu)
         {
             MatrixFactorizationModelFactory factory = new MatrixFactorizationModelFactory();
-            MatrixFactorizationModel model = factory.newRandomModel(trainUsers, trainItems, k, miu);
+            MatrixFactorizationModel model = factory.newRandomModel(users, items, k, miu);
 
             double error;
             double actualRating;
