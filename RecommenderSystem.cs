@@ -69,11 +69,23 @@ namespace RecommenderSystem
             //calculate the overall average rating 
             CalculateAverageRatingForTrainingSet();
             evaluationEngine = new EvaluationEngine(users);
+
+
         }
 
         public void TrainBaseModel(int cFeatures)
         {
-            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine(trainUsers, trainItems, dsSize);
+            double trainSize = Math.Round(dsSize * 0.95);
+
+            var data = DataUtils.DataSplit(0.95, trainSize, new Tuple<Users, Items>(users, items),
+                RecommenderSystem.DatasetType.Validation, RecommenderSystem.DatasetType.Train);
+
+            Users trainUsers = data[RecommenderSystem.DatasetType.Train].Item1;
+            Items trainItems = data[RecommenderSystem.DatasetType.Train].Item2;
+            Users validatationUsers = data[RecommenderSystem.DatasetType.Validation].Item1;
+            Items validatationItems = data[RecommenderSystem.DatasetType.Validation].Item2;
+
+            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine(trainUsers, trainItems,validatationUsers,validatationItems);
             matrixFactorizationEngine.train(cFeatures, averageTrainRating); //TODO - modify the average rating to be only on the small train set
         }
 
