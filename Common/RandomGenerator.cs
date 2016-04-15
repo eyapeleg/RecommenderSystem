@@ -77,7 +77,7 @@ namespace RecommenderSystem
             return randomItems;
         }
 
-        public User newRandomUser(Users users)
+        public User newRandomUser(IEnumerable<User> users)
         {
             var next = rand.Next(users.Count() - 1);
             return users.ElementAt(next);

@@ -24,7 +24,7 @@ namespace RecommenderSystem
             //initialize test/train sets
             result.Add(largeSetType, data);
             result.Add(smallSetType, new Tuple<Users, Items>(new Users(), new Items()));
-            Users largesetUsers = result[RecommenderSystem.DatasetType.Train].Item1;
+            Users largesetUsers = result[largeSetType].Item1;
 
             do
             {

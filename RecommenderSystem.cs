@@ -20,6 +20,8 @@ namespace RecommenderSystem
         //TODO: decide how to formalize that part
         private Users trainUsers;
         private Items trainItems;
+        private Users validationUsers;
+        private Items validationItems;
         private Users testUsers;
         private Items testItems;
 
@@ -59,33 +61,33 @@ namespace RecommenderSystem
 
         public void Load(string sFileName, double dTrainSetSize)
         {
-            Dictionary<DatasetType, Tuple<Users, Items>> data = dataLoaderEngine.Load(sFileName, dTrainSetSize);
+            Tuple<Users, Items> data = dataLoaderEngine.Load(sFileName);
+            Dictionary<RecommenderSystem.DatasetType, Tuple<Users, Items>> splittedData;
+            
             this.dsSize = dataLoaderEngine.GetDataSetSize();
+            splittedData  = dataUtils.Split(dTrainSetSize, dsSize, data, DatasetType.Test, DatasetType.Train);
 
-            trainUsers = data[DatasetType.Train].Item1;
-            testUsers = data[DatasetType.Test].Item1;
-            trainItems = data[DatasetType.Train].Item2;
-            testItems = data[DatasetType.Test].Item2;
+            trainUsers = splittedData[DatasetType.Train].Item1;
+            trainItems = splittedData[DatasetType.Train].Item2;
+            testUsers = splittedData[DatasetType.Test].Item1;
+            testItems = splittedData[DatasetType.Test].Item2;
+
+            double trainSize = Math.Round(dsSize * 0.95); //TODO - parameterize hardcoded data size
+            splittedData = dataUtils.Split(0.95, trainSize, new Tuple<Users, Items>(this.trainUsers, this.trainItems), DatasetType.Validation, DatasetType.Train);//TODO - parameterize hardcoded data size
+
+            trainUsers = splittedData[DatasetType.Train].Item1;
+            trainItems = splittedData[DatasetType.Train].Item2;
+            validationUsers = splittedData[DatasetType.Validation].Item1;
+            validationItems = splittedData[DatasetType.Validation].Item2;
 
             //calculate the overall average rating 
             CalculateAverageRatingForTrainingSet();
             evaluationEngine = new EvaluationEngine(users);
-
-
         }
 
         public void TrainBaseModel(int cFeatures)
         {
-            double trainSize = Math.Round(dsSize * 0.95);
-
-            var data = dataUtils.Split(0.95, trainSize, new Tuple<Users, Items>(this.trainUsers, this.trainItems), RecommenderSystem.DatasetType.Validation, RecommenderSystem.DatasetType.Train);
-
-            Users subsetTrainUsers = data[RecommenderSystem.DatasetType.Train].Item1;
-            Items subsetTrainItems = data[RecommenderSystem.DatasetType.Train].Item2;
-            Users validatationUsers = data[RecommenderSystem.DatasetType.Validation].Item1;
-            Items validatationItems = data[RecommenderSystem.DatasetType.Validation].Item2;
-
-            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine(trainUsers, trainItems, subsetTrainUsers, subsetTrainItems, validatationUsers, validatationItems);
+            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine(trainUsers, trainItems, validationUsers, validationItems);
             matrixFactorizationEngine.train(cFeatures, averageTrainRating); //TODO - modify the average rating to be only on the small train set
         }
 

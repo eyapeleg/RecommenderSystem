@@ -7,7 +7,13 @@ namespace RecommenderSystem
 {
     public class EvaluationEngine
     {
-        private Users users;
+        private Users users; //TODO - remove this dependecy and pass it as an argument to the corresponding method
+
+
+        public EvaluationEngine()
+        {
+        
+        }
 
         public EvaluationEngine(Users users)
         {

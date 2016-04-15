@@ -50,13 +50,6 @@ namespace RecommenderSystem
             return Tuple.Create<Users, Items>(users, items);
         }
 
-        public Dictionary<RecommenderSystem.DatasetType, Tuple<Users, Items>> Load(string sFileName, double dTrainSetSize)
-        {
-            Tuple<Users, Items> data = Load(sFileName);
-            var splitUsers = dataUtils.Split(dTrainSetSize, datasetSize, data, RecommenderSystem.DatasetType.Test, RecommenderSystem.DatasetType.Train);
-            return splitUsers;
-        }
-
         public int GetDataSetSize()
         {
             return datasetSize;
