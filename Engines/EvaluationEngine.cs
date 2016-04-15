@@ -97,7 +97,7 @@ namespace RecommenderSystem
 
                     Item item = validationItems.GetItemById(itemId);
 
-                    actualRating = user.GetRating(item.GetId()); //TODO - take only items that user rated
+                    actualRating = user.GetRating(itemId); //TODO - take only items that user rated
                     predictedRating = model.getPrediction(user, item);
 
                     sse += Math.Pow(actualRating - predictedRating, 2);

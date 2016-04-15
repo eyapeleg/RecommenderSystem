@@ -55,9 +55,9 @@ namespace RecommenderSystem
             return vector;
         }
 
-        public List<string> newRandomItemsPerUser(User user)
+        public Dictionary<string, double> NewRandomItemsPerUser(User user)
         {
-            List<string> randomItems = new List<string>();
+            Dictionary<string, double> randomItems = new Dictionary<string, double>();
             int count = 0; //set the number of selected items per user
 
             int kItems = rand.Next(1, user.GetRatedItems().Count); //pick a random items from the user rating list
@@ -66,7 +66,8 @@ namespace RecommenderSystem
             {
                 int idx = rand.Next(user.GetRatedItems().Count - 1);
                 string itemId = user.GetRatedItems().ElementAt(idx);
-                randomItems.Add(itemId);
+                double rating = user.GetRating(itemId);
+                randomItems.Add(itemId, rating);
                 count++;
 
                 user.RemoveItemById(itemId);

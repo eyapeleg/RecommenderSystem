@@ -38,8 +38,8 @@ namespace RecommenderSystem
                 //verify the user has at least 2 rated Items
                 if (numberOfRatings > 2)
                 {
-                    List<string> smallSetItems = randomGenerator.newRandomItemsPerUser(user);
-                    List<string> largeSetItems = user.GetRatedItems().Except(smallSetItems).ToList();
+                    Dictionary<string, double> smallSetItems = randomGenerator.NewRandomItemsPerUser(user);
+                    Dictionary<string, double> largeSetItems = user.GetRatedItemsDic();
                     currentTestSize += smallSetItems.Count;
 
                     AddUserToDataset(result, user, smallSetType, smallSetItems); //random items goes to small set
@@ -47,7 +47,7 @@ namespace RecommenderSystem
                 }
                 else //add user with less than two items to the large dataset
                 {
-                    AddUserToDataset(result, user, largeSetType, user.GetRatedItems());
+                    AddUserToDataset(result, user, largeSetType, user.GetRatedItemsDic());
                 }
 
                 //remove the user from the full list once the 
@@ -58,7 +58,7 @@ namespace RecommenderSystem
             //Add the rest of the users to the large dataset
             foreach (var user in data.Item1)
             {
-                AddUserToDataset(result, user, largeSetType, user.GetRatedItems());
+                AddUserToDataset(result, user, largeSetType, user.GetRatedItemsDic());
             }
 
             timer.Stop();
@@ -68,14 +68,15 @@ namespace RecommenderSystem
             return result;
         }
 
-        private void AddUserToDataset(Dictionary<RecommenderSystem.DatasetType, Tuple<Users, Items>> result, 
-                                        User user, RecommenderSystem.DatasetType dsType, List<string> items)
+        private void AddUserToDataset(Dictionary<RecommenderSystem.DatasetType, Tuple<Users, Items>> result,
+                                        User user, RecommenderSystem.DatasetType dsType, Dictionary<string, double> items)
         {
             string userId = user.GetId();
 
-            foreach (var itemId in items)
+            foreach (var element in items)
             {
-                double rating = user.GetRating(itemId);
+                string itemId = element.Key;
+                double rating = element.Value;
                 result[dsType].Item1.addItemToUser(userId, itemId, rating);
                 result[dsType].Item2.addUserToItem(userId, itemId, rating);
             }

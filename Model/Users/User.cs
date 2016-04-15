@@ -57,6 +57,11 @@ namespace RecommenderSystem
             return itemsRatings.Keys.ToList();
         }
 
+        public Dictionary<string, double> GetRatedItemsDic()
+        {
+            return itemsRatings;
+        }
+
 
         public double GetRating(string sIID)
         {
