@@ -42,8 +42,8 @@ namespace RecommenderSystem
                     List<string> largeSetItems = user.GetRatedItems().Except(smallSetItems).ToList();
                     currentTestSize += smallSetItems.Count;
 
-                    AddUserToDataset(result, user, smallSetType, smallSetItems); //random items goes to test set
-                    AddUserToDataset(result, user, largeSetType, largeSetItems); //the rest of the items goes to train set
+                    AddUserToDataset(result, user, smallSetType, smallSetItems); //random items goes to small set
+                    AddUserToDataset(result, user, largeSetType, largeSetItems); //the rest of the items goes to large set
                 }
                 else //add user with less than two items to the large dataset
                 {
