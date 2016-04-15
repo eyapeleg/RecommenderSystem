@@ -21,45 +21,27 @@ namespace RecommenderSystem
             double smallDsSize = Math.Round(datasetSize* (1- subsetSize));
             int currentTestSize = 0;
 
-            //get the list of users
-            Users users = data.Item1;
-
             //initialize test/train sets
-            result.Add(largeSetType, new Tuple<Users, Items>(new Users(), new Items()));
+            result.Add(largeSetType, data);
             result.Add(smallSetType, new Tuple<Users, Items>(new Users(), new Items()));
+            Users largesetUsers = result[RecommenderSystem.DatasetType.Train].Item1;
 
             do
             {
                 //select random user
-                User user = randomGenerator.newRandomUser(users);
+                User user = randomGenerator.newRandomUser(largesetUsers);
                 var numberOfRatings = user.GetRatedItems().Count;
-                string userId = user.GetId();
 
                 //verify the user has at least 2 rated Items
                 if (numberOfRatings > 2)
                 {
                     Dictionary<string, double> smallSetItems = randomGenerator.NewRandomItemsPerUser(user);
-                    Dictionary<string, double> largeSetItems = user.GetRatedItemsDic();
                     currentTestSize += smallSetItems.Count;
 
-                    AddUserToDataset(result, user, smallSetType, smallSetItems); //random items goes to small set
-                    AddUserToDataset(result, user, largeSetType, largeSetItems); //the rest of the items goes to large set
+                    AddUserToSmallDataset(result[smallSetType], user, smallSetItems); //random items goes to small set
+                    RemoveUserFromLargeDataset(user, smallSetItems); //the rest of the items goes to large set
                 }
-                else //add user with less than two items to the large dataset
-                {
-                    AddUserToDataset(result, user, largeSetType, user.GetRatedItemsDic());
-                }
-
-                //remove the user from the full list once the 
-                users.RemoveUserById(userId);
-
             } while (currentTestSize < smallDsSize);
-
-            //Add the rest of the users to the large dataset
-            foreach (var user in data.Item1)
-            {
-                AddUserToDataset(result, user, largeSetType, user.GetRatedItemsDic());
-            }
 
             timer.Stop();
             TimeSpan elapsed = timer.Elapsed;
@@ -68,8 +50,15 @@ namespace RecommenderSystem
             return result;
         }
 
-        private void AddUserToDataset(Dictionary<RecommenderSystem.DatasetType, Tuple<Users, Items>> result,
-                                        User user, RecommenderSystem.DatasetType dsType, Dictionary<string, double> items)
+        private void RemoveUserFromLargeDataset(User user, Dictionary<string, double> smallSetItems)
+        {
+            foreach (var item in smallSetItems)
+            {
+                user.RemoveItemById(item.Key);
+            }
+        }
+
+        private void AddUserToSmallDataset(Tuple<Users, Items> result, User user, Dictionary<string, double> items)
         {
             string userId = user.GetId();
 
@@ -77,8 +66,8 @@ namespace RecommenderSystem
             {
                 string itemId = element.Key;
                 double rating = element.Value;
-                result[dsType].Item1.addItemToUser(userId, itemId, rating);
-                result[dsType].Item2.addUserToItem(userId, itemId, rating);
+                result.Item1.addItemToUser(userId, itemId, rating);
+                result.Item2.addUserToItem(userId, itemId, rating);
             }
         }
     }

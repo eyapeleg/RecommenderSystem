@@ -58,19 +58,20 @@ namespace RecommenderSystem
         public Dictionary<string, double> NewRandomItemsPerUser(User user)
         {
             Dictionary<string, double> randomItems = new Dictionary<string, double>();
-            int count = 0; //set the number of selected items per user
+            List<string> ratingItems = user.GetRatedItems().Select(item => (string)item.Clone()).ToList();
+            int count = 0; //set the number of selected items per user           
 
-            int kItems = rand.Next(1, user.GetRatedItems().Count); //pick a random items from the user rating list
+            int kItems = rand.Next(1, ratingItems.Count - 1); //pick a random items from the user rating list
 
             while (count < kItems)
             {
-                int idx = rand.Next(user.GetRatedItems().Count - 1);
-                string itemId = user.GetRatedItems().ElementAt(idx);
+                int idx = rand.Next(ratingItems.Count - 1);
+                string itemId = ratingItems.ElementAt(idx);
                 double rating = user.GetRating(itemId);
                 randomItems.Add(itemId, rating);
                 count++;
 
-                user.RemoveItemById(itemId);
+                ratingItems.Remove(itemId);
             }
 
             return randomItems;

@@ -55,6 +55,7 @@
     <Compile Include="Logger\InfoLogger.cs" />
     <Compile Include="Engines\PredictionEngine.cs" />
     <Compile Include="Model\Collections\ValueComparablePair.cs" />
+    <Compile Include="Model\Exceptions\ElementNotFoundException.cs" />
     <Compile Include="Model\Item\Item.cs" />
     <Compile Include="Model\Matrix\MatrixFactorizationModelFactory.cs" />
     <Compile Include="Model\Matrix\Matrix.cs" />

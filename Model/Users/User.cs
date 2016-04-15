@@ -9,8 +9,6 @@ namespace RecommenderSystem
     public class User : IComparable<User>
     {
         private Dictionary<string, double> itemsRatings;
-        //private UserSimilarities similarUsers;
-        //private List<User> intersectUserList;  //TODO - verify
         private double sum;
         private int count;
         private string id;
