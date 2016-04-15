@@ -82,7 +82,7 @@ namespace RecommenderSystem
             return maeResult;
         }
 
-        public double computeRMSE(MatrixFactorizationModel model)
+        public double computeRMSE(Users validationUsers, Items validationItems, MatrixFactorizationModel model)
         {
 
             double sse = 0;
@@ -90,18 +90,20 @@ namespace RecommenderSystem
             double predictedRating;
             int n = 0;
 
-            foreach (Tuple<User, Item> userItemTuple in model)
+            foreach (User user in validationUsers)
             {
-                User user = userItemTuple.Item1;
-                Item item = userItemTuple.Item2;
+                foreach (string itemId in user.GetRatedItems())
+                {
 
-                actualRating = user.GetRating(item.GetId()); //TODO - take only items that user rated
-                predictedRating = model.getPrediction(user, item);
+                    Item item = validationItems.GetItemById(itemId);
 
-                sse += Math.Pow(actualRating - predictedRating, 2);
-                n++;
+                    actualRating = user.GetRating(item.GetId()); //TODO - take only items that user rated
+                    predictedRating = model.getPrediction(user, item);
+
+                    sse += Math.Pow(actualRating - predictedRating, 2);
+                    n++;
+                }
             }
-
             return Math.Sqrt(sse / n);
         }
     }

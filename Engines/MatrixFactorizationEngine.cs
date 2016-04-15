@@ -12,21 +12,15 @@ namespace RecommenderSystem
         private const double minErrorThreshold = 1.0; //TODO - evalute the appropriate error threshold 
         private Users trainUsers;
         private Items trainItems;
-        private Users validatationUsers;
-        private Items validatationItems;
+        private Users validationUsers;
+        private Items validationItems;
 
-        public MatrixFactorizationEngine(Users users, Items items, int dsSize)
+        public MatrixFactorizationEngine(Users trainUsers, Items trainItems, Users validationUsers, Items validationItems)
         {
-
-            double trainSize = Math.Round(dsSize * 0.95);
-
-            var data = DataUtils.DataSplit(0.95, trainSize, new Tuple<Users, Items>(users, items),
-                RecommenderSystem.DatasetType.Validation, RecommenderSystem.DatasetType.Train);
-
-            trainUsers = data[RecommenderSystem.DatasetType.Train].Item1;
-            trainItems = data[RecommenderSystem.DatasetType.Train].Item2;
-            validatationUsers = data[RecommenderSystem.DatasetType.Validation].Item1;
-            validatationItems = data[RecommenderSystem.DatasetType.Validation].Item2;
+            this.trainUsers = trainUsers;
+            this.trainItems = trainItems;
+            this.validationUsers = validationUsers;
+            this.validationItems = validationItems;
         }
 
         public MatrixFactorizationModel train(int k, double miu)
@@ -39,27 +33,30 @@ namespace RecommenderSystem
             double predictedRating;
             double prevRmse = Double.MaxValue;
 
-            EvaluationEngine evaluationEngine = new EvaluationEngine(validatationUsers);
-            double currRmse = evaluationEngine.computeRMSE(model); //TODO - modify the rmse to be on the validation set
+            EvaluationEngine evaluationEngine = new EvaluationEngine(validationUsers);
+            double currRmse = evaluationEngine.computeRMSE(validationUsers, validationItems, model); 
 
             while (prevRmse > currRmse) //TODO - add num iteration and improvment threshold conditions
             {
-                foreach (Tuple<User, Item> userItemTuple in model)
+                foreach(User user in trainUsers)
                 {
-                    User user = userItemTuple.Item1;
-                    Item item = userItemTuple.Item2;
+                    foreach (string itemId in user.GetRatedItems())
+                    {
 
-                    actualRating = user.GetRating(item.GetId());
-                    predictedRating = model.getPrediction(user, item);
-                    error = actualRating - predictedRating;
+                        Item item = trainItems.GetItemById(itemId);
 
-                    model.setBu(user, model.getBu(user) + yRate * (error - lambdaRate * model.getBu(user)));
-                    model.setBi(item, model.getBi(item) + yRate * (error - lambdaRate * model.getBi(item)));
-                    //TODO -  add set to pu qi
+                        actualRating = user.GetRating(item.GetId());
+                        predictedRating = model.getPrediction(user, item);
+                        error = actualRating - predictedRating;
+
+                        model.setBu(user, model.getBu(user) + yRate * (error - lambdaRate * model.getBu(user)));
+                        model.setBi(item, model.getBi(item) + yRate * (error - lambdaRate * model.getBi(item)));
+                        //TODO -  add set to pu qi
+                    }
                 }
 
                 prevRmse = currRmse;
-                currRmse = evaluationEngine.computeRMSE(model); //TODO - modify the rmse to be on the validation set
+                currRmse = evaluationEngine.computeRMSE(validationUsers, validationItems,model);
             }
 
             return model;

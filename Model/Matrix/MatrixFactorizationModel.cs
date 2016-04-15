@@ -6,7 +6,7 @@ using System.Text;
 
 namespace RecommenderSystem
 {
-    public class MatrixFactorizationModel : IEnumerable<Tuple<User,Item>>
+    public class MatrixFactorizationModel 
     {
         private Matrix<User> p;
         private Matrix<Item> q;
@@ -92,23 +92,6 @@ namespace RecommenderSystem
             }
 
             return sum;
-        }
-
-        public IEnumerator<Tuple<User, Item>> GetEnumerator()
-        {
-            foreach (KeyValuePair<User,double> user in buVector)
-            {
-                foreach (KeyValuePair<Item, double> item in biVector)
-                {
-                    yield return Tuple.Create(user.Key,item.Key);
-                
-                }
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }
