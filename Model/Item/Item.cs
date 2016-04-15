@@ -52,5 +52,10 @@ namespace RecommenderSystem
 
             return false;
         }
+
+        public override int GetHashCode()
+        {
+            return this.GetId().GetHashCode();
+        }
     }
 }

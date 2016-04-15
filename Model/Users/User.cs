@@ -101,6 +101,11 @@ namespace RecommenderSystem
             return false;
         }
 
+        public override int GetHashCode()
+        {
+            return this.GetId().GetHashCode();
+        }
+
         public double GetRandomRate()
         {
             Random rnd = new Random();

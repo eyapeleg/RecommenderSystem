@@ -82,7 +82,6 @@ namespace RecommenderSystem
 
             //calculate the overall average rating 
             CalculateAverageRatingForTrainingSet();
-            evaluationEngine = new EvaluationEngine(users);
         }
 
         public void TrainBaseModel(int cFeatures)
