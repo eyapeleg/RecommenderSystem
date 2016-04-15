@@ -15,6 +15,7 @@ namespace RecommenderSystem
         PredictionMethodsMapping predictionMethodsMapping;
         private Users users;
         private Items items;
+        DataUtils dataUtils = new DataUtils();
 
         //TODO: decide how to formalize that part
         private Users trainUsers;
@@ -59,7 +60,7 @@ namespace RecommenderSystem
         public void Load(string sFileName, double dTrainSetSize)
         {
             Dictionary<DatasetType, Tuple<Users, Items>> data = dataLoaderEngine.Load(sFileName, dTrainSetSize);
-            this.dsSize = dataLoaderEngine.GetDataSetSize(sFileName);
+            this.dsSize = dataLoaderEngine.GetDataSetSize();
 
             trainUsers = data[DatasetType.Train].Item1;
             testUsers = data[DatasetType.Test].Item1;
@@ -77,8 +78,7 @@ namespace RecommenderSystem
         {
             double trainSize = Math.Round(dsSize * 0.95);
 
-            var data = DataUtils.DataSplit(0.95, trainSize, new Tuple<Users, Items>(users, items),
-                RecommenderSystem.DatasetType.Validation, RecommenderSystem.DatasetType.Train);
+            var data = dataUtils.Split(0.95, trainSize, new Tuple<Users, Items>(this.trainUsers, this.trainItems), RecommenderSystem.DatasetType.Validation, RecommenderSystem.DatasetType.Train);
 
             Users trainUsers = data[RecommenderSystem.DatasetType.Train].Item1;
             Items trainItems = data[RecommenderSystem.DatasetType.Train].Item2;
