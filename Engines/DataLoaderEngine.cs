@@ -12,6 +12,7 @@ namespace RecommenderSystem
     {
         ILogger logger;
         private int datasetSize;
+        DataUtils dataUtils = new DataUtils();
 
         public DataLoaderEngine(ILogger logger)
         {
@@ -20,7 +21,6 @@ namespace RecommenderSystem
 
         public Tuple<Users,Items> Load(string sFileName)
         {
-
             Users users = new Users();
             Items items = new Items();
 
@@ -53,14 +53,13 @@ namespace RecommenderSystem
         public Dictionary<RecommenderSystem.DatasetType, Tuple<Users, Items>> Load(string sFileName, double dTrainSetSize)
         {
             Tuple<Users, Items> data = Load(sFileName);
-            var splitUsers = DataUtils.DataSplit(dTrainSetSize, datasetSize, data, RecommenderSystem.DatasetType.Test, RecommenderSystem.DatasetType.Train);
+            var splitUsers = dataUtils.Split(dTrainSetSize, datasetSize, data, RecommenderSystem.DatasetType.Test, RecommenderSystem.DatasetType.Train);
             return splitUsers;
         }
 
-        public int GetDataSetSize(string sFileName)
+        public int GetDataSetSize()
         {
-            int linesCount = File.ReadAllLines(sFileName).Length;
-            return linesCount;
+            return datasetSize;
         }
 
 

@@ -59,7 +59,7 @@ namespace RecommenderSystem
         public void Load(string sFileName, double dTrainSetSize)
         {
             Dictionary<DatasetType, Tuple<Users, Items>> data = dataLoaderEngine.Load(sFileName, dTrainSetSize);
-            this.dsSize = dataLoaderEngine.GetDataSetSize(sFileName);
+            this.dsSize = dataLoaderEngine.GetDataSetSize();
 
             trainUsers = data[DatasetType.Train].Item1;
             testUsers = data[DatasetType.Test].Item1;

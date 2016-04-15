@@ -54,5 +54,31 @@ namespace RecommenderSystem
 
             return vector;
         }
+
+        public List<string> newRandomItemsPerUser(User user)
+        {
+            List<string> randomItems = new List<string>();
+            int count = 0; //set the number of selected items per user
+
+            int kItems = rand.Next(1, user.GetRatedItems().Count); //pick a random items from the user rating list
+
+            while (count < kItems)
+            {
+                int idx = rand.Next(user.GetRatedItems().Count - 1);
+                string itemId = user.GetRatedItems().ElementAt(idx);
+                randomItems.Add(itemId);
+                count++;
+
+                user.RemoveItemById(itemId);
+            }
+
+            return randomItems;
+        }
+
+        public User newRandomUser(Users users)
+        {
+            var next = rand.Next(users.Count() - 1);
+            return users.ElementAt(next);
+        }
     }
 }
