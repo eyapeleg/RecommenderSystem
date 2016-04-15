@@ -59,6 +59,8 @@
     <Compile Include="Model\Matrix\MatrixFactorizationModelFactory.cs" />
     <Compile Include="Model\Matrix\Matrix.cs" />
     <Compile Include="Model\Matrix\MatrixFactorizationModel.cs" />
+    <Compile Include="Model\Stereotype\Stereotype.cs" />
+    <Compile Include="Model\Stereotype\Stereotypes.cs" />
     <Compile Include="Model\Users\UsersSimilarity.cs" />
     <Compile Include="PredictionMethods\CosineMethod.cs" />
     <Compile Include="Engines\DataLoaderEngine.cs" />

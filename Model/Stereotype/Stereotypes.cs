@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Assignment1.Model.Stereotype
+namespace RecommenderSystem
 {
-    class Stereotypes
+    public class Stereotypes
     {
+        Dictionary<int, Stereotype> stereotypes;
     }
 }

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Assignment1.Model.Stereotype
+namespace RecommenderSystem 
 {
-    class Stereotype
+    public class Stereotype
     {
+        private int id;
+        private Users users;
     }
 }

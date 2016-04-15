@@ -7,21 +7,23 @@ namespace RecommenderSystem
 {
     public class StereotypesEngine
     {
-        private Dictionary<int, List<User>> stereotypesGroups;
-        private int cStereotypes;
+        private RandomGenerator randomGenerator;
 
         public StereotypesEngine(int cStereotypes)
         {
-            this.cStereotypes = cStereotypes;
-            this.stereotypesGroups = new Dictionary<int, List<User>>();
+            this.randomGenerator = new RandomGenerator();
+        }
 
-            //Intialize dictionary and set their Id
-            for (int i = 1; i <= cStereotypes ; i++)
+        public void initStereotypes(Users users, SimilarityEngine similarityEngine, int cStereotypes)
+        {
+            //TODO create a list of candidate users
+            for (int i = 0; i < cStereotypes; i++)
             {
-                stereotypesGroups.Add(i, new List<User>());
+                User stereotypeUser = randomGenerator.newRandomUser(users);
+                //TODO select a candidate user
             }
 
-
+            
         }
     }
 }
