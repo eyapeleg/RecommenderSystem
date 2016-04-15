@@ -80,12 +80,12 @@ namespace RecommenderSystem
 
             var data = dataUtils.Split(0.95, trainSize, new Tuple<Users, Items>(this.trainUsers, this.trainItems), RecommenderSystem.DatasetType.Validation, RecommenderSystem.DatasetType.Train);
 
-            Users trainUsers = data[RecommenderSystem.DatasetType.Train].Item1;
-            Items trainItems = data[RecommenderSystem.DatasetType.Train].Item2;
+            Users subsetTrainUsers = data[RecommenderSystem.DatasetType.Train].Item1;
+            Items subsetTrainItems = data[RecommenderSystem.DatasetType.Train].Item2;
             Users validatationUsers = data[RecommenderSystem.DatasetType.Validation].Item1;
             Items validatationItems = data[RecommenderSystem.DatasetType.Validation].Item2;
 
-            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine(users, items, trainUsers, trainItems,validatationUsers,validatationItems);
+            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine(trainUsers, trainItems, subsetTrainUsers, subsetTrainItems, validatationUsers, validatationItems);
             matrixFactorizationEngine.train(cFeatures, averageTrainRating); //TODO - modify the average rating to be only on the small train set
         }
 

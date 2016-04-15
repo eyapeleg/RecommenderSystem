@@ -30,16 +30,27 @@ namespace RecommenderSystem
 
         public double getPrediction(User user, Item item)
         {
-            return miu +
-                   getBu(user) +
-                   getBi(item) +
-                   getPQmultiplication(user, item);
+            try
+            {
+                return miu +
+                       getBu(user) +
+                       getBi(item) +
+                       getPQmultiplication(user, item);
+            }
+            catch (UserNotFoundException e)
+            {
+                throw new NotImplementedException();
+            }
+            catch (ItemNotFoundException e)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public double getBu(User user)
         {
             if (!buVector.ContainsKey(user))
-                throw new NullReferenceException("User [" + user.GetId() + "] not found in the DB!");
+                throw new UserNotFoundException("User [" + user.GetId() + "] not found in the DB!");
 
             return buVector[user];
         }
@@ -47,7 +58,7 @@ namespace RecommenderSystem
         public double getBi(Item item)
         {
             if (!biVector.ContainsKey(item))
-                throw new NullReferenceException("Item [" + item.GetId() + "] not found in the DB!");
+                throw new ItemNotFoundException("Item [" + item.GetId() + "] not found in the DB!");
 
             return biVector[item];
         }
@@ -55,7 +66,7 @@ namespace RecommenderSystem
         public void setBu(User user, double value)
         {
             if (!buVector.ContainsKey(user))
-                throw new NullReferenceException("User [" + user.GetId() + "] not found in the DB!");
+                throw new UserNotFoundException("User [" + user.GetId() + "] not found in the DB!");
 
             buVector[user] = value;
         }
@@ -63,7 +74,7 @@ namespace RecommenderSystem
         public void setBi(Item item, double value)
         {
             if (!biVector.ContainsKey(item))
-                throw new NullReferenceException("Item [" + item.GetId() + "] not found in the DB!");
+                throw new ItemNotFoundException("Item [" + item.GetId() + "] not found in the DB!");
 
             biVector[item] = value;
         }
