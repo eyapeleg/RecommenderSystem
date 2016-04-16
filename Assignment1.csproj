@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\DataUtils.cs" />
+    <Compile Include="Common\MatrixUtils.cs" />
     <Compile Include="Common\RandomGenerator.cs" />
     <Compile Include="Engines\EvaluationEngine.cs" />
     <Compile Include="Engines\MatrixFactorizationEngine.cs" />
