@@ -23,6 +23,19 @@ namespace RecommenderSystem
             itemsRatings = new Dictionary<string, double>();
         }
 
+        public User(User user)
+        {
+            this.id=user.id;
+            this.sum = user.sum;
+            this.count = user.count;
+            this.squaredSum = user.squaredSum;
+            this.itemsRatings = new Dictionary<string, double>();
+            foreach (var item in user.itemsRatings)
+            {
+                this.itemsRatings.Add(item.Key, item.Value);
+            }
+        }
+
         public string GetId()
         {
             return id;

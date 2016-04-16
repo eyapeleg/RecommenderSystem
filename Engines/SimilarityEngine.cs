@@ -26,7 +26,14 @@ namespace RecommenderSystem
             commonItemsThreshold = Int32.Parse(ConfigurationManager.AppSettings["commonItemsThreshold"]);
         }
 
-        public List<KeyValuePair<User, double>> calculateSimilarity(IPredictionMethod predictionMethod, User thisUser, List<string> candidateUsers)
+        public List<KeyValuePair<User, double>> calculateSimilarity(IPredictionMethod predictionMethod, User thisUser, List<string> candidateUsersIds)
+        {
+            
+            List<User> candidateUsers = candidateUsersIds.Select(userId => users.getUserById(userId)).ToList();
+            return calculateSimilarity(predictionMethod, thisUser, candidateUsers);
+        }
+
+        public List<KeyValuePair<User, double>> calculateSimilarity(IPredictionMethod predictionMethod, User thisUser, List<User> candidateUsers)
         {
             if (predictionMethod == null || thisUser == null)
                 throw new ArgumentNullException("IPredictionMethod predictionMethod, User thisUser must both be not null!");
@@ -36,9 +43,8 @@ namespace RecommenderSystem
             UsersSimilarity similarUsers = new UsersSimilarity(MAX_SIMILAR_USERS);
             var thisUserList = thisUser.GetRatedItems();
 
-            foreach (var user in candidateUsers)
+            foreach (var thatUser in candidateUsers)
             {
-                User thatUser = users.getUserById(user);
                 if (!thisUser.Equals(thatUser))
                 {
                     var thatUserList = thatUser.GetRatedItems();
@@ -55,24 +61,6 @@ namespace RecommenderSystem
                     }
                 }
             }
-
-            //Parallel.ForEach(users, thatUser =>
-            //{
-            //    double similarity;
-            //    if (!thatUser.Equals(thisUser))
-            //    {
-            //        List<string> commonItems = thatUser.GetRatedItems().Intersect(thisUser.GetRatedItems()).ToList(); //check if both users rated at least one common item 
-            //        if (commonItems.Any())
-            //        {
-            //            logger.debug("calcualting similarity for user " + "[" + thisUser.GetId().ToString() + "]" + " with user " + "[" + thatUser.GetId().ToString() + "]");
-            //            similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItems);
-            //            if (similarity != 0) //in some cases the users rate their common item the same as their average then we can get here zero
-            //            {
-            //                similarUsers.add(thatUser, similarity);
-            //            }
-            //        }
-            //    }
-            //});
             timer.Stop();
             logger.debug("Similarity calculation time for user" + " [" + thisUser.GetId() + "] " + timer.Elapsed);
 

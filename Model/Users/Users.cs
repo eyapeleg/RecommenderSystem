@@ -15,8 +15,13 @@ namespace RecommenderSystem
         }
 
 
-        public List<string> GetAllUsers(){
+        public List<string> GetAllUsersIds(){
             return users.Keys.ToList();
+        }
+
+        public List<User> GetAllUsers()
+        {
+            return users.Values.ToList();
         }
 
         public List<string> GetRatedItems(string userId)
@@ -49,6 +54,14 @@ namespace RecommenderSystem
 
             User user = new User(userId);
             users.Add(userId, user);
+        }
+
+        public void addUser(User user)
+        {
+            if (users.Keys.Contains(user.GetId()))
+                throw new NotSupportedException("Users " + "[" + user.GetId() + "]" + " already exists in the DB!");
+
+            users.Add(user.GetId(), user);
         }
 
         public void addItemToUser(string userId, string itemId, double rating){

@@ -82,6 +82,8 @@ namespace RecommenderSystem
 
             //calculate the overall average rating 
             CalculateAverageRatingForTrainingSet();
+
+            similarityEngine = new SimilarityEngine(trainUsers, MAX_SIMILAR_USERS, logger);
         }
 
         public void TrainBaseModel(int cFeatures)
@@ -92,19 +94,22 @@ namespace RecommenderSystem
 
         public void TrainStereotypes(int cStereotypes)
         {
-            throw new NotImplementedException();
+            StereotypesEngine engine = new StereotypesEngine(similarityEngine, new PearsonMethod());
+            Stereotypes stereotypes = engine.initStereotypes(trainUsers, trainItems, cStereotypes);
+            engine.trainStereotypes(stereotypes, trainUsers);
+
         }
 
         //return a list of the ids of all the users in the dataset
         public List<string> GetAllUsers()
         {
-            return users.GetAllUsers();
+            return users.GetAllUsersIds();
         }
 
         //returns a list of all the items in the dataset
         public List<string> GetAllItems()
         {
-            return items.GetAllItems();
+            return items.GetAllItemsIds();
         }
 
         //returns the list of all items that the given user has rated in the dataset

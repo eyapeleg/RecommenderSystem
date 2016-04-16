@@ -14,9 +14,14 @@ namespace RecommenderSystem
             items = new Dictionary<string, Item>();
         }
 
-        public List<string> GetAllItems()
+        public List<string> GetAllItemsIds()
         {
             return items.Keys.ToList();
+        }
+
+        public List<Item> GetAllItems()
+        {
+            return items.Values.ToList();
         }
 
         public Item GetItemById(string itemId)

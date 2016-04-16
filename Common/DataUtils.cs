@@ -29,7 +29,7 @@ namespace RecommenderSystem
             do
             {
                 //select random user
-                User user = randomGenerator.newRandomUser(largesetUsers);
+                User user = randomGenerator.getRandomUser(largesetUsers);
                 var numberOfRatings = user.GetRatedItems().Count;
 
                 //verify the user has at least 2 rated Items

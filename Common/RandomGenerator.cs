@@ -77,10 +77,19 @@ namespace RecommenderSystem
             return randomItems;
         }
 
-        public User newRandomUser(IEnumerable<User> users)
+        public User getRandomUser(IEnumerable<User> users)
         {
             var next = rand.Next(users.Count() - 1);
             return users.ElementAt(next);
+        }
+
+        public User getValidRandomUser(IEnumerable<User> users){
+            while (true)
+            {
+                User user = getRandomUser(users);
+                if (user.GetRatedItems().Count > 20) //TODO -- 1.add other validation if required 2.verify the count bound 3, parameterize this value
+                    return user;
+            }
         }
     }
 }
