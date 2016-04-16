@@ -58,7 +58,7 @@
     <Compile Include="Model\Exceptions\ElementNotFoundException.cs" />
     <Compile Include="Model\Item\Item.cs" />
     <Compile Include="Model\Matrix\MatrixFactorizationModelFactory.cs" />
-    <Compile Include="Model\Matrix\Matrix.cs" />
+    <Compile Include="Model\Collections\Matrix.cs" />
     <Compile Include="Model\Matrix\MatrixFactorizationModel.cs" />
     <Compile Include="Model\Stereotype\Stereotype.cs" />
     <Compile Include="Model\Stereotype\Stereotypes.cs" />

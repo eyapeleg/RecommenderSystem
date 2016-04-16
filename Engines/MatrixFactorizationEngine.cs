@@ -51,7 +51,7 @@ namespace RecommenderSystem
 
                         model.setBu(user, model.getBu(user) + yRate * (error - lambdaRate * model.getBu(user)));
                         model.setBi(item, model.getBi(item) + yRate * (error - lambdaRate * model.getBi(item)));
-                        //TODO -  add set to pu qi
+                        
                     }
                 }
 

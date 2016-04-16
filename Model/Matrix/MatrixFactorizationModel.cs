@@ -104,5 +104,15 @@ namespace RecommenderSystem
 
             return sum;
         }
+
+        private void setPu(User user, List<double> values)
+        {
+            p.setElementAt(user, values);
+        }
+
+        private void setPi(Item item, List<double> values)
+        {
+            q.setElementAt(item, values);
+        }
     }
 }

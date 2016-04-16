@@ -26,9 +26,16 @@ namespace RecommenderSystem
 
             if (values == null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("Element Not found!");
             }
             return values;
+        }
+
+        public void setElementAt(T element, List<double> values){
+            if (!matrix.ContainsKey(element))
+                throw new ArgumentNullException("Element Not found!");
+
+            matrix[element] = values;
         }
 
     }
