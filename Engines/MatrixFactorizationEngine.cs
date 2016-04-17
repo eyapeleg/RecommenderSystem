@@ -36,7 +36,7 @@ namespace RecommenderSystem
             EvaluationEngine evaluationEngine = new EvaluationEngine();
             double currRmse = evaluationEngine.computeRMSE(validationUsers, validationItems, model); 
 
-            while (prevRmse > currRmse) //TODO - add num iteration and improvment threshold conditions
+             while (prevRmse > currRmse) //TODO - add num iteration and improvment threshold conditions
             {
                 foreach(User user in trainUsers)
                 {
@@ -55,19 +55,9 @@ namespace RecommenderSystem
                         //update Qi and Pu
                         var pu = model.getPu(user);
                         var qi = model.getQi(item);
-
-                        var multipleErrorPu = MathUtils.MultipleScalarByVector(error, pu);
-                        var multipleLambdaQi = MathUtils.MultipleScalarByVector(lambdaRate, qi);
-                        var minusQi = MathUtils.MinusVectors(multipleErrorPu, multipleLambdaQi);
-                        var multipleYRateQi = MathUtils.MultipleScalarByVector(yRate, minusQi);
-                        var newQi = MathUtils.AdditionVectors(qi, multipleYRateQi);
+                        var newQi = MathUtils.AdditionVectors(qi, MathUtils.MultipleScalarByVector(yRate, MathUtils.MinusVectors(MathUtils.MultipleScalarByVector(error, pu), MathUtils.MultipleScalarByVector(lambdaRate, qi))));
                         model.setQi(item, newQi);
-
-                        var multipleErrorQi = MathUtils.MultipleScalarByVector(error, qi);
-                        var multipleLambdaPu = MathUtils.MultipleScalarByVector(lambdaRate, pu);
-                        var minusPu = MathUtils.MinusVectors(multipleErrorQi, multipleLambdaPu);
-                        var multipleYRatePu = MathUtils.MultipleScalarByVector(yRate, minusPu);
-                        var newPu = MathUtils.AdditionVectors(pu, multipleYRatePu);
+                        var newPu = MathUtils.AdditionVectors(pu, MathUtils.MultipleScalarByVector(yRate, MathUtils.MinusVectors(MathUtils.MultipleScalarByVector(error, qi), MathUtils.MultipleScalarByVector(lambdaRate, pu))));
                         model.setPu(user, newPu);
                     }
                 }
