@@ -5,50 +5,33 @@ using System.Text;
 
 namespace RecommenderSystem
 {
-    public class MatrixUtils
+    public static class MathUtils
     {
-        public List<double> MultipleScalarByVector(double scalar, List<double> vector)
+        public static List<double> MultipleScalarByVector(double scalar, List<double> vector)
         {
-            for (int i = 0; i < vector.Count; i++)
-            {
-                vector[i] *= scalar;
-            }
-
-            return vector;
+            return vector.Select(x => x * scalar).ToList();
         }
 
-        public List<double> MinusVectors(List<double> l1, List<double> l2)
+        public static List<double> MinusVectors(List<double> l1, List<double> l2)
         {
             List<double> result = new List<double>();
 
             if (l1.Count != l2.Count)
             {
-                throw new NotImplementedException();
+                throw new ArgumentException("Vector lengths different");
             }
 
-            for (int i = 0; i < l1.Count; i++)
-            {
-                result[i] = l1[i] - l2[i];
-            }
-
-            return result;
+            return l1.Select((t, i) => t - l2[i]).ToList();
         }
 
-        public List<double> AdditionVectors(List<double> l1, List<double> l2)
+        public static List<double> AdditionVectors(List<double> l1, List<double> l2)
         {
-            List<double> result = new List<double>();
-
             if (l1.Count != l2.Count)
             {
-                throw new NotImplementedException();
+                throw new ArgumentException("Vector lengths different");
             }
 
-            for (int i = 0; i < l1.Count; i++)
-            {
-                result[i] = l1[i] + l2[i];
-            }
-
-            return result;
+            return l1.Select((t, i) => t + l2[i]).ToList();
         }
     }
 }

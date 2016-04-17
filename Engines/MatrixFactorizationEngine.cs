@@ -51,7 +51,24 @@ namespace RecommenderSystem
 
                         model.setBu(user, model.getBu(user) + yRate * (error - lambdaRate * model.getBu(user)));
                         model.setBi(item, model.getBi(item) + yRate * (error - lambdaRate * model.getBi(item)));
-                        
+
+                        //update Qi and Pu
+                        var pu = model.getPu(user);
+                        var qi = model.getQi(item);
+
+                        var multipleErrorPu = MathUtils.MultipleScalarByVector(error, pu);
+                        var multipleLambdaQi = MathUtils.MultipleScalarByVector(lambdaRate, qi);
+                        var minusQi = MathUtils.MinusVectors(multipleErrorPu, multipleLambdaQi);
+                        var multipleYRateQi = MathUtils.MultipleScalarByVector(yRate, minusQi);
+                        var newQi = MathUtils.AdditionVectors(qi, multipleYRateQi);
+                        model.setQi(item, newQi);
+
+                        var multipleErrorQi = MathUtils.MultipleScalarByVector(error, qi);
+                        var multipleLambdaPu = MathUtils.MultipleScalarByVector(lambdaRate, pu);
+                        var minusPu = MathUtils.MinusVectors(multipleErrorQi, multipleLambdaPu);
+                        var multipleYRatePu = MathUtils.MultipleScalarByVector(yRate, minusPu);
+                        var newPu = MathUtils.AdditionVectors(pu, multipleYRatePu);
+                        model.setPu(user, newPu);
                     }
                 }
 
