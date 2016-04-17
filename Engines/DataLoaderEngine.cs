@@ -29,7 +29,7 @@ namespace RecommenderSystem
             Stopwatch timer = Stopwatch.StartNew();
 
             StreamReader objInput = new StreamReader(sFileName, Encoding.Default);
-            while (!objInput.EndOfStream)
+           while (!objInput.EndOfStream)
             {
                 datasetSize++;
                 string line = objInput.ReadLine();

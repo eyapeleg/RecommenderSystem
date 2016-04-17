@@ -46,7 +46,7 @@ namespace RecommenderSystem
             return squaredSum;
         }
 
-        public void AddItem(string item, double rating)
+        public void AddItemById(string item, double rating)
         {
             if (itemsRatings.ContainsKey(item))
                 throw new NotSupportedException("Item " + "[" + item + "]" + " already exists in the DB!");
@@ -55,6 +55,14 @@ namespace RecommenderSystem
             squaredSum += Math.Pow(rating, 2);
             count++;
             itemsRatings.Add(item, rating);
+        }
+
+        public void RemoveItemById(string itemId)
+        {
+            sum -= itemsRatings[itemId];
+            squaredSum -= Math.Pow(itemsRatings[itemId], 2);
+            count--;
+            itemsRatings.Remove(itemId);
         }
 
         public double GetAverageRatings()
@@ -82,6 +90,10 @@ namespace RecommenderSystem
                 return rating;
 
             return 0.0;
+        }
+
+        public void SetRating(string sIID, double value){
+            itemsRatings[sIID] = value;
         }
 
         public Dictionary<double,double> GetRatingDistribution()
@@ -124,11 +136,6 @@ namespace RecommenderSystem
             Random rnd = new Random();
             var idx = rnd.Next(0,itemsRatings.Count - 1);
             return itemsRatings.ElementAt(idx).Value;
-        }
-
-        public void RemoveItemById(string itemId)
-        {
-            itemsRatings.Remove(itemId);
         }
     }
 }

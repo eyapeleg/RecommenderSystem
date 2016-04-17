@@ -10,12 +10,14 @@ namespace RecommenderSystem
         private RandomGenerator randomGenerator;
         private SimilarityEngine similarityEngine;
         private IPredictionMethod predictionMethod;
+        private double CENTROIDS_SIMILARITY_THRESHOLD;
 
         public StereotypesEngine(SimilarityEngine similarityEngine, IPredictionMethod predictionMethod)
         {
             this.randomGenerator = new RandomGenerator();
             this.similarityEngine = similarityEngine;
             this.predictionMethod = predictionMethod;
+            this.CENTROIDS_SIMILARITY_THRESHOLD = CENTROIDS_SIMILARITY_THRESHOLD = 0.99; //TODO - get from an external file
         }
 
         public Stereotypes initStereotypes(Users users, Items items, int cStereotypes)
@@ -37,7 +39,7 @@ namespace RecommenderSystem
                 //find farest user from stereotypes
                 foreach (User user in users)
                 {
-                    if (user.GetRatedItems().Count<20 || centroids.Contains(user)) //TODO - parameterize this value
+                    if (user.GetRatedItems().Count<50 || centroids.Contains(user)) //TODO - parameterize this value
                         continue;
 
                     // calculate similarites and update farest centroid accordingly
@@ -60,31 +62,61 @@ namespace RecommenderSystem
             }
 
             foreach(User user in centroids){
-                stereotypes.addStereotype(new Stereotype(new User(user)));
+                stereotypes.addStereotype(new Stereotype(user));
             }
             return stereotypes;
         }
 
-        public void trainStereotypes(Stereotypes stereotypes, Users users)
+        public Stereotypes trainStereotypes(Stereotypes stereotypes, Users users)
         {
-            // add iterations for convergence
-            List<User> centroids = stereotypes.getStereotypesCentroids();
-            foreach (User user in users)
-            {
-                List<KeyValuePair<User, double>> similarities = similarityEngine.calculateSimilarity(predictionMethod, user, centroids);
-                
-                double highestSimilarity = 0.0;
-                User mostSimilarCentroid=null;
-                foreach(KeyValuePair<User, double> similarity in similarities){
-                    if (similarity.Value>highestSimilarity){
-                        highestSimilarity = similarity.Value;
-                        mostSimilarCentroid = similarity.Key;
+            Users usersCopy = new Users(users);
+            bool isConverged = false;
+
+            while(!isConverged){//TODO - add number of iterations threshold convergence
+
+                List<User> prevCentroids = stereotypes.getStereotypesCentroids();
+                stereotypes.initStereotypesUsers();
+                List<User> usersWithNoSimilarity = new List<User>(); ;
+                foreach (User user in usersCopy)
+                {
+                    //Calculate a users similarity to the stereotypes
+                    List<KeyValuePair<User, double>> similarities = similarityEngine.calculateSimilarity(predictionMethod, user, prevCentroids);
+
+                    //Determine users that don't have a correlation with non of the stereotypes
+                    if (similarities.Count == 0)
+                    {
+                        usersWithNoSimilarity.Add(user);
+                        continue;
                     }
+
+                    //Allocate a user to it's most similar stereotype 
+                    User mostSimilarCentroid = similarities.Last().Key;
+                    stereotypes.addUserToStereotype(mostSimilarCentroid.GetId(), user);
                 }
-                if (mostSimilarCentroid == null)
-                    throw new ArgumentNullException();
-                stereotypes.addUserToStereotype(mostSimilarCentroid.GetId(), user);
+                usersCopy.removeUsers(usersWithNoSimilarity);
+
+                //Determine convergence
+                stereotypes.reCalculateCentroids();
+                List<User> currCentroids = stereotypes.getStereotypesCentroids();
+                var prevAndCurrCentroidsSimilarity = currCentroids.Zip(prevCentroids,(x, y) => Tuple.Create(x, y)).Select(x => Tuple.Create(x.Item1,x.Item2,similarityEngine.calculateSimilarity(predictionMethod, x.Item1, x.Item2))).ToList();
+                if (prevAndCurrCentroidsSimilarity.All(x => x.Item3>CENTROIDS_SIMILARITY_THRESHOLD))
+                    isConverged=true;
             }
+
+            return stereotypes;
+        }
+
+        public double predict(Stereotypes stereotypes, User user, string itemId){
+            List<User> centroids = stereotypes.getStereotypesCentroids();
+            List<KeyValuePair<User, double>> similarities = similarityEngine.calculateSimilarity(predictionMethod, user, centroids);
+
+            if (similarities.Count == 0)
+            {
+                throw new NotImplementedException(); //TODO 
+            }
+
+            User mostSimilarUser = similarities.Last().Key;
+            return mostSimilarUser.GetRating(itemId);
         }
 
 

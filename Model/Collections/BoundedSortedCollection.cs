@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,8 @@ using System.Runtime.CompilerServices;
 
 namespace RecommenderSystem
 {
-    public class BoundedSortedCollection<T> where T : IComparable<T>
+    public class BoundedSortedCollection<T>:IEnumerable<T>
+        where T : IComparable<T>
     {
            
         private SortedSet<T> sortedSet;
@@ -41,5 +43,14 @@ namespace RecommenderSystem
             return this.sortedSet.ToList();
         }
 
+        public IEnumerator<T> GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return sortedSet.GetEnumerator();
+        }
     }
 }

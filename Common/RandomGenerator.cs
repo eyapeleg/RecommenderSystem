@@ -87,7 +87,7 @@ namespace RecommenderSystem
             while (true)
             {
                 User user = getRandomUser(users);
-                if (user.GetRatedItems().Count > 20) //TODO -- 1.add other validation if required 2.verify the count bound 3, parameterize this value
+                if (user.GetRatedItems().Count > 50) //TODO -- 1.add another validation if required 2.verify the count bound 3, parameterize this value 4. what happens if it doesnt find any
                     return user;
             }
         }

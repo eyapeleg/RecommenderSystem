@@ -16,7 +16,7 @@ namespace RecommenderSystem
         }
         
         public void  addStereotype(Stereotype stereotype){
-            stereotypes.Add(stereotype.GetId(),stereotype);
+            stereotypes.Add(stereotype.GetId(),new Stereotype(stereotype));
         }
 
         public Stereotype getSeterotype(string stereotypeId)
@@ -32,6 +32,20 @@ namespace RecommenderSystem
         public List<User> getStereotypesCentroids()
         {
             return stereotypes.Select(s => s.Value.getCentroid()).ToList();
+        }
+
+        public void reCalculateCentroids()
+        {
+            foreach (Stereotype stereotype in stereotypes.Values)
+                stereotype.reCalculateCentroid();
+        }
+
+        public void initStereotypesUsers()
+        {
+            foreach (Stereotype stereotype in stereotypes.Values)
+            {
+                stereotype.initUsers();
+            }
         }
 
         public IEnumerator<Stereotype> GetEnumerator()

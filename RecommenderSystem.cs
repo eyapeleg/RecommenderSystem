@@ -96,7 +96,7 @@ namespace RecommenderSystem
         {
             StereotypesEngine engine = new StereotypesEngine(similarityEngine, new PearsonMethod());
             Stereotypes stereotypes = engine.initStereotypes(trainUsers, trainItems, cStereotypes);
-            engine.trainStereotypes(stereotypes, trainUsers);
+            stereotypes  = engine.trainStereotypes(stereotypes, trainUsers);
 
         }
 

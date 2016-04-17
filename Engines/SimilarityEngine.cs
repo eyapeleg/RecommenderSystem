@@ -33,6 +33,14 @@ namespace RecommenderSystem
             return calculateSimilarity(predictionMethod, thisUser, candidateUsers);
         }
 
+        public double calculateSimilarity(IPredictionMethod predictionMethod, User thisUser, User candidateUser)
+        {
+            List<KeyValuePair<User, double>> similarities = calculateSimilarity(predictionMethod, thisUser, new List<User>(){candidateUser});
+            if (similarities.Count == 0)
+                return 0.0;
+            return similarities[0].Value;
+        }
+       
         public List<KeyValuePair<User, double>> calculateSimilarity(IPredictionMethod predictionMethod, User thisUser, List<User> candidateUsers)
         {
             if (predictionMethod == null || thisUser == null)
@@ -45,8 +53,9 @@ namespace RecommenderSystem
 
             foreach (var thatUser in candidateUsers)
             {
-                if (!thisUser.Equals(thatUser))
-                {
+                //TODO - verify that we remove "thisUser" from "candidateUsers" in other parts of the code since we remove the "if (!thisUser.Equals(thatUser))" condition
+                //if (!thisUser.Equals(thatUser))
+                //{
                     var thatUserList = thatUser.GetRatedItems();
 
                     List<string> commonItemsList = thatUserList.Intersect(thisUserList).ToList(); //check if both users rated at least one common item 
@@ -59,7 +68,7 @@ namespace RecommenderSystem
                             similarUsers.add(thatUser, similarity);
                         }
                     }
-                }
+                //
             }
             timer.Stop();
             logger.debug("Similarity calculation time for user" + " [" + thisUser.GetId() + "] " + timer.Elapsed);

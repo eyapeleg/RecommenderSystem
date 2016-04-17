@@ -10,6 +10,16 @@ namespace RecommenderSystem
     {
         private Dictionary<string, User> users;
 
+
+        public Users(Users users)
+        {
+            this.users = new Dictionary<string, User>();
+            foreach (User user in users)
+            {
+                this.users.Add(user.GetId(), user);
+            }
+        }
+
         public Users(){
             users = new Dictionary<string, User>();
         }
@@ -72,7 +82,7 @@ namespace RecommenderSystem
                 addItemToUser(userId, itemId, rating);
             }
             else{
-                user.AddItem(itemId, rating);
+                user.AddItemById(itemId, rating);
             }
         }
 
@@ -100,6 +110,12 @@ namespace RecommenderSystem
             {
                 users.Remove(userId);
             }
+        }
+
+        public void removeUsers(IEnumerable<User> users)
+        {
+            foreach (User user in users)
+                this.users.Remove(user.GetId());
         }
 
     }
