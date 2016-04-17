@@ -13,8 +13,8 @@ namespace RecommenderSystem
         {
             RecommenderSystem rs = new RecommenderSystem();
             rs.Load("ratings.dat", 0.95);
-            //rs.TrainBaseModel(10); //TODO - remove comment
-            rs.TrainStereotypes(10);
+            rs.TrainBaseModel(10); //TODO - remove comment
+            //rs.TrainStereotypes(10);
             List<RecommenderSystem.PredictionMethod> lMethods = new List<RecommenderSystem.PredictionMethod>();
             lMethods.Add(RecommenderSystem.PredictionMethod.BaseModel);
             lMethods.Add(RecommenderSystem.PredictionMethod.Stereotypes);

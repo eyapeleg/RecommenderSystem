@@ -36,7 +36,7 @@ namespace RecommenderSystem
             EvaluationEngine evaluationEngine = new EvaluationEngine();
             double currRmse = evaluationEngine.computeRMSE(validationUsers, validationItems, model); 
 
-            while (prevRmse > currRmse) //TODO - add num iteration and improvment threshold conditions
+             while (prevRmse > currRmse) //TODO - add num iteration and improvment threshold conditions
             {
                 foreach(User user in trainUsers)
                 {
@@ -51,7 +51,14 @@ namespace RecommenderSystem
 
                         model.setBu(user, model.getBu(user) + yRate * (error - lambdaRate * model.getBu(user)));
                         model.setBi(item, model.getBi(item) + yRate * (error - lambdaRate * model.getBi(item)));
-                        
+
+                        //update Qi and Pu
+                        var pu = model.getPu(user);
+                        var qi = model.getQi(item);
+                        var newQi = MathUtils.AdditionVectors(qi, MathUtils.MultipleScalarByVector(yRate, MathUtils.MinusVectors(MathUtils.MultipleScalarByVector(error, pu), MathUtils.MultipleScalarByVector(lambdaRate, qi))));
+                        model.setQi(item, newQi);
+                        var newPu = MathUtils.AdditionVectors(pu, MathUtils.MultipleScalarByVector(yRate, MathUtils.MinusVectors(MathUtils.MultipleScalarByVector(error, qi), MathUtils.MultipleScalarByVector(lambdaRate, pu))));
+                        model.setPu(user, newPu);
                     }
                 }
 
