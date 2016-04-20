@@ -82,14 +82,5 @@ namespace RecommenderSystem
             var next = rand.Next(users.Count() - 1);
             return users.ElementAt(next);
         }
-
-        public User getValidRandomUser(IEnumerable<User> users){
-            while (true)
-            {
-                User user = getRandomUser(users);
-                if (user.GetRatedItems().Count > 50) //TODO -- 1.add another validation if required 2.verify the count bound 3, parameterize this value 4. what happens if it doesnt find any
-                    return user;
-            }
-        }
     }
 }

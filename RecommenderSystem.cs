@@ -12,7 +12,6 @@ namespace RecommenderSystem
     {
         public enum PredictionMethod { Pearson, Cosine, Random, BaseModel, Stereotypes };
         public enum DatasetType { Train, Test, Validation};
-        PredictionMethodsMapping predictionMethodsMapping;
         private Users users;
         private Items items;
         DataUtils dataUtils = new DataUtils();
@@ -31,7 +30,8 @@ namespace RecommenderSystem
         private DataLoaderEngine dataLoaderEngine;
         private PredictionEngine predictionEngine;
         private EvaluationEngine evaluationEngine;
-        private MatrixFactorizationEngine matrixFactorizationEngine;
+        private MatrixFactorizationModel _matrixFactorizationModel;
+        private StereotypesModel _stereotypesModel;
 
         private ILogger logger;
 
@@ -43,10 +43,10 @@ namespace RecommenderSystem
         {
             logger = new InfoLogger();
             dataLoaderEngine = new DataLoaderEngine(logger);
+            predictionEngine = new PredictionEngine();
 
             MAX_SIMILAR_USERS = 30;
             NUM_OF_TRIALS = 1000;
-            predictionMethodsMapping = new PredictionMethodsMapping();           
         }
 
         public void Load(string sFileName)
@@ -55,7 +55,6 @@ namespace RecommenderSystem
             users = data.Item1;
             items = data.Item2;
             similarityEngine = new SimilarityEngine(users, MAX_SIMILAR_USERS, logger);
-            predictionEngine = new PredictionEngine(users, items, predictionMethodsMapping, similarityEngine);
             evaluationEngine = new EvaluationEngine(users);
         }
 
@@ -84,20 +83,24 @@ namespace RecommenderSystem
             CalculateAverageRatingForTrainingSet();
 
             similarityEngine = new SimilarityEngine(trainUsers, MAX_SIMILAR_USERS, logger);
+
+            predictionEngine.addModel(PredictionMethod.Cosine, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new CosineMethod()));
+            predictionEngine.addModel(PredictionMethod.Pearson, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new PearsonMethod()));
+            predictionEngine.addModel(PredictionMethod.Random, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new RandomMethod()));
         }
 
         public void TrainBaseModel(int cFeatures)
         {
-            MatrixFactorizationEngine matrixFactorizationEngine = new MatrixFactorizationEngine(trainUsers, trainItems, validationUsers, validationItems);
-            matrixFactorizationEngine.train(cFeatures, averageTrainRating); //TODO - modify the average rating to be only on the small train set
+            IPredictionModel matrixFactorizationModel = new MatrixFactorizationModel(trainUsers, trainItems, validationUsers, validationItems, cFeatures, averageTrainRating);
+            predictionEngine.addModel(PredictionMethod.BaseModel, matrixFactorizationModel);
+            predictionEngine.Train(PredictionMethod.BaseModel); //TODO - modify the average rating to be only on the small train set
         }
 
         public void TrainStereotypes(int cStereotypes)
         {
-            StereotypesEngine engine = new StereotypesEngine(similarityEngine, new PearsonMethod());
-            Stereotypes stereotypes = engine.initStereotypes(trainUsers, trainItems, cStereotypes);
-            stereotypes  = engine.trainStereotypes(stereotypes, trainUsers);
-
+            IPredictionModel stereotypesModel = new StereotypesModel(similarityEngine, new PearsonMethod(), trainUsers, trainItems, cStereotypes);
+            predictionEngine.addModel(PredictionMethod.Stereotypes, stereotypesModel);
+            predictionEngine.Train(PredictionMethod.Stereotypes);
         }
 
         //return a list of the ids of all the users in the dataset
@@ -134,7 +137,7 @@ namespace RecommenderSystem
         {
             User user = users.getUserById(sUID);
             Item item = items.GetItemById(sIID);
-            return predictionEngine.PredictRating(m, user, item);
+            return predictionEngine.Predict(m, user, item);
         }
 
         //Compute MAE (mean absolute error) for a set of rating prediction methods over the same user-item pairs

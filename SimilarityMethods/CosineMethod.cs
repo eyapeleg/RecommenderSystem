@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RecommenderSystem
 {
-    public class CosineMethod : IPredictionMethod
+    public class CosineMethod : ISimilarityMethod
     {
         public double calculateSimilarity(User u1, User u2, List<string> intersectList)
         {

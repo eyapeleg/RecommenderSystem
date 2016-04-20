@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RecommenderSystem
 {
-    public interface IPredictionMethod
+    public interface ISimilarityMethod
     {
         double calculateSimilarity(User u1, User u2, List<string> intersectList );
 

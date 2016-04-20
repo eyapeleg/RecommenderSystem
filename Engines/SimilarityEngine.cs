@@ -26,14 +26,14 @@ namespace RecommenderSystem
             commonItemsThreshold = Int32.Parse(ConfigurationManager.AppSettings["commonItemsThreshold"]);
         }
 
-        public List<KeyValuePair<User, double>> calculateSimilarity(IPredictionMethod predictionMethod, User thisUser, List<string> candidateUsersIds)
+        public List<KeyValuePair<User, double>> calculateSimilarity(ISimilarityMethod predictionMethod, User thisUser, List<string> candidateUsersIds)
         {
             
             List<User> candidateUsers = candidateUsersIds.Select(userId => users.getUserById(userId)).ToList();
             return calculateSimilarity(predictionMethod, thisUser, candidateUsers);
         }
 
-        public double calculateSimilarity(IPredictionMethod predictionMethod, User thisUser, User candidateUser)
+        public double calculateSimilarity(ISimilarityMethod predictionMethod, User thisUser, User candidateUser)
         {
             List<KeyValuePair<User, double>> similarities = calculateSimilarity(predictionMethod, thisUser, new List<User>(){candidateUser});
             if (similarities.Count == 0)
@@ -41,7 +41,7 @@ namespace RecommenderSystem
             return similarities[0].Value;
         }
        
-        public List<KeyValuePair<User, double>> calculateSimilarity(IPredictionMethod predictionMethod, User thisUser, List<User> candidateUsers)
+        public List<KeyValuePair<User, double>> calculateSimilarity(ISimilarityMethod predictionMethod, User thisUser, List<User> candidateUsers)
         {
             if (predictionMethod == null || thisUser == null)
                 throw new ArgumentNullException("IPredictionMethod predictionMethod, User thisUser must both be not null!");

@@ -64,7 +64,7 @@ namespace RecommenderSystem
                 double actual = user.GetRating(testedObject.Value);
                 foreach (var lMethod in lMethods)
                 {
-                    double predicted = predictionEngine.PredictRating(lMethod, user, item);
+                    double predicted = predictionEngine.Predict(lMethod, user, item);
                     double error = Math.Abs(predicted - actual);
 
                     if (!maeResult.ContainsKey(lMethod))
@@ -88,7 +88,7 @@ namespace RecommenderSystem
             return maeResult;
         }
 
-        public double computeRMSE(Users validationUsers, Items validationItems, MatrixFactorizationModel model)
+        public double computeRMSE(Users validationUsers, Items validationItems, IPredictionModel model)
         {
 
             double sse = 0;
@@ -104,7 +104,7 @@ namespace RecommenderSystem
                     Item item = validationItems.GetItemById(itemId);
 
                     actualRating = user.GetRating(itemId); //TODO - take only items that user rated
-                    predictedRating = model.getPrediction(user, item);
+                    predictedRating = model.Predict(user, item);
 
                     sse += Math.Pow(actualRating - predictedRating, 2);
                     n++;

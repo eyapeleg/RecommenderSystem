@@ -14,8 +14,6 @@ namespace RecommenderSystem
 
         public static List<double> MinusVectors(List<double> l1, List<double> l2)
         {
-            List<double> result = new List<double>();
-
             if (l1.Count != l2.Count)
             {
                 throw new ArgumentException("Vector lengths different");
@@ -32,6 +30,16 @@ namespace RecommenderSystem
             }
 
             return l1.Select((t, i) => t + l2[i]).ToList();
+        }
+
+        public static double InnerProduct(List<double> l1, List<double> l2)
+        {
+            if (l1.Count != l2.Count)
+            {
+                throw new ArgumentException("Vector lengths different");
+            }
+
+            return l1.Select((t, i) => t * l2[i]).Sum();
         }
     }
 }
