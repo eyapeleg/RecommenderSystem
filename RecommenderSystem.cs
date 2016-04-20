@@ -55,7 +55,6 @@ namespace RecommenderSystem
             users = data.Item1;
             items = data.Item2;
             similarityEngine = new SimilarityEngine(users, MAX_SIMILAR_USERS, logger);
-            evaluationEngine = new EvaluationEngine(users);
         }
 
         public void Load(string sFileName, double dTrainSetSize)
@@ -83,6 +82,7 @@ namespace RecommenderSystem
             CalculateAverageRatingForTrainingSet();
 
             similarityEngine = new SimilarityEngine(trainUsers, MAX_SIMILAR_USERS, logger);
+            evaluationEngine = new EvaluationEngine(testUsers);
 
             predictionEngine.addModel(PredictionMethod.Cosine, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new CosineMethod()));
             predictionEngine.addModel(PredictionMethod.Pearson, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new PearsonMethod()));
@@ -155,7 +155,19 @@ namespace RecommenderSystem
 
         public Dictionary<PredictionMethod, double> ComputeRMSE(List<PredictionMethod> lMethods, out Dictionary<PredictionMethod, Dictionary<PredictionMethod, double>> dConfidence)
         {
-            throw new NotImplementedException();
+            Dictionary<PredictionMethod, double> results = new Dictionary<PredictionMethod, double>();
+            dConfidence = new Dictionary<PredictionMethod, Dictionary<PredictionMethod, double>>();
+
+            foreach (var method in lMethods)
+            {
+                IPredictionModel model = predictionEngine.getModel(method);
+                if (model != null)
+                {
+                    var rmse = evaluationEngine.computeRMSE(testUsers, testItems, model);
+                    results.Add(method, rmse);
+                }
+            }
+            return results;
         }
 
         public void CalculateAverageRatingForTrainingSet()

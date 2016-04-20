@@ -32,6 +32,7 @@ namespace RecommenderSystem
 
         public void Train()
         {
+            Console.WriteLine("*****************Train Matrix Factorization Model*********************");
             mf = MatrixFactorization.newRandomMatrix(trainUsers, trainItems, cFeatures, miu);
 
             double error;

@@ -57,5 +57,10 @@ namespace RecommenderSystem
         {
             return this.GetId().GetHashCode();
         }
+
+        public double GetAverageRatings()
+        {
+            return itemsRatings.Average(x=> x.Value);
+        }
     }
 }

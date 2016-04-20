@@ -84,6 +84,7 @@ namespace RecommenderSystem
 
         public void Train()
         {
+            Console.WriteLine("*****************Train Stereotypes  Model*********************");
             stereotypes = newRandomCentroids(users, items, cStereotypes);
 
             Users usersCopy = new Users(users);
@@ -145,7 +146,8 @@ namespace RecommenderSystem
 
             if (mostSimilarUser.GetRating(itemId) == 0.0)
             {
-                throw new NotImplementedException(); //TODO 
+                //TODO - 1.why not to try the 2nd level similarity centroid? , 2.consider the return value for case the item didn't found
+                return item.GetAverageRatings(); 
             }
 
             return mostSimilarUser.GetRating(itemId);

@@ -32,5 +32,10 @@ namespace RecommenderSystem
             }      
         }
 
+
+        internal IPredictionModel getModel(RecommenderSystem.PredictionMethod method)
+        {
+            return predictionMethodsDictionary[method];
+        }
     }
 }
