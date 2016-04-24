@@ -41,5 +41,7 @@ namespace RecommenderSystem
 
             return l1.Select((t, i) => t * l2[i]).Sum();
         }
+
+        public static Func<int, int> Factorial = x => x < 0 ? -1 : x == 1 || x == 0 ? 1 : x * Factorial(x - 1);
     }
 }

@@ -70,6 +70,16 @@ namespace RecommenderSystem
                 result.Item2.addUserToItem(userId, itemId, rating);
             }
         }
+
+        public static List<Tuple<E, E>> getAllPairedCombinations<E>(IEnumerable<E> collection)
+        {
+            List<Tuple<E, E>> result = new List<Tuple<E, E>>();
+            for (int i = 0; i < collection.Count(); i++)
+                for (int j = i + 1; j < collection.Count(); j++)
+                    result.Add(Tuple.Create(collection.ElementAt(i), collection.ElementAt(j)));
+
+            return result;
+        }
     }
 
 

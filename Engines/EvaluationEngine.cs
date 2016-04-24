@@ -112,5 +112,67 @@ namespace RecommenderSystem
             }
             return Math.Sqrt(sse / n);
         }
+
+        public Tuple<double,double> computeConfidence(Users validationUsers, Items validationItems, IPredictionModel modelA, IPredictionModel modelB)
+        {
+
+            double aCounter = 0;
+            double bCounter = 0;
+            double aPrediction;
+            double bPrediction;
+            double aError;
+            double bError;
+            double actualRating;
+
+            // calcualte number wins for each model
+            foreach (User user in validationUsers)
+            {
+                foreach (string itemId in user.GetRatedItems())
+                {
+
+                    Item item = validationItems.GetItemById(itemId);                    
+                    actualRating = user.GetRating(itemId);  //TODO - take only items that user rated
+
+                    aPrediction = modelA.Predict(user, item);
+                    bPrediction = modelB.Predict(user, item);
+
+                    aError = Math.Abs(actualRating - aPrediction);
+                    bError = Math.Abs(actualRating - bPrediction);
+
+                    if (aError < bError)
+                        aCounter++;
+                    else if (aError > bError)
+                        bCounter++;
+                    else
+                    {
+                        aCounter += 0.5;
+                        bCounter += 0.5;
+                    }
+                }
+            }
+
+            int n = (int)(aCounter + bCounter);
+            
+            // calcualte pA
+            double sum=0;
+
+            for (int i = (int)aCounter; i < n; i++)
+            {
+                sum += MathUtils.Factorial(n) / (MathUtils.Factorial(n - i) * MathUtils.Factorial(i));
+            }
+
+            double pA = (1 - Math.Pow(0.5, n) * sum);           
+
+            // calculate pB
+            sum = 0;
+            for (int i = (int)bCounter; i < n; i++)
+            {
+                sum += MathUtils.Factorial(n) / (MathUtils.Factorial(n - i) * MathUtils.Factorial(i));
+            }
+
+            double pB = (1 - Math.Pow(0.5, n) * sum);
+
+            return Tuple.Create(pA, pB);
+        }
     }
 }

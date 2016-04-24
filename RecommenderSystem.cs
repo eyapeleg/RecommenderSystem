@@ -155,9 +155,9 @@ namespace RecommenderSystem
 
         public Dictionary<PredictionMethod, double> ComputeRMSE(List<PredictionMethod> lMethods, out Dictionary<PredictionMethod, Dictionary<PredictionMethod, double>> dConfidence)
         {
-            Dictionary<PredictionMethod, double> results = new Dictionary<PredictionMethod, double>();
-            dConfidence = new Dictionary<PredictionMethod, Dictionary<PredictionMethod, double>>();
 
+            // compute RMSE
+            Dictionary<PredictionMethod, double> results = new Dictionary<PredictionMethod, double>();
             foreach (var method in lMethods)
             {
                 IPredictionModel model = predictionEngine.getModel(method);
@@ -166,7 +166,26 @@ namespace RecommenderSystem
                     var rmse = evaluationEngine.computeRMSE(testUsers, testItems, model);
                     results.Add(method, rmse);
                 }
+            }       
+
+            // compute dConfidence
+            dConfidence = new Dictionary<PredictionMethod, Dictionary<PredictionMethod, double>>();
+            foreach (var method in lMethods)
+                dConfidence.Add(method, new Dictionary<PredictionMethod, double>());
+
+
+            List<Tuple<PredictionMethod, PredictionMethod>> methodPairs = DataUtils.getAllPairedCombinations(lMethods);
+            foreach (var methodPair in methodPairs)
+            {
+                PredictionMethod method1 = methodPair.Item1;
+                PredictionMethod method2 = methodPair.Item2;
+
+                Tuple<double, double> pApB = evaluationEngine.computeConfidence(testUsers, testItems, predictionEngine.getModel(method1), predictionEngine.getModel(method2));
+                dConfidence[method1].Add(method2, pApB.Item1);
+                dConfidence[method2].Add(method1, pApB.Item2);
             }
+
+
             return results;
         }
 
