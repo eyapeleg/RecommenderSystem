@@ -30,8 +30,6 @@ namespace RecommenderSystem
         private DataLoaderEngine dataLoaderEngine;
         private PredictionEngine predictionEngine;
         private EvaluationEngine evaluationEngine;
-        private MatrixFactorizationModel _matrixFactorizationModel;
-        private StereotypesModel _stereotypesModel;
 
         private ILogger logger;
 
@@ -148,9 +146,24 @@ namespace RecommenderSystem
             return evaluationEngine.ComputeMAE(predictionEngine,lMethods, userItemTestSet); //TODO - verify that prediction engine is not null
         }
 
-        public Dictionary<PredictionMethod, double> ComputeRMSE(List<PredictionMethod> lMethods, int cTrials)
+        public Dictionary<PredictionMethod, double> ComputeRMSE(List<PredictionMethod> lMethods, int cTrials = 0)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("*****************    Model Evaluation    *********************");
+            Dictionary<RecommenderSystem.PredictionMethod, double> results = new Dictionary<PredictionMethod, double>();
+
+            foreach (var method in lMethods)
+            {
+                IPredictionModel model = predictionEngine.getModel(method);
+                if (model != null)
+                {
+                    var rmse = evaluationEngine.computeRMSE(testUsers, testItems, model);
+                    Console.WriteLine(String.Format("Model: {0}, RMSE: {1}", method, rmse));
+                    results.Add(method, rmse);
+                }
+            }
+            Console.WriteLine("*************************************************************");
+
+            return results;
         }
 
         public Dictionary<PredictionMethod, double> ComputeRMSE(List<PredictionMethod> lMethods, out Dictionary<PredictionMethod, Dictionary<PredictionMethod, double>> dConfidence)

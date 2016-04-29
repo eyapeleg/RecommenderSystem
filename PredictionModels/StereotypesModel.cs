@@ -74,6 +74,7 @@ namespace RecommenderSystem
                     throw new ArgumentNullException();
 
                 centroids.Add(farestUser);
+                subsetUsers.Remove(farestUser); //TODO - Ask Eyal why he didn't remove the farest user from the subset list once it's added to the centroids
             }
 
             foreach(User user in centroids){
@@ -84,7 +85,7 @@ namespace RecommenderSystem
 
         public void Train()
         {
-            Console.WriteLine("*****************Train Stereotypes  Model*********************");
+            Console.WriteLine("***************** Train Stereotypes  Model *********************");
             stereotypes = newRandomCentroids(users, items, cStereotypes);
 
             Users usersCopy = new Users(users);

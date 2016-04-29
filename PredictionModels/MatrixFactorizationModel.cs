@@ -11,7 +11,6 @@ namespace RecommenderSystem
         private static readonly double yRate = Double.Parse(ConfigurationManager.AppSettings["yRate"]);
         private static readonly double lambdaRate = Double.Parse(ConfigurationManager.AppSettings["lambdaRate"]);
         private const double minErrorThreshold = 1.0; //TODO - evalute the appropriate error threshold 
-        private int k;
         private double miu;
         private Users trainUsers;
         private Items trainItems;
@@ -32,7 +31,7 @@ namespace RecommenderSystem
 
         public void Train()
         {
-            Console.WriteLine("*****************Train Matrix Factorization Model*********************");
+            Console.WriteLine("***************** Train Matrix Factorization Model *********************");
             mf = MatrixFactorization.newRandomMatrix(trainUsers, trainItems, cFeatures, miu);
 
             double error;
@@ -73,7 +72,7 @@ namespace RecommenderSystem
                 currRmse = evaluationEngine.computeRMSE(validationUsers, validationItems,this);
             }
 
-            Console.WriteLine("Final Result - RMSE = " + prevRmse);
+            Console.WriteLine(String.Format("Final Result - RMSE = {0}", prevRmse));
        }
 
         public double Predict(User user, Item item)

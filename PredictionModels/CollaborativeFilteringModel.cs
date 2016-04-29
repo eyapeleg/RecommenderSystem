@@ -59,9 +59,12 @@ namespace RecommenderSystem
             {
                 double w = thatUserSimilarity.Value;
                 rating = thatUserSimilarity.Key.GetRating(item.GetId());
+
+                if (rating == 0) //in case the similar user didn't rate the item, take the random user's rating 
+                {
+                    rating = thatUserSimilarity.Key.GetRandomRate();
+                }
                 avgRating = thatUserSimilarity.Key.GetAverageRatings();
-
-
                 numerator += w * (rating - avgRating);
             }
 

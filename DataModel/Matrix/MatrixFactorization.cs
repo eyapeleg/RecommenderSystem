@@ -58,6 +58,7 @@ namespace RecommenderSystem
             }
             catch (ItemNotFoundException e)
             {
+                //TODO
                 throw new NotImplementedException();
             }
         }

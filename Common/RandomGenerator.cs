@@ -8,6 +8,7 @@ namespace RecommenderSystem
     public class RandomGenerator
     {
         private Random rand;
+        double minItemsToTake = Double.Parse(ConfigurationManager.AppSettings["split_minItemsToTake"]); 
 
         public RandomGenerator() {
             rand = new Random();
@@ -61,7 +62,7 @@ namespace RecommenderSystem
             List<string> ratingItems = user.GetRatedItems().Select(item => (string)item.Clone()).ToList();
             int count = 0; //set the number of selected items per user           
 
-            int kItems = rand.Next(1, ratingItems.Count - 1); //pick a random items from the user rating list
+            int kItems = rand.Next(minItemsToTake, ratingItems.Count - 1); //pick a random items from the user rating list - limit the total number of selected items
 
             while (count < kItems)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 
@@ -9,6 +10,7 @@ namespace RecommenderSystem
     {
         static ILogger logger = new InfoLogger();
         RandomGenerator randomGenerator = new RandomGenerator();
+        double minRatingThreshold = Double.Parse(ConfigurationManager.AppSettings["split_MinimunRatedItemsPerUser"]); 
 
         public Dictionary<RecommenderSystem.DatasetType, Tuple<Users, Items>> Split(double subsetSize, double datasetSize, 
             Tuple<Users, Items> data, RecommenderSystem.DatasetType smallSetType, RecommenderSystem.DatasetType largeSetType)
@@ -24,23 +26,20 @@ namespace RecommenderSystem
             //initialize test/train sets
             result.Add(largeSetType, data);
             result.Add(smallSetType, new Tuple<Users, Items>(new Users(), new Items()));
-            Users largesetUsers = result[largeSetType].Item1;
+            var subsetUsers = result[largeSetType].Item1.Where(x => x.GetRatedItems().Count >= minRatingThreshold);
 
             do
             {
                 //select random user
-                User user = randomGenerator.getRandomUser(largesetUsers);
+                User user = randomGenerator.getRandomUser(subsetUsers);
                 var numberOfRatings = user.GetRatedItems().Count;
 
-                //verify the user has at least 2 rated Items
-                if (numberOfRatings > 2)
-                {
-                    Dictionary<string, double> smallSetItems = randomGenerator.NewRandomItemsPerUser(user);
-                    currentTestSize += smallSetItems.Count;
+                Dictionary<string, double> smallSetItems = randomGenerator.NewRandomItemsPerUser(user);
+                currentTestSize += smallSetItems.Count;
 
-                    AddUserToSmallDataset(result[smallSetType], user, smallSetItems); //random items goes to small set
-                    RemoveUserFromLargeDataset(user, smallSetItems); //the rest of the items goes to large set
-                }
+                AddUserToSmallDataset(result[smallSetType], user, smallSetItems); //random items goes to small set
+                RemoveUserFromLargeDataset(user, smallSetItems); //the rest of the items goes to large set
+
             } while (currentTestSize < smallDsSize);
 
             timer.Stop();
