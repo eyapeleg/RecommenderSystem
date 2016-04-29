@@ -79,7 +79,7 @@ namespace RecommenderSystem
             //calculate the overall average rating 
             CalculateAverageRatingForTrainingSet();
 
-            similarityEngine = new SimilarityEngine(trainUsers, MAX_SIMILAR_USERS, logger);
+            similarityEngine = new SimilarityEngine(testUsers, MAX_SIMILAR_USERS, logger);//TODO - Check if we need to send test/train users here
             evaluationEngine = new EvaluationEngine(testUsers);
 
             predictionEngine.addModel(PredictionMethod.Cosine, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new CosineMethod()));
@@ -156,7 +156,7 @@ namespace RecommenderSystem
                 IPredictionModel model = predictionEngine.getModel(method);
                 if (model != null)
                 {
-                    var rmse = evaluationEngine.computeRMSE(testUsers, testItems, model);
+                   var rmse = evaluationEngine.computeRMSE(testUsers, testItems, model);
                     Console.WriteLine(String.Format("Model: {0}, RMSE: {1}", method, rmse));
                     results.Add(method, rmse);
                 }

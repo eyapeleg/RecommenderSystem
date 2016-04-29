@@ -102,7 +102,7 @@ namespace RecommenderSystem
                 foreach (User user in usersCopy)
                 {
                     //Calculate a users similarity to the stereotypes
-                    List<KeyValuePair<User, double>> similarities = similarityEngine.calculateSimilarity(similarityMethod, user, prevCentroids);
+                    List<KeyValuePair<User, double>> similarities = similarityEngine.calculateSimilarity(similarityMethod, user, prevCentroids); //TODO - check the similarity threshold for stereotype algorithm
 
                     //Determine users that don't have a correlation with non of the stereotypes
                     if (similarities.Count == 0)

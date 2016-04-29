@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 
@@ -8,7 +9,7 @@ namespace RecommenderSystem
     public class RandomGenerator
     {
         private Random rand;
-        double minItemsToTake = Double.Parse(ConfigurationManager.AppSettings["split_minItemsToTake"]); 
+        double minItemsToTake = int.Parse(ConfigurationManager.AppSettings["split_minItemsToTake"]); 
 
         public RandomGenerator() {
             rand = new Random();
@@ -62,7 +63,8 @@ namespace RecommenderSystem
             List<string> ratingItems = user.GetRatedItems().Select(item => (string)item.Clone()).ToList();
             int count = 0; //set the number of selected items per user           
 
-            int kItems = rand.Next(minItemsToTake, ratingItems.Count - 1); //pick a random items from the user rating list - limit the total number of selected items
+            //TODO - consider to take at least half of the rated items
+            int kItems = rand.Next((int)minItemsToTake, ratingItems.Count - 1); //pick a random items from the user rating list - limit the total number of selected items
 
             while (count < kItems)
             {
