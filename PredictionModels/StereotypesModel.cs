@@ -58,10 +58,10 @@ namespace RecommenderSystem
 
                     // calculate similarites and update farest centroid accordingly
                     sumSquaredDistanceFromStereotypes = 0.0;
-                    List<KeyValuePair<User, double>> similarities = similarityEngine.calculateSimilarity(similarityMethod,user,centroids);
+                    List<KeyValuePair<User, double>> disSimilarities = similarityEngine.calculateSimilarity(similarityMethod,user,centroids,true);
 
-                    foreach(KeyValuePair<User, double> similarity in similarities)    {
-                        sumSquaredDistanceFromStereotypes += Math.Pow(1-Math.Abs(similarity.Value), 2);
+                    foreach(KeyValuePair<User, double> disSimilarity in disSimilarities)    {
+                        sumSquaredDistanceFromStereotypes += Math.Pow(Math.Abs(disSimilarity.Value), 2);
                     }
 
                     if (sumSquaredDistanceFromStereotypes > farestDistanceFromStereotypes)
@@ -75,6 +75,9 @@ namespace RecommenderSystem
 
                 centroids.Add(farestUser);
                 subsetUsers.Remove(farestUser); //TODO - Ask Eyal why he didn't remove the farest user from the subset list once it's added to the centroids
+                // Eyals response - we can remove it, or what i did i checked:
+                // if (centroids.Contains(user))
+                //     continue;
             }
 
             foreach(User user in centroids){
@@ -93,7 +96,7 @@ namespace RecommenderSystem
             int iteration = 1;
 
             while (!isConverged && iteration <= MAX_ITERATION)
-            {//TODO - add number of iterations threshold convergence
+            {
 
                 Console.WriteLine("Iteration: {0}", iteration);
                 List<User> prevCentroids = stereotypes.getStereotypesCentroids();
@@ -148,6 +151,10 @@ namespace RecommenderSystem
             if (mostSimilarUser.GetRating(itemId) == 0.0)
             {
                 //TODO - 1.why not to try the 2nd level similarity centroid? , 2.consider the return value for case the item didn't found
+                // Eyals response: 
+                //1. could work.  take into account that the centroids are far away from each other so im not sure if the 2nd centroid is really relevant.
+                // if it complicates the logic, I wouldn't focus on it, otherwise, it's worth the try...
+                // 2. item not found - i think average is also good
                 return item.GetAverageRatings(); 
             }
 

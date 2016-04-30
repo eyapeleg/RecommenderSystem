@@ -7,20 +7,13 @@ namespace RecommenderSystem
 {
     public class EvaluationEngine
     {
-        private Users users; //TODO - remove this dependecy and pass it as an argument to the corresponding method
-
 
         public EvaluationEngine()
         {
         
         }
 
-        public EvaluationEngine(Users users)
-        {
-            this.users = users;
-        }
-
-        public List<KeyValuePair<User, string>> createTestSet(int cTrials)
+        public List<KeyValuePair<User, string>> createTestSet(int cTrials, Users users)
         {
             List<KeyValuePair<User, string>> userItemTestSet = new List<KeyValuePair<User, string>>();
             Random rnd = new Random();

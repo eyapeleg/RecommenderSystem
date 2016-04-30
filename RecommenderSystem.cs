@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Threading;
+using System.Configuration;
 using System.Threading.Tasks;
 
 namespace RecommenderSystem
@@ -36,6 +37,7 @@ namespace RecommenderSystem
         private int MAX_SIMILAR_USERS;
         private int NUM_OF_TRIALS;
         private int dsSize;
+        private double TRAIN_DATA_PERCENTAGE;
 
         public RecommenderSystem()
         {
@@ -45,6 +47,7 @@ namespace RecommenderSystem
 
             MAX_SIMILAR_USERS = 30;
             NUM_OF_TRIALS = 1000;
+
         }
 
         public void Load(string sFileName)
@@ -53,6 +56,7 @@ namespace RecommenderSystem
             users = data.Item1;
             items = data.Item2;
             similarityEngine = new SimilarityEngine(users, MAX_SIMILAR_USERS, logger);
+            TRAIN_DATA_PERCENTAGE = double.Parse(ConfigurationManager.AppSettings["train_data_percentage"]);
         }
 
         public void Load(string sFileName, double dTrainSetSize)
@@ -68,8 +72,8 @@ namespace RecommenderSystem
             testUsers = splittedData[DatasetType.Test].Item1;
             testItems = splittedData[DatasetType.Test].Item2;
 
-            double trainSize = Math.Round(dsSize * 0.95); //TODO - parameterize hardcoded data size
-            splittedData = dataUtils.Split(0.95, trainSize, new Tuple<Users, Items>(this.trainUsers, this.trainItems), DatasetType.Validation, DatasetType.Train);//TODO - parameterize hardcoded data size
+            double trainSize = Math.Round(dsSize * TRAIN_DATA_PERCENTAGE); 
+            splittedData = dataUtils.Split(TRAIN_DATA_PERCENTAGE, trainSize, new Tuple<Users, Items>(this.trainUsers, this.trainItems), DatasetType.Validation, DatasetType.Train);
 
             trainUsers = splittedData[DatasetType.Train].Item1;
             trainItems = splittedData[DatasetType.Train].Item2;
@@ -80,7 +84,7 @@ namespace RecommenderSystem
             CalculateAverageRatingForTrainingSet();
 
             similarityEngine = new SimilarityEngine(testUsers, MAX_SIMILAR_USERS, logger);//TODO - Check if we need to send test/train users here
-            evaluationEngine = new EvaluationEngine(testUsers);
+            evaluationEngine = new EvaluationEngine();
 
             predictionEngine.addModel(PredictionMethod.Cosine, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new CosineMethod()));
             predictionEngine.addModel(PredictionMethod.Pearson, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new PearsonMethod()));
@@ -142,8 +146,8 @@ namespace RecommenderSystem
         //cTrials specifies the number of user-item pairs to be tested
         public Dictionary<PredictionMethod, double> ComputeMAE(List<PredictionMethod> lMethods, int cTrials)
         {
-            List<KeyValuePair<User, string>> userItemTestSet = evaluationEngine.createTestSet(cTrials);
-            return evaluationEngine.ComputeMAE(predictionEngine,lMethods, userItemTestSet); //TODO - verify that prediction engine is not null
+            List<KeyValuePair<User, string>> userItemTestSet = evaluationEngine.createTestSet(cTrials, testUsers);
+            return evaluationEngine.ComputeMAE(predictionEngine,lMethods, userItemTestSet); 
         }
 
         public Dictionary<PredictionMethod, double> ComputeRMSE(List<PredictionMethod> lMethods, int cTrials = 0)
