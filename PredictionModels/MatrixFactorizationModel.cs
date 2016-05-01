@@ -10,7 +10,7 @@ namespace RecommenderSystem
     {
         private static readonly double yRate = Double.Parse(ConfigurationManager.AppSettings["yRate"]);
         private static readonly double lambdaRate = Double.Parse(ConfigurationManager.AppSettings["lambdaRate"]);
-        private const double minErrorThreshold = 1.0; //TODO - evalute the appropriate error threshold 
+        private const double minErrorThreshold = 1.0; //TODO Eyal- evalute the appropriate error threshold 
         private double miu;
         private Users trainUsers;
         private Items trainItems;
@@ -41,11 +41,11 @@ namespace RecommenderSystem
 
             EvaluationEngine evaluationEngine = new EvaluationEngine();
             double currRmse = evaluationEngine.computeRMSE(validationUsers, validationItems, this);
-            int iteration = 1; //TODO - remove that before submission
+            int iteration = 1;
 
-            while (prevRmse > currRmse) //TODO - add num iteration and improvment threshold conditions
+            while (prevRmse > currRmse) //TODO Eyal - add num iteration and improvment threshold conditions
             {
-                Console.WriteLine("Iteraion: {0}, Current RMSE: {1}", iteration++, currRmse);
+                Console.WriteLine("Iteraion: {0}, Current RMSE: {1}", iteration, currRmse);
                 foreach(User user in trainUsers)
                 {
                     foreach (string itemId in user.GetRatedItems())
@@ -70,6 +70,7 @@ namespace RecommenderSystem
 
                 prevRmse = currRmse;
                 currRmse = evaluationEngine.computeRMSE(validationUsers, validationItems,this);
+                iteration++;
             }
 
             Console.WriteLine(String.Format("Final Result - RMSE = {0}", prevRmse));

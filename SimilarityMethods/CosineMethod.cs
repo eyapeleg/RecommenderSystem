@@ -18,7 +18,6 @@ namespace RecommenderSystem
                 dotProduct += u1Rating*u2Rating;
             }
 
-            //todo check that condition
             if (!intersectList.Any())
                 u1.GetRandomRate();
 

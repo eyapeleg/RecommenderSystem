@@ -45,7 +45,6 @@ namespace RecommenderSystem
             users.TryGetValue(userId, out user);
 
             return user; //TODO add exception
-
         }
 
         public double GetRating(string userId, string itemId)

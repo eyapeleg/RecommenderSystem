@@ -53,12 +53,12 @@ namespace RecommenderSystem
             }
             catch (UserNotFoundException e)
             {
-                //TODO
+                //TODO Eyal
                 throw new NotImplementedException();
             }
             catch (ItemNotFoundException e)
             {
-                //TODO
+                //TODO Eyal
                 throw new NotImplementedException();
             }
         }

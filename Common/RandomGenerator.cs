@@ -63,7 +63,7 @@ namespace RecommenderSystem
             List<string> ratingItems = user.GetRatedItems().Select(item => (string)item.Clone()).ToList();
             int count = 0; //set the number of selected items per user           
 
-            //TODO - consider to take at least half of the rated items
+            //TODO Eyal- consider to take at least half of the rated items
             int kItems = rand.Next((int)minItemsToTake, ratingItems.Count - 1); //pick a random items from the user rating list - limit the total number of selected items
 
             while (count < kItems)

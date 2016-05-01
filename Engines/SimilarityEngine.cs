@@ -57,7 +57,6 @@ namespace RecommenderSystem
                     var thatUserList = thatUser.GetRatedItems();
 
                     List<string> commonItemsList = thatUserList.Intersect(thisUserList).ToList(); //check if both users rated at least one common item 
-                    //TODO decide about threshold
                     if (commonItemsList.Count > commonItemsThreshold && thatUserList.Count > 0 && thisUserList.Count > 0)
                     {
                         var similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItemsList);

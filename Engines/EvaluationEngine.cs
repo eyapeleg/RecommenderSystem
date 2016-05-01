@@ -7,7 +7,7 @@ namespace RecommenderSystem
 {
     public class EvaluationEngine
     {
-        private Users users; //TODO - remove this dependecy and pass it as an argument to the corresponding method
+        private Users users; //TODO Eyal- remove this dependecy and pass it as an argument to the corresponding method
 
 
         public EvaluationEngine()
@@ -103,7 +103,7 @@ namespace RecommenderSystem
 
                     Item item = validationItems.GetItemById(itemId);
 
-                    actualRating = user.GetRating(itemId); //TODO - take only items that user rated
+                    actualRating = user.GetRating(itemId); 
                     predictedRating = model.Predict(user, item);
 
                     sse += Math.Pow(actualRating - predictedRating, 2);
@@ -131,7 +131,7 @@ namespace RecommenderSystem
                 {
 
                     Item item = validationItems.GetItemById(itemId);                    
-                    actualRating = user.GetRating(itemId);  //TODO - take only items that user rated
+                    actualRating = user.GetRating(itemId);  
 
                     aPrediction = modelA.Predict(user, item);
                     bPrediction = modelB.Predict(user, item);

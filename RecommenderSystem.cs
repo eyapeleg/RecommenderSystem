@@ -16,7 +16,7 @@ namespace RecommenderSystem
         private Items items;
         DataUtils dataUtils = new DataUtils();
 
-        //TODO: decide how to formalize that part
+        //TODO Eyal: decide how to formalize that part
         private Users trainUsers;
         private Items trainItems;
         private Users validationUsers;
@@ -68,8 +68,8 @@ namespace RecommenderSystem
             testUsers = splittedData[DatasetType.Test].Item1;
             testItems = splittedData[DatasetType.Test].Item2;
 
-            double trainSize = Math.Round(dsSize * 0.95); //TODO - parameterize hardcoded data size
-            splittedData = dataUtils.Split(0.95, trainSize, new Tuple<Users, Items>(this.trainUsers, this.trainItems), DatasetType.Validation, DatasetType.Train);//TODO - parameterize hardcoded data size
+            double trainSize = Math.Round(dsSize * dTrainSetSize);
+            splittedData = dataUtils.Split(dTrainSetSize, trainSize, new Tuple<Users, Items>(this.trainUsers, this.trainItems), DatasetType.Validation, DatasetType.Train);
 
             trainUsers = splittedData[DatasetType.Train].Item1;
             trainItems = splittedData[DatasetType.Train].Item2;
@@ -79,7 +79,7 @@ namespace RecommenderSystem
             //calculate the overall average rating 
             CalculateAverageRatingForTrainingSet();
 
-            similarityEngine = new SimilarityEngine(testUsers, MAX_SIMILAR_USERS, logger);//TODO - Check if we need to send test/train users here
+            similarityEngine = new SimilarityEngine(testUsers, MAX_SIMILAR_USERS, logger); //Similarity engine used by pearson and cosine 
             evaluationEngine = new EvaluationEngine(testUsers);
 
             predictionEngine.addModel(PredictionMethod.Cosine, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new CosineMethod()));
@@ -89,9 +89,10 @@ namespace RecommenderSystem
 
         public void TrainBaseModel(int cFeatures)
         {
-            IPredictionModel matrixFactorizationModel = new MatrixFactorizationModel(trainUsers, trainItems, validationUsers, validationItems, cFeatures, averageTrainRating);
+            double avgRating = getAverageRating(trainUsers); //calculate the average rating of the training set
+            IPredictionModel matrixFactorizationModel = new MatrixFactorizationModel(trainUsers, trainItems, validationUsers, validationItems, cFeatures, avgRating);
             predictionEngine.addModel(PredictionMethod.BaseModel, matrixFactorizationModel);
-            predictionEngine.Train(PredictionMethod.BaseModel); //TODO - modify the average rating to be only on the small train set
+            predictionEngine.Train(PredictionMethod.BaseModel); 
         }
 
         public void TrainStereotypes(int cStereotypes)
@@ -143,7 +144,7 @@ namespace RecommenderSystem
         public Dictionary<PredictionMethod, double> ComputeMAE(List<PredictionMethod> lMethods, int cTrials)
         {
             List<KeyValuePair<User, string>> userItemTestSet = evaluationEngine.createTestSet(cTrials);
-            return evaluationEngine.ComputeMAE(predictionEngine,lMethods, userItemTestSet); //TODO - verify that prediction engine is not null
+            return evaluationEngine.ComputeMAE(predictionEngine,lMethods, userItemTestSet); 
         }
 
         public Dictionary<PredictionMethod, double> ComputeRMSE(List<PredictionMethod> lMethods, int cTrials = 0)
@@ -207,6 +208,13 @@ namespace RecommenderSystem
             double sum = trainUsers.Sum(user => user.GetAverageRatings());
 
             this.averageTrainRating = sum / trainUsers.Count();
+        }
+
+        private double getAverageRating(Users userSet)
+        {
+            double sum = userSet.Sum(user => user.GetAverageRatings());
+
+            return sum / userSet.Count();
         }
     }
 }

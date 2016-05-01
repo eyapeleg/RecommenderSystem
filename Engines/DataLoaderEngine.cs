@@ -25,7 +25,6 @@ namespace RecommenderSystem
             Items items = new Items();
 
             logger.info("Starting load data...");
-            //TODO: Remove stopwatch on submittion 
             Stopwatch timer = Stopwatch.StartNew();
 
             StreamReader objInput = new StreamReader(sFileName, Encoding.Default);

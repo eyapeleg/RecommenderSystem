@@ -74,7 +74,7 @@ namespace RecommenderSystem
                     throw new ArgumentNullException();
 
                 centroids.Add(farestUser);
-                subsetUsers.Remove(farestUser); //TODO - Ask Eyal why he didn't remove the farest user from the subset list once it's added to the centroids
+                subsetUsers.Remove(farestUser); //TODO Eyal- why he didn't remove the farest user from the subset list once it's added to the centroids
             }
 
             foreach(User user in centroids){
@@ -93,8 +93,7 @@ namespace RecommenderSystem
             int iteration = 1;
 
             while (!isConverged && iteration <= MAX_ITERATION)
-            {//TODO - add number of iterations threshold convergence
-
+            {
                 Console.WriteLine("Iteration: {0}", iteration);
                 List<User> prevCentroids = stereotypes.getStereotypesCentroids();
                 stereotypes.initStereotypesUsers();
@@ -102,7 +101,7 @@ namespace RecommenderSystem
                 foreach (User user in usersCopy)
                 {
                     //Calculate a users similarity to the stereotypes
-                    List<KeyValuePair<User, double>> similarities = similarityEngine.calculateSimilarity(similarityMethod, user, prevCentroids); //TODO - check the similarity threshold for stereotype algorithm
+                    List<KeyValuePair<User, double>> similarities = similarityEngine.calculateSimilarity(similarityMethod, user, prevCentroids); //TODO Eyal - check the similarity threshold for stereotype algorithm
 
                     //Determine users that don't have a correlation with non of the stereotypes
                     if (similarities.Count == 0)
@@ -147,7 +146,7 @@ namespace RecommenderSystem
 
             if (mostSimilarUser.GetRating(itemId) == 0.0)
             {
-                //TODO - 1.why not to try the 2nd level similarity centroid? , 2.consider the return value for case the item didn't found
+                //TODO Eyal - 1.why not to try the 2nd level similarity centroid? , 2.consider the return value for case the item didn't found
                 return item.GetAverageRatings(); 
             }
 
