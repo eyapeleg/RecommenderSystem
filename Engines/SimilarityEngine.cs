@@ -40,7 +40,7 @@ namespace RecommenderSystem
             return similarities[0].Value;
         }
        
-        public List<KeyValuePair<User, double>> calculateSimilarity(ISimilarityMethod predictionMethod, User thisUser, List<User> candidateUsers)
+        public List<KeyValuePair<User, double>> calculateSimilarity(ISimilarityMethod predictionMethod, User thisUser, List<User> candidateUsers, bool revertSimilarities = false)
         {
             if (predictionMethod == null || thisUser == null)
                 throw new ArgumentNullException("IPredictionMethod predictionMethod, User thisUser must both be not null!");
@@ -60,9 +60,13 @@ namespace RecommenderSystem
                     if (commonItemsList.Count > commonItemsThreshold && thatUserList.Count > 0 && thisUserList.Count > 0)
                     {
                         var similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItemsList);
+                        if (revertSimilarities == true)
+                        {
+                            similarity *= -1;
+                        }
                         if (similarity > similarityThreshold) //in some cases the users rate their common item the same as their average then we can get here zero
                         {
-                            similarUsers.add(thatUser, similarity);
+                           similarUsers.add(thatUser, similarity);
                         }
                     }
                 }

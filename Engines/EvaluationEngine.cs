@@ -7,20 +7,13 @@ namespace RecommenderSystem
 {
     public class EvaluationEngine
     {
-        private Users users; //TODO Eyal- remove this dependecy and pass it as an argument to the corresponding method
-
 
         public EvaluationEngine()
         {
         
         }
 
-        public EvaluationEngine(Users users)
-        {
-            this.users = users;
-        }
-
-        public List<KeyValuePair<User, string>> createTestSet(int cTrials)
+        public List<KeyValuePair<User, string>> createTestSet(int cTrials, Users users)
         {
             List<KeyValuePair<User, string>> userItemTestSet = new List<KeyValuePair<User, string>>();
             Random rnd = new Random();
@@ -103,7 +96,7 @@ namespace RecommenderSystem
 
                     Item item = validationItems.GetItemById(itemId);
 
-                    actualRating = user.GetRating(itemId); 
+                    actualRating = user.GetRating(itemId); //TODO - take only items that user rated
                     predictedRating = model.Predict(user, item);
 
                     sse += Math.Pow(actualRating - predictedRating, 2);
@@ -131,7 +124,7 @@ namespace RecommenderSystem
                 {
 
                     Item item = validationItems.GetItemById(itemId);                    
-                    actualRating = user.GetRating(itemId);  
+                    actualRating = user.GetRating(itemId);  //TODO - take only items that user rated
 
                     aPrediction = modelA.Predict(user, item);
                     bPrediction = modelB.Predict(user, item);

@@ -67,7 +67,7 @@
     <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Logger\InfoLogger.cs" />
     <Compile Include="Engines\PredictionEngine.cs" />
-    <Compile Include="DataModel\Matrix\MatrixFactorization.cs" />
+    <Compile Include="Model\Matrix\MatrixFactorization.cs" />
     <Compile Include="SimilarityMethods\CosineMethod.cs" />
     <Compile Include="Engines\DataLoaderEngine.cs" />
     <Compile Include="SimilarityMethods\ISimilarityMethod.cs" />
@@ -78,11 +78,6 @@
     <Compile Include="Engines\SimilarityEngine.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DataModel\Collections\" />
-    <Folder Include="DataModel\Exceptions\" />
-    <Folder Include="DataModel\Item\" />
-    <Folder Include="DataModel\Stereotype\" />
-    <Folder Include="DataModel\Users\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
