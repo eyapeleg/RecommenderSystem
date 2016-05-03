@@ -8,8 +8,8 @@ namespace RecommenderSystem
 {
     public class MatrixFactorizationModel : IPredictionModel
     {
-        private static readonly double yRate = Double.Parse(ConfigurationManager.AppSettings["yRate"]);
-        private static readonly double lambdaRate = Double.Parse(ConfigurationManager.AppSettings["lambdaRate"]);
+        private static readonly double yRate = 0.05; //Double.Parse(ConfigurationManager.AppSettings["yRate"]);
+        private static readonly double lambdaRate = 0.05; //Double.Parse(ConfigurationManager.AppSettings["lambdaRate"]);
         private const double minErrorThreshold = 1.0; //TODO Eyal- evalute the appropriate error threshold 
         private double miu;
         private Users trainUsers;

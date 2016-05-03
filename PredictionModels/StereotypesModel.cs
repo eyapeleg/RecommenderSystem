@@ -25,9 +25,9 @@ namespace RecommenderSystem
             this.randomGenerator = new RandomGenerator();
             this.similarityEngine = similarityEngine;
             this.similarityMethod = similarityMethod;
-            this.CENTROIDS_SIMILARITY_THRESHOLD = double.Parse(ConfigurationManager.AppSettings["CentroidsSimilarityThreshold"]);
-            this.MAX_ITERATION = int.Parse(ConfigurationManager.AppSettings["maxNumIterationStereotype"]);
-            this.minimumRatingThreshold = int.Parse(ConfigurationManager.AppSettings["minimumRatingThreshold"]);
+            this.CENTROIDS_SIMILARITY_THRESHOLD = 0.99; // double.Parse(ConfigurationManager.AppSettings["CentroidsSimilarityThreshold"]);
+            this.MAX_ITERATION = 20; // int.Parse(ConfigurationManager.AppSettings["maxNumIterationStereotype"]);
+            this.minimumRatingThreshold = 50;// int.Parse(ConfigurationManager.AppSettings["minimumRatingThreshold"]);
             this.users = users;
             this.items = items;
             this.cStereotypes = cStereotypes;
@@ -74,10 +74,6 @@ namespace RecommenderSystem
                     throw new ArgumentNullException();
 
                 centroids.Add(farestUser);
-                subsetUsers.Remove(farestUser); //TODO - Ask Eyal why he didn't remove the farest user from the subset list once it's added to the centroids
-                // Eyals response - we can remove it, or what i did i checked:
-                // if (centroids.Contains(user))
-                //     continue;
             }
 
             foreach(User user in centroids){

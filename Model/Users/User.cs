@@ -73,7 +73,12 @@ namespace RecommenderSystem
 
         public List<string> GetRatedItems()
         {
-            return itemsRatings.Keys.ToList();
+            if (itemsRatings != null)
+            {
+                return itemsRatings.Keys.ToList();
+            }
+
+            return new List<string>(); //return empty list
         }
 
         public Dictionary<string, double> GetRatedItemsDic()

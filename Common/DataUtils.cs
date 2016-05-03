@@ -10,7 +10,7 @@ namespace RecommenderSystem
     {
         static ILogger logger = new InfoLogger();
         RandomGenerator randomGenerator = new RandomGenerator();
-        double minRatingThreshold = Double.Parse(ConfigurationManager.AppSettings["split_MinimunRatedItemsPerUser"]); 
+        double minRatingThreshold = 10; //Double.Parse(ConfigurationManager.AppSettings["split_MinimunRatedItemsPerUser"]); 
 
         public Dictionary<RecommenderSystem.DatasetType, Tuple<Users, Items>> Split(double subsetSize, double datasetSize, 
             Tuple<Users, Items> data, RecommenderSystem.DatasetType smallSetType, RecommenderSystem.DatasetType largeSetType)

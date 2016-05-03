@@ -9,7 +9,8 @@ namespace RecommenderSystem
     public class RandomGenerator
     {
         private Random rand;
-        double minItemsToTake = int.Parse(ConfigurationManager.AppSettings["split_minItemsToTake"]); 
+        //double minItemsToTake = Double.Parse(ConfigurationManager.AppSettings["split_minItemsToTake"]); 
+        double minItemsToTake = 3;
 
         public RandomGenerator() {
             rand = new Random();

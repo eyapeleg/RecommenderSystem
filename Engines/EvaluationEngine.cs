@@ -124,7 +124,7 @@ namespace RecommenderSystem
                 {
 
                     Item item = validationItems.GetItemById(itemId);                    
-                    actualRating = user.GetRating(itemId);  //TODO - take only items that user rated
+                    actualRating = user.GetRating(itemId); 
 
                     aPrediction = modelA.Predict(user, item);
                     bPrediction = modelB.Predict(user, item);

@@ -15,8 +15,8 @@ namespace RecommenderSystem
         private Dictionary<User, double> buVector;
         private Dictionary<Item, double> biVector;
 
-        private static readonly double yRate = Double.Parse(ConfigurationManager.AppSettings["yRate"]);
-        private static readonly double lambdaRate = Double.Parse(ConfigurationManager.AppSettings["lambdaRate"]);
+        private static readonly double yRate = 0.05; //Double.Parse(ConfigurationManager.AppSettings["yRate"]);
+        private static readonly double lambdaRate = 0.05; //Double.Parse(ConfigurationManager.AppSettings["lambdaRate"]);
 
         public MatrixFactorization(double miu, 
                                         Dictionary<User, double> buVector,
