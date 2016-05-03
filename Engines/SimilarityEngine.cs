@@ -28,7 +28,7 @@ namespace RecommenderSystem
 
         public List<KeyValuePair<User, double>> calculateSimilarity(ISimilarityMethod predictionMethod, User thisUser, List<string> candidateUsersIds)
         {
-            List<User> candidateUsers = candidateUsersIds.Select(userId => users.getUserById(userId)).ToList(); 
+            List<User> candidateUsers = candidateUsersIds.Select(userId => users.getUserById(userId)).Where(user => user != null).ToList(); 
             return calculateSimilarity(predictionMethod, thisUser, candidateUsers);
         }
 
@@ -54,21 +54,29 @@ namespace RecommenderSystem
             {
                 if (thatUser != null && !thisUser.Equals(thatUser))
                 {
-                    List<string> thatUserList = thatUser.GetRatedItems();
-                    List<string> commonItemsList = thatUserList.Intersect(thisUserList).ToList(); //check if both users rated at least one common item 
-
-                    if (commonItemsList.Count > commonItemsThreshold && thatUserList.Count > 0 && thisUserList.Count > 0)
+                    try
                     {
-                        var similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItemsList);
-                        if (revertSimilarities == true)
+                        List<string> thatUserList = thatUser.GetRatedItems();
+                        List<string> commonItemsList = thatUserList.Intersect(thisUserList).ToList(); //check if both users rated at least one common item 
+
+                        if (commonItemsList.Count > commonItemsThreshold && thatUserList.Count > 0 && thisUserList.Count > 0)
                         {
-                            similarity *= -1;
-                        }
-                        if (similarity > similarityThreshold) //in some cases the users rate their common item the same as their average then we can get here zero
-                        {
-                           similarUsers.add(thatUser, similarity);
+                            var similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItemsList);
+                            if (revertSimilarities == true)
+                            {
+                                similarity *= -1;
+                            }
+                            if (similarity > similarityThreshold) //in some cases the users rate their common item the same as their average then we can get here zero
+                            {
+                                similarUsers.add(thatUser, similarity);
+                            }
                         }
                     }
+                    catch
+                    {
+                        Console.WriteLine("user does not exist"); //TODO remove - only for interanl testing
+                        continue;
+                    }         
                 }
             }
             timer.Stop();
