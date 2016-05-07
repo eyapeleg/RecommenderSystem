@@ -7,10 +7,11 @@ namespace RecommenderSystem
 {
     public class EvaluationEngine
     {
+        double avgRating;
 
-        public EvaluationEngine()
+        public EvaluationEngine(double avgRating)
         {
-        
+            this.avgRating = avgRating;
         }
 
         public List<KeyValuePair<User, string>> createTestSet(int cTrials, Users users)
@@ -93,11 +94,16 @@ namespace RecommenderSystem
             {
                 foreach (string itemId in user.GetRatedItems())
                 {
-
+                   
                     Item item = validationItems.GetItemById(itemId);
 
-                    actualRating = user.GetRating(itemId); //TODO - take only items that user rated
+                    actualRating = user.GetRating(itemId); 
                     predictedRating = model.Predict(user, item);
+
+                    if(predictedRating == -1) //in case the user and item are not exist the prediction is the average rating
+                    {
+                        predictedRating = avgRating;
+                    }
 
                     sse += Math.Pow(actualRating - predictedRating, 2);
                     n++;

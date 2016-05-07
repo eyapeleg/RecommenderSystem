@@ -54,29 +54,21 @@ namespace RecommenderSystem
             {
                 if (thatUser != null && !thisUser.Equals(thatUser))
                 {
-                    try
-                    {
-                        List<string> thatUserList = thatUser.GetRatedItems();
-                        List<string> commonItemsList = thatUserList.Intersect(thisUserList).ToList(); //check if both users rated at least one common item 
+                   List<string> thatUserList = thatUser.GetRatedItems();
+                    List<string> commonItemsList = thatUserList.Intersect(thisUserList).ToList(); //check if both users rated at least one common item 
 
-                        if (commonItemsList.Count > commonItemsThreshold && thatUserList.Count > 0 && thisUserList.Count > 0)
-                        {
-                            var similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItemsList);
-                            if (revertSimilarities == true)
-                            {
-                                similarity *= -1;
-                            }
-                            if (similarity > similarityThreshold) //in some cases the users rate their common item the same as their average then we can get here zero
-                            {
-                                similarUsers.add(thatUser, similarity);
-                            }
-                        }
-                    }
-                    catch
+                    if (commonItemsList.Count > commonItemsThreshold && thatUserList.Count > 0 && thisUserList.Count > 0)
                     {
-                        Console.WriteLine("user does not exist"); //TODO remove - only for interanl testing
-                        continue;
-                    }         
+                        var similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItemsList);
+                        if (revertSimilarities == true)
+                        {
+                            similarity *= -1;
+                        }
+                        if (similarity > similarityThreshold) //in some cases the users rate their common item the same as their average then we can get here zero
+                        {
+                            similarUsers.add(thatUser, similarity);
+                        }
+                    }      
                 }
             }
             timer.Stop();

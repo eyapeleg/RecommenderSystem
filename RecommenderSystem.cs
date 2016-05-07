@@ -87,7 +87,7 @@ namespace RecommenderSystem
             CalculateAverageRatingForTrainingSet();
 
             similarityEngine = new SimilarityEngine(testUsers, MAX_SIMILAR_USERS, logger);  //Similarity engine used by pearson and cosine 
-            evaluationEngine = new EvaluationEngine();
+            evaluationEngine = new EvaluationEngine(averageTrainRating);
 
             predictionEngine.addModel(PredictionMethod.Cosine, new CollaborativeFilteringModel(testUsers, testItems, similarityEngine, new CosineMethod()));
             predictionEngine.addModel(PredictionMethod.Pearson, new CollaborativeFilteringModel(testUsers, testItems, similarityEngine, new PearsonMethod()));

@@ -39,7 +39,7 @@ namespace RecommenderSystem
             double predictedRating;
             double prevRmse = Double.MaxValue;
 
-            EvaluationEngine evaluationEngine = new EvaluationEngine();
+            EvaluationEngine evaluationEngine = new EvaluationEngine(miu);
             double currRmse = evaluationEngine.computeRMSE(validationUsers, validationItems, this);
             int iteration = 1;
 

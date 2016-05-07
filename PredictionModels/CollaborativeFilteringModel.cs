@@ -27,6 +27,21 @@ namespace RecommenderSystem
 
         public double Predict(User user, Item item)
         {
+            if(item == null && user != null) //in case the item doesn't exist take the random rate for that user
+            {
+                return user.GetRandomRate();
+            }
+
+            if(user == null && item != null) //in case the item exist but the user not, take the average rating of that item
+            {
+                return item.GetAverageRatings();
+            }
+
+            if(user == null && item == null) //otherwise, both user and item are not exist, take the average rating of all system
+            {
+                return -1;
+            }
+
             var candidateUsers = item.GetRatingUsers();
 
             //in case the current user is the only one that predict this item return the random rating or otherwise if the current user has only one rated item
