@@ -12,6 +12,8 @@ namespace RecommenderSystem
     public class RecommenderSystem
     {
         public enum PredictionMethod { Pearson, Cosine, Random, BaseModel, Stereotypes };
+        public enum RecommendationMethod { Popularity, Pearson, Cosine, BaseModel, Stereotypes, NNPearson, NNCosine, NNBaseModel, NNJaccard, CP, Jaccard };
+
         public enum DatasetType { Train, Test, Validation};
         private Users users;
         private Items items;
@@ -211,6 +213,45 @@ namespace RecommenderSystem
             return results;
         }
 
+        public List<string> Recommend(RecommendationMethod sAlgorithm, string sUserId, int cRecommendations)
+        {
+            List<string> result = new List<string>();
+
+            switch (sAlgorithm)
+            {
+                case (RecommendationMethod.Popularity):
+                    result = GetPopularItems(sUserId, cRecommendations);
+                    break;
+                case (RecommendationMethod.Pearson):
+                    result = GetTopItems(predictionEngine.getModel(PredictionMethod.Pearson), sUserId, cRecommendations);
+                    break;
+                case (RecommendationMethod.Cosine):
+                    result = GetTopItems(predictionEngine.getModel(PredictionMethod.Cosine), sUserId, cRecommendations);
+                    break;
+                case (RecommendationMethod.BaseModel):
+                    result = GetTopItems(predictionEngine.getModel(PredictionMethod.BaseModel), sUserId, cRecommendations);
+                    break;
+                case (RecommendationMethod.Stereotypes):
+                    result = GetTopItems(predictionEngine.getModel(PredictionMethod.Stereotypes), sUserId, cRecommendations);
+                    break;
+                case (RecommendationMethod.NNPearson):
+                    result = GetTopItemsBasedNN(new PearsonMethod(), sUserId, cRecommendations);
+                    break;
+                case (RecommendationMethod.NNCosine):
+                    result = GetTopItemsBasedNN(new CosineMethod(), sUserId, cRecommendations);
+                    break;
+                case (RecommendationMethod.NNBaseModel):
+                    break;
+            }
+
+            return result;
+        }
+
+        Dictionary<int, Dictionary<RecommendationMethod, Dictionary<string, double>>> ComputePrecisionRecall(List<RecommendationMethod> lMethods, List<int> lLengths, int cTrials)
+        {
+            throw new NotImplementedException();
+        }
+
         public void CalculateAverageRatingForTrainingSet()
         {
             double sum = trainUsers.Sum(user => user.GetAverageRatings());
@@ -218,11 +259,43 @@ namespace RecommenderSystem
             this.averageTrainRating = sum / trainUsers.Count();
         }
 
+        #region private methods
+
         private double getAverageRating(Users userSet)
         {
            double sum = userSet.Sum(user => user.GetAverageRatings());
 
            return sum / userSet.Count();
         }
+
+        private List<string> GetPopularItems(string sUserId, int cRecommendations)
+        {
+            // take only items that has not rated by the user and order them by popularity 
+            return items.Where(item => !item.GetRatingUsers().Contains(sUserId)).OrderByDescending(item => item.GetRatingUsers().Count()).Select(item => item.GetId()).Take(cRecommendations).ToList();
+        }
+
+        private List<string> GetTopItems(IPredictionModel predictionModel, string sUserId, int cRecommendations)
+        {
+            var currentUser = users.getUserById(sUserId);
+            
+            //TODO need to think about scenario of new user (without any rated items)
+            var candidateItems = items.Where(item => !item.GetRatingUsers().Contains(sUserId));
+            var orderByPrdiction = candidateItems.OrderByDescending(item => predictionModel.Predict(currentUser, item));
+            return orderByPrdiction.Select(item => item.GetId()).Take(cRecommendations).ToList();
+        }
+
+        private List<string> GetTopItemsBasedNN(ISimilarityMethod similarityMethod, string sUserId, int cRecommendations)
+        {
+            List<string> result = new List<string>();
+
+            User currentUser = users.getUserById(sUserId);
+            var candidateItems = items.Where(item => !item.GetRatingUsers().Contains(sUserId));
+            var NNList = users.Where(user => !user.Equals(currentUser)).OrderByDescending(user => similarityEngine.calculateSimilarity(similarityMethod, currentUser, user)).Take(20); //TODO Set K
+            
+            // Eyal Need to start from here 
+            return result;
+        }
+
+        #endregion
     }
 }
