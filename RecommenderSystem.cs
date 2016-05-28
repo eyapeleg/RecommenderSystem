@@ -274,7 +274,7 @@ namespace RecommenderSystem
         private List<string> GetPopularItems(string sUserId, int cRecommendations)
         {
             // take only items that has not rated by the user and order them by popularity 
-            return items.Where(item => !item.GetRatingUsers().Contains(sUserId)).OrderByDescending(item => item.GetRatingUsers().Count()).Select(item => item.GetId()).Take(cRecommendations).ToList();
+            return trainItems.Where(item => !item.GetRatingUsers().Contains(sUserId)).OrderByDescending(item => item.GetRatingUsers().Count()).Select(item => item.GetId()).Take(cRecommendations).ToList();
         }
 
         private List<string> GetTopItems(IPredictionModel predictionModel, string sUserId, int cRecommendations)
@@ -282,7 +282,7 @@ namespace RecommenderSystem
             var currentUser = users.getUserById(sUserId);
             
             //TODO need to think about scenario of new user (without any rated items)
-            var candidateItems = items.Where(item => !item.GetRatingUsers().Contains(sUserId));
+            var candidateItems = trainItems.Where(item => !item.GetRatingUsers().Contains(sUserId));
             var orderByPrdiction = candidateItems.OrderByDescending(item => predictionModel.Predict(currentUser, item));
             return orderByPrdiction.Select(item => item.GetId()).Take(cRecommendations).ToList();
         }
@@ -294,11 +294,11 @@ namespace RecommenderSystem
             int k = 20; //number of NN
 
             //Select an item only if one of the neighbors has rated it
-            User currentUser = users.getUserById(sUserId);
+            User currentUser = trainUsers.getUserById(sUserId);
             var currentUserRatedItems = currentUser.GetRatedItems();
-            var NNList = users.Where(user => !user.Equals(currentUser)).OrderByDescending(user => similarityEngine.calculateSimilarity(similarityMethod, currentUser, user));
+            var NNList = trainUsers.Where(user => !user.Equals(currentUser)).OrderByDescending(user => similarityEngine.calculateSimilarity(similarityMethod, currentUser, user));
             var NNTopK = NNList.Take(k);
-            var NNRatedItems = NNTopK.Select(user => user.GetRatedItems()).Select(line => line.Except(currentUserRatedItems));
+            var NNRatedItems = NNTopK.Select(user => user.GetRatedItems()).Select(items => items.Except(currentUserRatedItems));
 
             //For each item that rated by one of the neighbors, calculate the normalized rating score
             for (int i = 0; i < NNRatedItems.Count(); i++)
