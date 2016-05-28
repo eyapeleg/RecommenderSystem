@@ -83,7 +83,8 @@ namespace RecommenderSystem
                 numerator += w * (rating - avgRating);
             }
 
-            return user.GetAverageRatings() + (numerator / denominator);
+            double predict = user.GetAverageRatings() + (numerator / denominator);
+            return predict;
         }
 
         #endregion

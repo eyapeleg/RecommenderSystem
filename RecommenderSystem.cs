@@ -13,6 +13,7 @@ namespace RecommenderSystem
     {
         public enum PredictionMethod { Pearson, Cosine, Random, BaseModel, Stereotypes, Jaccard };
         public enum RecommendationMethod { Popularity, Pearson, Cosine, BaseModel, Stereotypes, NNPearson, NNCosine, NNBaseModel, NNJaccard, CP, Jaccard };
+        public enum RecommendationMeasure { Precision, Recall };
 
         public enum DatasetType { Train, Test, Validation};
         private Users users;
@@ -88,12 +89,12 @@ namespace RecommenderSystem
             //calculate the overall average rating 
             CalculateAverageRatingForTrainingSet();
 
-            similarityEngine = new SimilarityEngine(testUsers, MAX_SIMILAR_USERS, logger);  //Similarity engine used by pearson and cosine 
+            similarityEngine = new SimilarityEngine(trainUsers, MAX_SIMILAR_USERS, logger);  //TODO - check whether it should be train/test users
             evaluationEngine = new EvaluationEngine(averageTrainRating);
 
-            predictionEngine.addModel(PredictionMethod.Cosine, new CollaborativeFilteringModel(testUsers, testItems, similarityEngine, new CosineMethod()));
-            predictionEngine.addModel(PredictionMethod.Pearson, new CollaborativeFilteringModel(testUsers, testItems, similarityEngine, new PearsonMethod()));
-            predictionEngine.addModel(PredictionMethod.Random, new CollaborativeFilteringModel(testUsers, testItems, similarityEngine, new RandomMethod()));
+            predictionEngine.addModel(PredictionMethod.Cosine, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new CosineMethod()));
+            predictionEngine.addModel(PredictionMethod.Pearson, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new PearsonMethod()));
+            predictionEngine.addModel(PredictionMethod.Random, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new RandomMethod()));
         }
 
         public void TrainBaseModel(int cFeatures)
@@ -250,9 +251,62 @@ namespace RecommenderSystem
             return result;
         }
 
-        Dictionary<int, Dictionary<RecommendationMethod, Dictionary<string, double>>> ComputePrecisionRecall(List<RecommendationMethod> lMethods, List<int> lLengths, int cTrials)
+        public Dictionary<int, Dictionary<RecommendationMethod, Dictionary<string, double>>> ComputePrecisionRecall(List<RecommendationMethod> lMethods, List<int> lLengths, int cTrials)
         {
-            throw new NotImplementedException();
+            string precisionString = RecommendationMeasure.Precision.ToString();
+            string recallString = RecommendationMeasure.Recall.ToString();
+
+            Dictionary<int, Dictionary<RecommendationMethod, Dictionary<string, double>>> ans = new Dictionary<int, Dictionary<RecommendationMethod, Dictionary<string, double>>>();
+            int maxLength = lLengths.Max();
+
+            //intialize values
+            foreach (var len in lLengths)
+            {
+                ans.Add(len, new Dictionary<RecommendationMethod, Dictionary<string, double>>());
+                foreach (var method in lMethods)
+                {
+                    ans[len].Add(method, new Dictionary<string, double> { { precisionString, 0 }, { recallString, 0 } });
+                }
+            }
+
+            int counterTest = 0;
+            //for each test user, get recommened list of size N and calcualte measures: Precision, Recall
+            foreach (var user in testUsers)
+	        {
+                string userId = user.GetId();
+
+		        foreach (var method in lMethods)
+                {
+                    var recommended = Recommend(method, userId, maxLength);
+                    
+                    foreach (var len in lLengths)
+                    {
+                        var userRatedItems = user.GetRatedItems();
+                        double tp = recommended.Take(len).Intersect(userRatedItems).Count(); 
+                        double fp = len - tp;
+                        double fn = userRatedItems.Count - tp;
+
+                        double precision = tp / (tp + fp);
+                        double recall = tp / (tp + fn);
+
+                        ans[len][method][precisionString] += precision;
+                        ans[len][method][recallString] += recall;
+                    }
+                }
+                counterTest++;
+	        }
+
+            //for each size of list, calculate the precision and recall
+            foreach (var len in lLengths)
+            {
+                foreach (var method in lMethods)
+                {
+                    ans[len][method][precisionString] = ans[len][method][precisionString] / testUsers.Count();
+                    ans[len][method][recallString] = ans[len][method][recallString] / testUsers.Count();
+                }
+            }
+
+            return ans;
         }
 
         public void CalculateAverageRatingForTrainingSet()
@@ -279,12 +333,16 @@ namespace RecommenderSystem
 
         private List<string> GetTopItems(IPredictionModel predictionModel, string sUserId, int cRecommendations)
         {
-            var currentUser = users.getUserById(sUserId);
-            
-            //TODO need to think about scenario of new user (without any rated items)
-            var candidateItems = trainItems.Where(item => !item.GetRatingUsers().Contains(sUserId));
-            var orderByPrdiction = candidateItems.OrderByDescending(item => predictionModel.Predict(currentUser, item));
-            return orderByPrdiction.Select(item => item.GetId()).Take(cRecommendations).ToList();
+            var currentUser = testUsers.getUserById(sUserId);
+            var currentItems = currentUser.GetRatedItems();
+
+            //select items that current user is not yet rated
+            var candidateItems = trainItems.GetAllItemsIds().Except(currentItems);
+            var candidateItemsDic = candidateItems.ToDictionary(item => item, item => predictionModel.Predict(currentUser, trainItems.GetItemById(item)));
+            //Console.WriteLine("Before filtering: {0}, After filtering: {1}", trainItems.GetAllItemsIds().Count(), candidateItemsDic.Count());
+            var orderByPrediction = candidateItemsDic.OrderByDescending(item => item.Value);
+
+            return orderByPrediction.Select(item => item.Key).Take(cRecommendations).ToList();
         }
 
         private List<string> GetTopItemsBasedNN(ISimilarityMethod similarityMethod, string sUserId, int cRecommendations)
@@ -294,8 +352,9 @@ namespace RecommenderSystem
             int k = 20; //number of NN
 
             //Select an item only if one of the neighbors has rated it
-            User currentUser = trainUsers.getUserById(sUserId);
+            User currentUser = testUsers.getUserById(sUserId);
             var currentUserRatedItems = currentUser.GetRatedItems();
+            //TODO Eyal - check if we need to take the same user from train or not
             var NNList = trainUsers.Where(user => !user.Equals(currentUser)).OrderByDescending(user => similarityEngine.calculateSimilarity(similarityMethod, currentUser, user));
             var NNTopK = NNList.Take(k);
             var NNRatedItems = NNTopK.Select(user => user.GetRatedItems()).Select(items => items.Except(currentUserRatedItems));
@@ -322,8 +381,14 @@ namespace RecommenderSystem
                 }   
 			}
 
-            var result = itemScore.ToDictionary(item => item.Key, item => itemScore[item.Key] / itemCount[item.Key]).OrderByDescending(item => item.Value);
-            return result.Select(item => item.Key).Take(cRecommendations).ToList(); ;
+            for (int i = 0; i < itemScore.Keys.Count; i++)
+            {
+                string key = itemScore.ElementAt(i).Key;
+                itemScore[key] = itemScore[key] / (double)itemCount[key];
+            }
+
+            //var result = itemScore.ToDictionary(item => item.Key, item => itemScore[item.Key] / itemCount[item.Key]).OrderByDescending(item => item.Value);
+            return itemScore.OrderByDescending(item => item.Value).Select(item => item.Key).Take(cRecommendations).ToList(); ;
         }
 
         #endregion

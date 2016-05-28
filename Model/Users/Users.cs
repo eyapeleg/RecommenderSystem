@@ -117,6 +117,12 @@ namespace RecommenderSystem
                 this.users.Remove(user.GetId());
         }
 
+        public void removeUsers(List<string> users)
+        {
+            foreach (string user in users)
+                this.users.Remove(user);
+        }
+
     }
 
     public interface IDatasetType

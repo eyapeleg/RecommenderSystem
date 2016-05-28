@@ -13,7 +13,7 @@ namespace RecommenderSystem
             double u2Count = u2.GetRatedItems().Count();
             double intersectCount = intersectList.Count();
 
-            return (u1Count + u2Count) / intersectCount;
+            return intersectCount / (u1Count + u2Count);
         }
 
         public RecommenderSystem.PredictionMethod GetPredictionMethod()
