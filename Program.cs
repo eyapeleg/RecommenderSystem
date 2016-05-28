@@ -16,25 +16,31 @@ namespace RecommenderSystem
             rs.TrainBaseModel(10);
             rs.TrainStereotypes(10);
 
-            //List<string> lRecommendations = rs.Recommend(RecommenderSystem.RecommendationMethod.Popularity, "2", 5);
-            //List<string> lRecommendationsPearson = rs.Recommend(RecommenderSystem.RecommendationMethod.Pearson, "2", 5);
-            //List<string> lRecommendationsCosine = rs.Recommend(RecommenderSystem.RecommendationMethod.Cosine, "2", 5);
-            //List<string> lRecommendationsBaseModel = rs.Recommend(RecommenderSystem.RecommendationMethod.BaseModel, "2", 5);
-            //List<string> lRecommendationsSt = rs.Recommend(RecommenderSystem.RecommendationMethod.Stereotypes, "2", 5);
+            List<string> lRecommendations = rs.Recommend(RecommenderSystem.RecommendationMethod.Pearson, "6", 5);
+            Console.Write("Recommended movies for user 6 ");
+            foreach (string sMovie in lRecommendations)
+                Console.Write(sMovie + ",");
+            Console.WriteLine();
 
-            //List<RecommenderSystem.RecommendationMethod> lMethods = new List<RecommenderSystem.RecommendationMethod>();
-            //lMethods.Add(RecommenderSystem.RecommendationMethod.BaseModel);
-            //lMethods.Add(RecommenderSystem.RecommendationMethod.Pearson);
-            //lMethods.Add(RecommenderSystem.RecommendationMethod.NNPearson);
-            //lMethods.Add(RecommenderSystem.RecommendationMethod.Popularity);
-            //lMethods.Add(RecommenderSystem.RecommendationMethod.Jaccard);
+            List<string> lRecommendationsPopulairty = rs.Recommend(RecommenderSystem.RecommendationMethod.Popularity, "2", 5);
+            List<string> lRecommendationsPearson = rs.Recommend(RecommenderSystem.RecommendationMethod.Pearson, "2", 5);
+            List<string> lRecommendationsCosine = rs.Recommend(RecommenderSystem.RecommendationMethod.Cosine, "2", 5);
+            List<string> lRecommendationsBaseModel = rs.Recommend(RecommenderSystem.RecommendationMethod.BaseModel, "2", 5);
+            List<string> lRecommendationsSt = rs.Recommend(RecommenderSystem.RecommendationMethod.Stereotypes, "2", 5);
 
-            //List<int> lLengths = new List<int>();
-            //lLengths.Add(1);
-            //lLengths.Add(3);
-            //lLengths.Add(5);
-            //lLengths.Add(10);
-            //lLengths.Add(20);
+            List<RecommenderSystem.RecommendationMethod> lMethods = new List<RecommenderSystem.RecommendationMethod>();
+            lMethods.Add(RecommenderSystem.RecommendationMethod.BaseModel);
+            lMethods.Add(RecommenderSystem.RecommendationMethod.Pearson);
+            lMethods.Add(RecommenderSystem.RecommendationMethod.NNPearson);
+            lMethods.Add(RecommenderSystem.RecommendationMethod.Popularity);
+            lMethods.Add(RecommenderSystem.RecommendationMethod.Jaccard);
+
+            List<int> lLengths = new List<int>();
+            lLengths.Add(1);
+            lLengths.Add(3);
+            lLengths.Add(5);
+            lLengths.Add(10);
+            lLengths.Add(20);
 
             //DateTime dtStart = DateTime.Now;
             //Dictionary<int, Dictionary<RecommenderSystem.RecommendationMethod, Dictionary<string, double>>> dResults = rs.ComputePrecisionRecall(lMethods, lLengths, 1000);

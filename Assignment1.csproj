@@ -8,8 +8,8 @@
     <ProjectGuid>{A5718205-D535-42B4-95E0-E7EC030F5B61}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RecommenderSystem</RootNamespace>
-    <AssemblyName>Assignment2</AssemblyName>
+    <RootNamespace>Assignment1</RootNamespace>
+    <AssemblyName>Assignment1</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -47,13 +47,11 @@
     <Compile Include="Common\DataUtils.cs" />
     <Compile Include="Common\MathUtils.cs" />
     <Compile Include="Common\RandomGenerator.cs" />
-    <Compile Include="PredictionModels\ConditionalProbabilityModel.cs" />
     <Compile Include="Engines\EvaluationEngine.cs" />
     <Compile Include="Model\Collections\BoundedSortedCollection.cs" />
     <Compile Include="Model\Collections\Matrix.cs" />
     <Compile Include="Model\Collections\ValueComparablePair.cs" />
     <Compile Include="Model\Exceptions\ElementNotFoundException.cs" />
-    <Compile Include="Model\ItemBased\ItemToItem.cs" />
     <Compile Include="Model\Item\Item.cs" />
     <Compile Include="Model\Item\Items.cs" />
     <Compile Include="Model\Stereotype\Stereotype.cs" />
@@ -69,7 +67,7 @@
     <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Logger\InfoLogger.cs" />
     <Compile Include="Engines\PredictionEngine.cs" />
-    <Compile Include="Model\Matrix\MatrixFactorization.cs" />
+    <Compile Include="DataModel\Matrix\MatrixFactorization.cs" />
     <Compile Include="SimilarityMethods\CosineMethod.cs" />
     <Compile Include="Engines\DataLoaderEngine.cs" />
     <Compile Include="SimilarityMethods\ISimilarityMethod.cs" />
@@ -80,6 +78,11 @@
     <Compile Include="Engines\SimilarityEngine.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="DataModel\Collections\" />
+    <Folder Include="DataModel\Exceptions\" />
+    <Folder Include="DataModel\Item\" />
+    <Folder Include="DataModel\Stereotype\" />
+    <Folder Include="DataModel\Users\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

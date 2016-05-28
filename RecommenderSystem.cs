@@ -234,6 +234,9 @@ namespace RecommenderSystem
                 case (RecommendationMethod.Stereotypes):
                     result = GetTopItems(predictionEngine.getModel(PredictionMethod.Stereotypes), sUserId, cRecommendations);
                     break;
+                case (RecommendationMethod.CP):
+                    result = GetTopItems(predictionEngine.getModel(PredictionMethod.Stereotypes), sUserId, cRecommendations);
+                    break;
                 case (RecommendationMethod.NNPearson):
                     result = GetTopItemsBasedNN(new PearsonMethod(), sUserId, cRecommendations);
                     break;
@@ -282,6 +285,11 @@ namespace RecommenderSystem
             var candidateItems = items.Where(item => !item.GetRatingUsers().Contains(sUserId));
             var orderByPrdiction = candidateItems.OrderByDescending(item => predictionModel.Predict(currentUser, item));
             return orderByPrdiction.Select(item => item.GetId()).Take(cRecommendations).ToList();
+        }
+
+        private List<string> GetTopCpItems(string sUserId, int cRecommendations)
+        {
+
         }
 
         private List<string> GetTopItemsBasedNN(ISimilarityMethod similarityMethod, string sUserId, int cRecommendations)
