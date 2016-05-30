@@ -242,9 +242,16 @@ namespace RecommenderSystem
                     result = GetTopItemsBasedNN(new CosineMethod(), sUserId, cRecommendations);
                     break;
                 case (RecommendationMethod.NNBaseModel):
+                    result = GetTopItemsBasedNN(new BaseModelMethod(predictionEngine.getModel(PredictionMethod.BaseModel)), sUserId, cRecommendations);
                     break;
                 case (RecommendationMethod.NNJaccard):
                     result = GetTopItemsBasedNN(new JaccardMethod(), sUserId, cRecommendations);
+                    break;
+                case (RecommendationMethod.CP):
+                    throw new NotImplementedException();
+                    break;
+                case (RecommendationMethod.Jaccard):
+                    throw new NotImplementedException();
                     break;
             }
 
