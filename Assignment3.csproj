@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SimilarityMethods\BaseModelMethod.cs" />
     <Compile Include="Common\DataUtils.cs" />
     <Compile Include="Common\MathUtils.cs" />
     <Compile Include="Common\RandomGenerator.cs" />

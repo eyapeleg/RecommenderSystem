@@ -242,9 +242,16 @@ namespace RecommenderSystem
                     result = GetTopItemsBasedNN(new CosineMethod(), sUserId, cRecommendations);
                     break;
                 case (RecommendationMethod.NNBaseModel):
+                    result = GetTopItemsBasedNN(new BaseModelMethod(predictionEngine.getModel(PredictionMethod.BaseModel)), sUserId, cRecommendations);
                     break;
                 case (RecommendationMethod.NNJaccard):
                     result = GetTopItemsBasedNN(new JaccardMethod(), sUserId, cRecommendations);
+                    break;
+                case (RecommendationMethod.CP):
+                    throw new NotImplementedException();
+                    break;
+                case (RecommendationMethod.Jaccard):
+                    throw new NotImplementedException();
                     break;
             }
 
@@ -327,19 +334,30 @@ namespace RecommenderSystem
 
         private List<string> GetPopularItems(string sUserId, int cRecommendations)
         {
+            Dictionary<string, int> result = new Dictionary<string, int>();
+
             // take only items that has not rated by the user and order them by popularity 
-            return trainItems.Where(item => !item.GetRatingUsers().Contains(sUserId)).OrderByDescending(item => item.GetRatingUsers().Count()).Select(item => item.GetId()).Take(cRecommendations).ToList();
+            foreach (var item in trainItems)
+            {
+                var ratingUsers = item.GetRatingUsers();
+                if (!ratingUsers.Contains(sUserId))
+                {
+                    result.Add(item.GetId(), ratingUsers.Count);
+                }
+            }
+
+            var orderedList = result.OrderByDescending(item => item.Value);
+            return orderedList.Select(item => item.Key).Take(cRecommendations).ToList();
         }
 
         private List<string> GetTopItems(IPredictionModel predictionModel, string sUserId, int cRecommendations)
         {
             var currentUser = testUsers.getUserById(sUserId);
-            var currentItems = currentUser.GetRatedItems();
 
-            //select items that current user is not yet rated
-            var candidateItems = trainItems.GetAllItemsIds().Except(currentItems);
+            var currentItems = trainUsers.getUserById(sUserId).GetRatedItems(); //in case the user is also in the training set we want to filter out those rated items from train set
+            var candidateItems = trainItems.GetAllItemsIds().Except(currentItems); //select items that current user is not yet rated
+
             var candidateItemsDic = candidateItems.ToDictionary(item => item, item => predictionModel.Predict(currentUser, trainItems.GetItemById(item)));
-            //Console.WriteLine("Before filtering: {0}, After filtering: {1}", trainItems.GetAllItemsIds().Count(), candidateItemsDic.Count());
             var orderByPrediction = candidateItemsDic.OrderByDescending(item => item.Value);
 
             return orderByPrediction.Select(item => item.Key).Take(cRecommendations).ToList();
@@ -348,47 +366,36 @@ namespace RecommenderSystem
         private List<string> GetTopItemsBasedNN(ISimilarityMethod similarityMethod, string sUserId, int cRecommendations)
         {
             Dictionary<string, double> itemScore = new Dictionary<string, double>();
-            Dictionary<string, double> itemCount = new Dictionary<string, double>();
             int k = 20; //number of NN
 
             //Select an item only if one of the neighbors has rated it
             User currentUser = testUsers.getUserById(sUserId);
-            var currentUserRatedItems = currentUser.GetRatedItems();
-            //TODO Eyal - check if we need to take the same user from train or not
-            var NNList = trainUsers.Where(user => !user.Equals(currentUser)).OrderByDescending(user => similarityEngine.calculateSimilarity(similarityMethod, currentUser, user));
-            var NNTopK = NNList.Take(k);
-            var NNRatedItems = NNTopK.Select(user => user.GetRatedItems()).Select(items => items.Except(currentUserRatedItems));
+            var NNList = trainUsers.Where(user => !user.Equals(currentUser));
+            var NNListDic = NNList.ToDictionary(user => user, user => similarityEngine.calculateSimilarity(similarityMethod, currentUser, user));
+            var NNListOrderedDic = NNListDic.OrderByDescending(user => user.Value);
+            var NNTopK = NNListOrderedDic.Take(k);
 
             //For each item that rated by one of the neighbors, calculate the normalized rating score
-            for (int i = 0; i < NNRatedItems.Count(); i++)
-			{
-                var itemList = NNRatedItems.ElementAt(i);
-                User thisUser = NNTopK.ElementAt(i);
-
-                foreach (string item in itemList)
+            foreach (var user in NNTopK)
+            {
+                double weight = user.Value;
+                var itemList = user.Key.GetRatedItems();
+                foreach (var item in itemList)
                 {
-                    double rating = thisUser.GetRating(item);
-                    if(!itemScore.ContainsKey(item))
+                    if (!itemScore.ContainsKey(item))
                     {
-                        itemScore.Add(item, rating);
-                        itemCount.Add(item, 1);
+                        itemScore.Add(item, weight);
                     }
                     else
                     {
-                        itemScore[item] += rating;
-                        itemCount[item] += 1;
+                        itemScore[item] += weight;
                     }
-                }   
-			}
+                }
 
-            for (int i = 0; i < itemScore.Keys.Count; i++)
-            {
-                string key = itemScore.ElementAt(i).Key;
-                itemScore[key] = itemScore[key] / (double)itemCount[key];
             }
 
-            //var result = itemScore.ToDictionary(item => item.Key, item => itemScore[item.Key] / itemCount[item.Key]).OrderByDescending(item => item.Value);
-            return itemScore.OrderByDescending(item => item.Value).Select(item => item.Key).Take(cRecommendations).ToList(); ;
+            var orderedItemScore = itemScore.OrderByDescending(item => item.Value);
+            return orderedItemScore.Select(item => item.Key).Take(cRecommendations).ToList(); ;
         }
 
         #endregion

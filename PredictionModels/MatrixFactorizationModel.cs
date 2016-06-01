@@ -80,5 +80,15 @@ namespace RecommenderSystem
         {
             return mf.Predict(user, item);
         }
+
+        public double calculateSimilarity(User u1, User u2)
+        {
+            var pu1 = mf.getPu(u1);
+            var pu2 = mf.getPu(u2);
+
+            double similarityVal = pu1.Select((t, i) => Math.Pow(t - pu2[i], 2)).Sum();
+
+            return Math.Sqrt(similarityVal);
+        }
     }
 }
