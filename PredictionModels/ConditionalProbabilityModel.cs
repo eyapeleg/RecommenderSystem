@@ -8,7 +8,6 @@ namespace RecommenderSystem
     class ConditionalProbabilityModel 
     {
         private int PairAppearanceThresholdCount = 10;
-        private ItemToItem itemToItem;
         private Users users;
         private Items items;
 
@@ -18,71 +17,93 @@ namespace RecommenderSystem
             this.items = items;
         }
 
-        public List<KeyValuePair<Item, double>> Recommend(Item givenItem, Items items)
+        public List<KeyValuePair<Item, double>> Recommend(User userToRecommendTo)
         {
-            return items
-                .Where(item => !item.Equals(givenItem))
-                .Select(item => new KeyValuePair<Item, double>(item, itemToItem.getConditionalProbability(givenItem, item)))
-                .OrderBy(kv => kv.Value)
-                .ToList();
+            ItemToItems itemsToItems = createItemToItemFromUser(userToRecommendTo);
+            itemsToItems = removePairsWithLowMutualCount(itemsToItems);
+            return calculateConditionalProbabilities(userToRecommendTo, itemsToItems);
         }
 
-        public List<KeyValuePair<Item, double>> Recommend(List<Item> givenItems, Items items)
+        private ItemToItems createItemToItemFromUser(User userToRecommendTo)
         {
-            List<KeyValuePair<Item, double>> conditionalProbabilities = new List<KeyValuePair<Item, double>>();
-            foreach (Item item in items)
+            ItemToItems itemsToItems = new ItemToItems();
+            foreach (User userToRecommendFrom in users)
             {
-                double maxProbability = givenItems
-                                            .Select(givenItem => itemToItem.getConditionalProbability(givenItem, item))
-                                            .Max();
+                if (userToRecommendFrom.Equals(userToRecommendTo))
+                    continue;
 
-                conditionalProbabilities.Add(new KeyValuePair<Item,double>(item, maxProbability));
+                itemsToItems = extractAllPairsFromUser(itemsToItems, userToRecommendFrom, userToRecommendTo);
             }
-            return conditionalProbabilities;
+            return itemsToItems;
         }
 
-        public void Train()
+        private ItemToItems extractAllPairsFromUser(ItemToItems itemsToItems, User userToRecommendFrom, User userToRecommendTo)
         {
-            ItemToItem itemToitem = extractItemPairsFromUsers();
-            itemToitem = removePairsWithLowMutualCount(itemToitem);
-            this.itemToItem = itemToitem;
-        }
-
-        private ItemToItem extractItemPairsFromUsers()
-        {
-            ItemToItem itemToItem = new ItemToItem();
-
-            foreach (User user in users)
+            List<Item> destUserItems = userToRecommendFrom.GetRatedItems().Select(itemId => items.GetItemById(itemId)).ToList();
+            List<Item> baseUserItems = userToRecommendTo.GetRatedItems().Select(itemId => items.GetItemById(itemId)).ToList();
+            foreach (Item baseUserItem in baseUserItems)
             {
-                List<Tuple<Item, Item>> itemPairs = getAllItemsPairs(user);
-                foreach (Tuple<Item, Item> itemPair in itemPairs)
+                itemsToItems = extractItemSpecificPairs(itemsToItems, destUserItems, baseUserItems, baseUserItem);
+            }
+            return itemsToItems;
+        }
+
+        private ItemToItems extractItemSpecificPairs(ItemToItems itemsToItems, List<Item> destUserItems, List<Item> baseUserItems, Item baseUserItem)
+        {
+            if (destUserItems.Contains(baseUserItem))
+            {
+                foreach (Item destUserItem in destUserItems)
                 {
-                    itemToItem.addPair(itemPair);
+                    if (!baseUserItems.Contains(destUserItem))
+                    {
+                        itemsToItems.addItem(baseUserItem, destUserItem);
+                    }
                 }
             }
-            return itemToItem;
+            return itemsToItems;
         }
 
-        private List<Tuple<Item, Item>> getAllItemsPairs(User user)
+        private ItemToItems removePairsWithLowMutualCount(ItemToItems itemToItems)
         {
-            var userItems = user.GetRatedItems().Select(itemId => items.GetItemById(itemId));
-            List<Tuple<Item, Item>> itemPairs = DataUtils.getAllPairedCombinations(userItems);
-            return itemPairs;
-        }
-
-        private ItemToItem removePairsWithLowMutualCount(ItemToItem itemToItem)
-        {
-            List<Tuple<Item, Item>> itemPairsToRemove = itemToItem
-                                                        .Where(itemToItemCount => itemToItemCount.Value < PairAppearanceThresholdCount)
-                                                        .Select(kv => kv.Key)
-                                                        .ToList();
-
-            foreach (Tuple<Item, Item> itemPair in itemPairsToRemove)
+            foreach (ItemToItem itemToItem in itemToItems)
             {
-                itemToItem.removePair(itemPair);
+                List<Item> itemPairsToRemove = new List<Item>();
+                foreach (KeyValuePair<Item, int> itemCount in itemToItem)
+                {
+                    if (itemCount.Value < PairAppearanceThresholdCount)
+                    {
+                        itemPairsToRemove.Add(itemCount.Key);
+                    }
+                }
+                foreach (Item item in itemPairsToRemove)
+                {
+                    itemToItem.removeItem(item);
+                }
             }
 
-            return itemToItem;
+            return itemToItems;
         }
+
+        private List<KeyValuePair<Item, double>> calculateConditionalProbabilities(User userToRecommendTo, ItemToItems itemsToItems)
+        {
+            List<Item> userItems = userToRecommendTo.GetRatedItems().Select(itemId => items.GetItemById(itemId)).ToList();
+            List<KeyValuePair<Item, double>> conditionalProbabilities = new List<KeyValuePair<Item, double>>();
+            
+            foreach (Item item in items)
+            {
+                if (userItems.Contains(item))
+                    continue;
+
+                double maxProbability = itemsToItems
+                                            .Select(itemToItem => itemToItem.getConditionalProbability(item))
+                                            .Max();
+
+                conditionalProbabilities.Add(new KeyValuePair<Item, double>(item, maxProbability));
+            }
+            return conditionalProbabilities.OrderByDescending(kv => kv.Value).ToList();
+        }
+
+
+ 
     }
 }

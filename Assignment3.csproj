@@ -47,6 +47,7 @@
     <Compile Include="Common\DataUtils.cs" />
     <Compile Include="Common\MathUtils.cs" />
     <Compile Include="Common\RandomGenerator.cs" />
+    <Compile Include="Model\ItemBased\ItemToItems.cs" />
     <Compile Include="PredictionModels\ConditionalProbabilityModel.cs" />
     <Compile Include="Engines\EvaluationEngine.cs" />
     <Compile Include="Model\Collections\BoundedSortedCollection.cs" />

@@ -6,83 +6,55 @@ using System.Text;
 
 namespace RecommenderSystem
 {
-    public class ItemToItem : IEnumerable<KeyValuePair<Tuple<Item,Item>,int>>
+    public class ItemToItem : IEnumerable<KeyValuePair<Item,int>>
     {
-        Dictionary<Tuple<Item, Item>, int> itemToItemCount;
-        Dictionary<Item, int> itemCount;
+        private Dictionary<Item, int> itemToItemCount;
+        private Item item;
+        private int itemCount;
 
         public ItemToItem()
         {
-            itemToItemCount = new Dictionary<Tuple<Item, Item>, int>();
-            itemCount = new Dictionary<Item, int>();
+            itemToItemCount = new Dictionary<Item, int>();
+            itemCount = 0;
         }
 
-        public double getConditionalProbability(Item givenItem, Item expectedItem)
+        public double getConditionalProbability(Item item)
         {
-            Tuple<Item,Item> itemPair = enforcePairIdsOrder(new Tuple<Item,Item>(givenItem,expectedItem));
-            if (!itemCount.ContainsKey(givenItem) || !itemCount.ContainsKey(expectedItem) || !itemToItemCount.ContainsKey(itemPair))
+            if (!itemToItemCount.ContainsKey(item))
                 return 0.0;
 
-            double numerator = itemToItemCount[itemPair];
-            double denominator = itemCount[expectedItem];
+            double numerator = itemToItemCount[item];
+            double denominator = itemCount;
 
             return (double) numerator / (double)denominator;
         }
 
-        public void addPair(Tuple<Item, Item> itemPair)
-        {
-            addToItemToItemCount(itemPair);
-            addToItemCount(itemPair.Item1);
-            addToItemCount(itemPair.Item2);
-        }
 
-        public void removePair(Tuple<Item, Item> itemPair)
+        public void removeItem(Item item)
         {
-            if (!itemToItemCount.ContainsKey(itemPair))
+            if (!itemToItemCount.ContainsKey(item))
                 return;
 
-            int pairCount = itemToItemCount[itemPair];
-            itemToItemCount.Remove(itemPair);
+            int count = itemToItemCount[item];
+            itemToItemCount.Remove(item);
 
-            itemCount[itemPair.Item1] -= pairCount;
-            itemCount[itemPair.Item2] -= pairCount;
+            itemCount -= count;
         }
 
-        private void addToItemToItemCount(Tuple<Item, Item> itemPair)
+        public void addItem(Item item)
         {
-           itemPair = enforcePairIdsOrder(itemPair);
-
-            if (itemToItemCount.ContainsKey(itemPair))
+            if (itemToItemCount.ContainsKey(item))
             {
-                itemToItemCount[itemPair]++;
+                itemToItemCount[item]++;
             }
             else
             {
-                itemToItemCount.Add(itemPair, 1);
+                itemToItemCount.Add(item, 1);
             }
+            itemCount++;
         }
 
-        private Tuple<Item,Item> enforcePairIdsOrder(Tuple<Item, Item> itemPair)
-        {
-           if (itemPair.Item1.GetId().CompareTo(itemPair.Item2.GetId()) > 0)
-              itemPair = Tuple.Create(itemPair.Item2, itemPair.Item1);
-        
-           return itemPair;
-        }
-
-        private void addToItemCount(Item item)
-        {
-            if (itemCount.ContainsKey(item)){
-                itemCount[item]++;
-            }
-            else
-            {
-                itemCount.Add(item, 1);
-            }
-
-        }
-
-        public IEnumerator<KeyValuePair<Tuple<Item,Item>,int>> GetEnumerator()
+        public IEnumerator<KeyValuePair<Item,int>> GetEnumerator()
         {
             return itemToItemCount.GetEnumerator();
         }
