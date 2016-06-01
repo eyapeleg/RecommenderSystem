@@ -18,6 +18,7 @@ namespace RecommenderSystem
         public enum DatasetType { Train, Test, Validation};
         private Users users;
         private Items items;
+        private Dictionary<string, int> popularItems; 
         DataUtils dataUtils = new DataUtils();
 
         //TODO: decide how to formalize that part
@@ -95,6 +96,13 @@ namespace RecommenderSystem
             predictionEngine.addModel(PredictionMethod.Cosine, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new CosineMethod()));
             predictionEngine.addModel(PredictionMethod.Pearson, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new PearsonMethod()));
             predictionEngine.addModel(PredictionMethod.Random, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new RandomMethod()));
+
+            popularItems = new Dictionary<string, int>();
+            foreach (var item in trainItems)
+            {
+                popularItems.Add(item.GetId(), item.GetRatingUsers().Count);
+            }
+            popularItems = popularItems.OrderByDescending(item => item.Value).ToDictionary(item => item.Key, item => item.Value);
         }
 
         public void TrainBaseModel(int cFeatures)
@@ -323,6 +331,17 @@ namespace RecommenderSystem
             this.averageTrainRating = sum / trainUsers.Count();
         }
 
+        public HashSet<string> GetTestUsers()
+        {
+            return new HashSet<string>(testUsers.getUsersArray());
+        }
+
+        public HashSet<string> GetTestUserItems(string sUserId)
+        {
+            return new HashSet<string>(testUsers.getUserById(sUserId).GetRatedItems());
+        }
+
+
         #region private methods
 
         private double getAverageRating(Users userSet)
@@ -334,20 +353,16 @@ namespace RecommenderSystem
 
         private List<string> GetPopularItems(string sUserId, int cRecommendations)
         {
-            Dictionary<string, int> result = new Dictionary<string, int>();
-
-            // take only items that has not rated by the user and order them by popularity 
-            foreach (var item in trainItems)
+            User user = trainUsers.getUserById(sUserId);
+            if(user == null)
             {
-                var ratingUsers = item.GetRatingUsers();
-                if (!ratingUsers.Contains(sUserId))
-                {
-                    result.Add(item.GetId(), ratingUsers.Count);
-                }
+                return popularItems.Select(item => item.Key).Take(cRecommendations).ToList();
             }
 
-            var orderedList = result.OrderByDescending(item => item.Value);
-            return orderedList.Select(item => item.Key).Take(cRecommendations).ToList();
+            var userItems = user.GetRatedItems();
+            var results = popularItems.Where(item => !userItems.Contains(item.Key));
+
+            return results.Select(item => item.Key).Take(cRecommendations).ToList();
         }
 
         private List<string> GetTopItems(IPredictionModel predictionModel, string sUserId, int cRecommendations)
