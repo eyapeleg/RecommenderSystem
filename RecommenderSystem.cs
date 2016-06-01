@@ -367,15 +367,22 @@ namespace RecommenderSystem
 
         private List<string> GetTopItems(IPredictionModel predictionModel, string sUserId, int cRecommendations)
         {
+            Dictionary<string, double> results = new Dictionary<string, double>();
+
             var currentUser = testUsers.getUserById(sUserId);
 
-            var currentItems = trainUsers.getUserById(sUserId).GetRatedItems(); //in case the user is also in the training set we want to filter out those rated items from train set
-            var candidateItems = trainItems.GetAllItemsIds().Except(currentItems); //select items that current user is not yet rated
+            var userItems = trainUsers.getUserById(sUserId).GetRatedItems(); //in case the user is also in the training set we want to filter out those rated items from train set
 
-            var candidateItemsDic = candidateItems.ToDictionary(item => item, item => predictionModel.Predict(currentUser, trainItems.GetItemById(item)));
-            var orderByPrediction = candidateItemsDic.OrderByDescending(item => item.Value);
-
-            return orderByPrediction.Select(item => item.Key).Take(cRecommendations).ToList();
+            foreach (var item in trainItems)
+            {
+                string itemId = item.GetId();
+                if (!userItems.Contains(itemId))
+                {
+                    double rating = predictionModel.Predict(currentUser, item);
+                    results.Add(itemId, rating);
+                }   
+            }
+            return results.OrderByDescending(item => item.Value).Select(item => item.Key).Take(cRecommendations).ToList();
         }
 
         private List<string> GetTopItemsBasedNN(ISimilarityMethod similarityMethod, string sUserId, int cRecommendations)
