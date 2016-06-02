@@ -67,7 +67,9 @@ namespace RecommenderSystem
 
         public double GetAverageRatings()
         {
-            return (sum / (double)count);
+            double sum = itemsRatings.Sum(item => item.Value);
+            double count = itemsRatings.Keys.Count();
+            return sum / count;
         }
 
 
@@ -79,6 +81,11 @@ namespace RecommenderSystem
             }
 
             return new List<string>(); //return empty list
+        }
+
+        public Dictionary<string, double>  GetItemsRatings()
+        {
+            return this.itemsRatings;
         }
 
         public Dictionary<string, double> GetRatedItemsDic()

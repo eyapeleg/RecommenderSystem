@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RecommenderSystem
 {
-    public class Item
+    public class Item : IComparable<Item>
     {
         private string id;
         private Dictionary<string, double> itemsRatings;

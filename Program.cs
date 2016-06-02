@@ -15,7 +15,10 @@ namespace RecommenderSystem
             rs.Load("ratings.dat", 0.95);
             //rs.TrainBaseModel(10);
             //rs.TrainStereotypes(10);
-            List<string> lRecommendationsCp = rs.Recommend(RecommenderSystem.RecommendationMethod.CP, "2", 5);
+
+            string testUserId = rs.getTestUserId();
+            List<string> lRecommendationsCp = rs.Recommend(RecommenderSystem.RecommendationMethod.CP, testUserId, 5);
+            List<string> lRecommendationsJaccard = rs.Recommend(RecommenderSystem.RecommendationMethod.Jaccard, testUserId, 5);
 
             //List<string> lRecommendations = rs.Recommend(RecommenderSystem.RecommendationMethod.Pearson, "6", 5);
             //Console.Write("Recommended movies for user 6 ");

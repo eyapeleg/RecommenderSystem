@@ -13,6 +13,7 @@ namespace RecommenderSystem
     {
         public enum PredictionMethod { Pearson, Cosine, Random, BaseModel, Stereotypes, Jaccard };
         public enum RecommendationMethod { Popularity, Pearson, Cosine, BaseModel, Stereotypes, NNPearson, NNCosine, NNBaseModel, NNJaccard, CP, Jaccard };
+        public enum RecommendationMeasure { Precision, Recall };
 
         public enum DatasetType { Train, Test, Validation};
         private Users users;
@@ -33,7 +34,8 @@ namespace RecommenderSystem
         private DataLoaderEngine dataLoaderEngine;
         private PredictionEngine predictionEngine;
         private EvaluationEngine evaluationEngine;
-        private ConditionalProbabilityModel conditionalProbabilityModel;
+        private ItemBasedEngine itemBasedEngine; 
+
         private ILogger logger;
 
         private int MAX_SIMILAR_USERS;
@@ -88,14 +90,20 @@ namespace RecommenderSystem
             //calculate the overall average rating 
             CalculateAverageRatingForTrainingSet();
 
-            similarityEngine = new SimilarityEngine(testUsers, MAX_SIMILAR_USERS, logger);  //Similarity engine used by pearson and cosine 
+            similarityEngine = new SimilarityEngine(trainUsers, MAX_SIMILAR_USERS, logger);  //TODO - check whether it should be train/test users
             evaluationEngine = new EvaluationEngine(averageTrainRating);
 
-            predictionEngine.addModel(PredictionMethod.Cosine, new CollaborativeFilteringModel(testUsers, testItems, similarityEngine, new CosineMethod()));
-            predictionEngine.addModel(PredictionMethod.Pearson, new CollaborativeFilteringModel(testUsers, testItems, similarityEngine, new PearsonMethod()));
-            predictionEngine.addModel(PredictionMethod.Random, new CollaborativeFilteringModel(testUsers, testItems, similarityEngine, new RandomMethod()));
+            predictionEngine.addModel(PredictionMethod.Cosine, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new CosineMethod()));
+            predictionEngine.addModel(PredictionMethod.Pearson, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new PearsonMethod()));
+            predictionEngine.addModel(PredictionMethod.Random, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new RandomMethod()));
 
-            conditionalProbabilityModel = new ConditionalProbabilityModel(trainUsers, trainItems);
+            itemBasedEngine = new ItemBasedEngine(testItems); //TODO - check that we need to use test items...
+        }
+
+        public string getTestUserId()
+        {
+            RandomGenerator randomGenerator = new RandomGenerator();
+            return randomGenerator.getRandomUser(testUsers).GetId();
         }
 
         public void TrainBaseModel(int cFeatures)
@@ -113,7 +121,6 @@ namespace RecommenderSystem
             predictionEngine.addModel(PredictionMethod.Stereotypes, stereotypesModel);
             predictionEngine.Train(PredictionMethod.Stereotypes);
         }
-
 
         //return a list of the ids of all the users in the dataset
         public List<string> GetAllUsers()
@@ -237,9 +244,6 @@ namespace RecommenderSystem
                 case (RecommendationMethod.Stereotypes):
                     result = GetTopItems(predictionEngine.getModel(PredictionMethod.Stereotypes), sUserId, cRecommendations);
                     break;
-                case (RecommendationMethod.CP):
-                    result = GetTopCpItems(sUserId, cRecommendations);
-                    break;
                 case (RecommendationMethod.NNPearson):
                     result = GetTopItemsBasedNN(new PearsonMethod(), sUserId, cRecommendations);
                     break;
@@ -247,15 +251,78 @@ namespace RecommenderSystem
                     result = GetTopItemsBasedNN(new CosineMethod(), sUserId, cRecommendations);
                     break;
                 case (RecommendationMethod.NNBaseModel):
+                    result = GetTopItemsBasedNN(new BaseModelMethod(predictionEngine.getModel(PredictionMethod.BaseModel)), sUserId, cRecommendations);
+                    break;
+                case (RecommendationMethod.NNJaccard):
+                    result = GetTopItemsBasedNN(new JaccardMethod(), sUserId, cRecommendations);
+                    break;
+                case (RecommendationMethod.CP):
+                    result = GetTopItemsCp(sUserId, cRecommendations);
+                    break;
+                case (RecommendationMethod.Jaccard):
+                    result = GetTopItemsJaccard(sUserId, cRecommendations);
                     break;
             }
 
             return result;
         }
 
-        Dictionary<int, Dictionary<RecommendationMethod, Dictionary<string, double>>> ComputePrecisionRecall(List<RecommendationMethod> lMethods, List<int> lLengths, int cTrials)
+        public Dictionary<int, Dictionary<RecommendationMethod, Dictionary<string, double>>> ComputePrecisionRecall(List<RecommendationMethod> lMethods, List<int> lLengths, int cTrials)
         {
-            throw new NotImplementedException();
+            string precisionString = RecommendationMeasure.Precision.ToString();
+            string recallString = RecommendationMeasure.Recall.ToString();
+
+            Dictionary<int, Dictionary<RecommendationMethod, Dictionary<string, double>>> ans = new Dictionary<int, Dictionary<RecommendationMethod, Dictionary<string, double>>>();
+            int maxLength = lLengths.Max();
+
+            //intialize values
+            foreach (var len in lLengths)
+            {
+                ans.Add(len, new Dictionary<RecommendationMethod, Dictionary<string, double>>());
+                foreach (var method in lMethods)
+                {
+                    ans[len].Add(method, new Dictionary<string, double> { { precisionString, 0 }, { recallString, 0 } });
+                }
+            }
+
+            int counterTest = 0;
+            //for each test user, get recommened list of size N and calcualte measures: Precision, Recall
+            foreach (var user in testUsers)
+	        {
+                string userId = user.GetId();
+
+		        foreach (var method in lMethods)
+                {
+                    var recommended = Recommend(method, userId, maxLength);
+                    
+                    foreach (var len in lLengths)
+                    {
+                        var userRatedItems = user.GetRatedItems();
+                        double tp = recommended.Take(len).Intersect(userRatedItems).Count(); 
+                        double fp = len - tp;
+                        double fn = userRatedItems.Count - tp;
+
+                        double precision = tp / (tp + fp);
+                        double recall = tp / (tp + fn);
+
+                        ans[len][method][precisionString] += precision;
+                        ans[len][method][recallString] += recall;
+                    }
+                }
+                counterTest++;
+	        }
+
+            //for each size of list, calculate the precision and recall
+            foreach (var len in lLengths)
+            {
+                foreach (var method in lMethods)
+                {
+                    ans[len][method][precisionString] = ans[len][method][precisionString] / testUsers.Count();
+                    ans[len][method][recallString] = ans[len][method][recallString] / testUsers.Count();
+                }
+            }
+
+            return ans;
         }
 
         public void CalculateAverageRatingForTrainingSet()
@@ -276,37 +343,98 @@ namespace RecommenderSystem
 
         private List<string> GetPopularItems(string sUserId, int cRecommendations)
         {
+            Dictionary<string, int> result = new Dictionary<string, int>();
+
             // take only items that has not rated by the user and order them by popularity 
-            return items.Where(item => !item.GetRatingUsers().Contains(sUserId)).OrderByDescending(item => item.GetRatingUsers().Count()).Select(item => item.GetId()).Take(cRecommendations).ToList();
+            foreach (var item in trainItems)
+            {
+                var ratingUsers = item.GetRatingUsers();
+                if (!ratingUsers.Contains(sUserId))
+                {
+                    result.Add(item.GetId(), ratingUsers.Count);
+                }
+            }
+
+            var orderedList = result.OrderByDescending(item => item.Value);
+            return orderedList.Select(item => item.Key).Take(cRecommendations).ToList();
         }
 
         private List<string> GetTopItems(IPredictionModel predictionModel, string sUserId, int cRecommendations)
         {
-            var currentUser = users.getUserById(sUserId);
-            
-            //TODO need to think about scenario of new user (without any rated items)
-            var candidateItems = items.Where(item => !item.GetRatingUsers().Contains(sUserId));
-            var orderByPrdiction = candidateItems.OrderByDescending(item => predictionModel.Predict(currentUser, item));
-            return orderByPrdiction.Select(item => item.GetId()).Take(cRecommendations).ToList();
-        }
+            var currentUser = testUsers.getUserById(sUserId);
 
-        private List<string> GetTopCpItems(string sUserId, int cRecommendations)
-        {
-            User user = users.getUserById(sUserId);
-            List<KeyValuePair<Item, double>> recommendedItems = conditionalProbabilityModel.Recommend(user);
-            return recommendedItems.Select(kv => kv.Key.GetId()).ToList();
+            var currentItems = trainUsers.getUserById(sUserId).GetRatedItems(); //in case the user is also in the training set we want to filter out those rated items from train set
+            var candidateItems = trainItems.GetAllItemsIds().Except(currentItems); //select items that current user is not yet rated
+
+            var candidateItemsDic = candidateItems.ToDictionary(item => item, item => predictionModel.Predict(currentUser, trainItems.GetItemById(item)));
+            var orderByPrediction = candidateItemsDic.OrderByDescending(item => item.Value);
+
+            return orderByPrediction.Select(item => item.Key).Take(cRecommendations).ToList();
         }
 
         private List<string> GetTopItemsBasedNN(ISimilarityMethod similarityMethod, string sUserId, int cRecommendations)
         {
-            List<string> result = new List<string>();
+            Dictionary<string, double> itemScore = new Dictionary<string, double>();
+            int k = 20; //number of NN
 
-            User currentUser = users.getUserById(sUserId);
-            var candidateItems = items.Where(item => !item.GetRatingUsers().Contains(sUserId));
-            var NNList = users.Where(user => !user.Equals(currentUser)).OrderByDescending(user => similarityEngine.calculateSimilarity(similarityMethod, currentUser, user)).Take(20); //TODO Set K
-            
-            // Eyal Need to start from here 
-            return result;
+            //Select an item only if one of the neighbors has rated it
+            User currentUser = testUsers.getUserById(sUserId);
+            var NNList = trainUsers.Where(user => !user.Equals(currentUser));
+            var NNListDic = NNList.ToDictionary(user => user, user => similarityEngine.calculateSimilarity(similarityMethod, currentUser, user));
+            var NNListOrderedDic = NNListDic.OrderByDescending(user => user.Value);
+            var NNTopK = NNListOrderedDic.Take(k);
+
+            //For each item that rated by one of the neighbors, calculate the normalized rating score
+            foreach (var user in NNTopK)
+            {
+                double weight = user.Value;
+                var itemList = user.Key.GetRatedItems();
+                foreach (var item in itemList)
+                {
+                    if (!itemScore.ContainsKey(item))
+                    {
+                        itemScore.Add(item, weight);
+                    }
+                    else
+                    {
+                        itemScore[item] += weight;
+                    }
+                }
+
+            }
+
+            var orderedItemScore = itemScore.OrderByDescending(item => item.Value);
+            return orderedItemScore.Select(item => item.Key).Take(cRecommendations).ToList(); ;
+        }
+
+        private List<string> GetTopItemsCp(string sUserId, int cRecommendations)
+        {
+            List<Item> givenItems = testUsers
+                                    .getUserById(sUserId)
+                                    .GetRatedItems()
+                                    .Select(itemId => testItems.GetItemById(itemId))
+                                    .ToList();
+
+            return itemBasedEngine
+                .getConditionalProbability(givenItems)
+                .Select(kv => kv.Key.GetId())
+                .ToList()
+                .GetRange(0,cRecommendations);
+        }
+
+        private List<string> GetTopItemsJaccard(string sUserId, int cRecommendations)
+        {
+            List<Item> givenItems = testUsers
+                        .getUserById(sUserId)
+                        .GetRatedItems()
+                        .Select(itemId => testItems.GetItemById(itemId))
+                        .ToList();
+
+            return itemBasedEngine
+                .getJaccardProbability(givenItems)
+                .Select(kv => kv.Key.GetId())
+                .ToList()
+                .GetRange(0, cRecommendations);
         }
 
         #endregion

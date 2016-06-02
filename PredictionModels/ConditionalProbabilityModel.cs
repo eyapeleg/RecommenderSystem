@@ -19,36 +19,53 @@ namespace RecommenderSystem
 
         public List<KeyValuePair<Item, double>> Recommend(User userToRecommendTo)
         {
-            ItemToItems itemsToItems = createItemToItemFromUser(userToRecommendTo);
-            itemsToItems = removePairsWithLowMutualCount(itemsToItems);
-            return calculateConditionalProbabilities(userToRecommendTo, itemsToItems);
+            BasedItems basedItems = createBasedItemsFromAllUsers(userToRecommendTo);
+           // basedItems = calculateTotalItemsCountFromAllUsers(basedItems, userToRecommendTo);
+            basedItems = removePairsWithLowMutualCount(basedItems);
+            return calculateConditionalProbabilities(userToRecommendTo, basedItems);
         }
 
-        private ItemToItems createItemToItemFromUser(User userToRecommendTo)
+        /*private BasedItems calculateTotalItemsCountFromAllUsers(BasedItems basedItems, User userToRecommendTo)
         {
-            ItemToItems itemsToItems = new ItemToItems();
+            foreach (User user in users)
+            {
+                if (user.Equals(userToRecommendTo))
+                    continue;
+
+                List<Item> userItems = user.GetRatedItems().Select(itemId => items.GetItemById(itemId)).ToList();
+                foreach (Item item in userItems)
+                {
+                    //bas
+                }
+
+            }
+        }*/
+
+        private BasedItems createBasedItemsFromAllUsers(User userToRecommendTo)
+        {
+            BasedItems basedItems = new BasedItems();
             foreach (User userToRecommendFrom in users)
             {
                 if (userToRecommendFrom.Equals(userToRecommendTo))
                     continue;
 
-                itemsToItems = extractAllPairsFromUser(itemsToItems, userToRecommendFrom, userToRecommendTo);
+                basedItems = createBasedItemsFromUser(basedItems, userToRecommendFrom, userToRecommendTo);
             }
-            return itemsToItems;
+            return basedItems;
         }
 
-        private ItemToItems extractAllPairsFromUser(ItemToItems itemsToItems, User userToRecommendFrom, User userToRecommendTo)
+        private BasedItems createBasedItemsFromUser(BasedItems basedItems, User userToRecommendFrom, User userToRecommendTo)
         {
             List<Item> destUserItems = userToRecommendFrom.GetRatedItems().Select(itemId => items.GetItemById(itemId)).ToList();
             List<Item> baseUserItems = userToRecommendTo.GetRatedItems().Select(itemId => items.GetItemById(itemId)).ToList();
             foreach (Item baseUserItem in baseUserItems)
             {
-                itemsToItems = extractItemSpecificPairs(itemsToItems, destUserItems, baseUserItems, baseUserItem);
+                basedItems = extractItemSpecificPairs(basedItems, destUserItems, baseUserItems, baseUserItem);
             }
-            return itemsToItems;
+            return basedItems;
         }
 
-        private ItemToItems extractItemSpecificPairs(ItemToItems itemsToItems, List<Item> destUserItems, List<Item> baseUserItems, Item baseUserItem)
+        private BasedItems extractItemSpecificPairs(BasedItems basedItems, List<Item> destUserItems, List<Item> baseUserItems, Item baseUserItem)
         {
             if (destUserItems.Contains(baseUserItem))
             {
@@ -56,19 +73,19 @@ namespace RecommenderSystem
                 {
                     if (!baseUserItems.Contains(destUserItem))
                     {
-                        itemsToItems.addItem(baseUserItem, destUserItem);
+                        basedItems.addItem(baseUserItem, destUserItem);
                     }
                 }
             }
-            return itemsToItems;
+            return basedItems;
         }
 
-        private ItemToItems removePairsWithLowMutualCount(ItemToItems itemToItems)
+        private BasedItems removePairsWithLowMutualCount(BasedItems basedItems)
         {
-            foreach (ItemToItem itemToItem in itemToItems)
+            foreach (BasedItem basedItem in basedItems)
             {
                 List<Item> itemPairsToRemove = new List<Item>();
-                foreach (KeyValuePair<Item, int> itemCount in itemToItem)
+                foreach (KeyValuePair<Item, int> itemCount in basedItem)
                 {
                     if (itemCount.Value < PairAppearanceThresholdCount)
                     {
@@ -77,14 +94,14 @@ namespace RecommenderSystem
                 }
                 foreach (Item item in itemPairsToRemove)
                 {
-                    itemToItem.removeItem(item);
+                    basedItem.removeItem(item);
                 }
             }
 
-            return itemToItems;
+            return basedItems;
         }
 
-        private List<KeyValuePair<Item, double>> calculateConditionalProbabilities(User userToRecommendTo, ItemToItems itemsToItems)
+        private List<KeyValuePair<Item, double>> calculateConditionalProbabilities(User userToRecommendTo, BasedItems basedItems)
         {
             List<Item> userItems = userToRecommendTo.GetRatedItems().Select(itemId => items.GetItemById(itemId)).ToList();
             List<KeyValuePair<Item, double>> conditionalProbabilities = new List<KeyValuePair<Item, double>>();
@@ -94,10 +111,7 @@ namespace RecommenderSystem
                 if (userItems.Contains(item))
                     continue;
 
-                double maxProbability = itemsToItems
-                                            .Select(itemToItem => itemToItem.getConditionalProbability(item))
-                                            .Max();
-
+                double maxProbability = basedItems.getConditionalProbability(item);
                 conditionalProbabilities.Add(new KeyValuePair<Item, double>(item, maxProbability));
             }
             return conditionalProbabilities.OrderByDescending(kv => kv.Value).ToList();

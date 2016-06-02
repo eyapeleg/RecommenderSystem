@@ -9,11 +9,17 @@ namespace RecommenderSystem
     {
         public double calculateSimilarity(User u1, User u2, List<string> intersectList)
         {
-            double u1Count = u1.GetRatedItems().Count();
-            double u2Count = u2.GetRatedItems().Count();
             double intersectCount = intersectList.Count();
 
-            return (u1Count + u2Count) / intersectCount;
+            if (intersectCount == 0)
+            {
+                return 0;
+            }
+
+            double u1Count = u1.GetRatedItems().Count();
+            double u2Count = u2.GetRatedItems().Count();
+
+            return intersectCount / (u1Count + u2Count);
         }
 
         public RecommenderSystem.PredictionMethod GetPredictionMethod()
