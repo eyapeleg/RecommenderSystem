@@ -19,6 +19,7 @@ namespace RecommenderSystem
         private int cStereotypes;
         private int MAX_ITERATION;
         private Stereotypes stereotypes;
+        private Dictionary<User, User> similarityDic;
 
         public StereotypesModel(SimilarityEngine similarityEngine, ISimilarityMethod similarityMethod, Users users, Items items, int cStereotypes)
         {
@@ -31,6 +32,7 @@ namespace RecommenderSystem
             this.users = users;
             this.items = items;
             this.cStereotypes = cStereotypes;
+            similarityDic = new Dictionary<User, User>();
         }
 
         public Stereotypes newRandomCentroids(Users users, Items items, int cStereotypes)
@@ -101,7 +103,7 @@ namespace RecommenderSystem
                 foreach (User user in usersCopy)
                 {
                     //Calculate a users similarity to the stereotypes
-                    List<KeyValuePair<User, double>> similarities = similarityEngine.calculateSimilarity(similarityMethod, user, prevCentroids); //TODO - check the similarity threshold for stereotype algorithm
+                    List<KeyValuePair<User, double>> similarities = similarityEngine.calculateSimilarity(similarityMethod, user, prevCentroids, false, true); //TODO - check the similarity threshold for stereotype algorithm
 
                     //Determine users that don't have a correlation with non of the stereotypes
                     if (similarities.Count == 0)
@@ -132,29 +134,40 @@ namespace RecommenderSystem
         }
 
         public double Predict(User user, Item item){
+
+            double rating = 0;
             List<User> centroids = stereotypes.getStereotypesCentroids();
-            List<KeyValuePair<User, double>> similarities = similarityEngine.calculateSimilarity(similarityMethod, user, centroids);
             string itemId = item.GetId();
 
-            if (similarities.Count == 0)
+            if(!similarityDic.ContainsKey(user))
             {
-                //var avgRating = centroids.Average(x => x.GetRating(itemId)); //Change to return instead of variable declaration 
+                List<KeyValuePair<User, double>> similarities = similarityEngine.calculateSimilarity(similarityMethod, user, centroids, false, true);
+
+                if(similarities.Count == 0)
+                {
+                    similarityDic.Add(user, null); //there is no similar centroid
+                    rating = user.GetAverageRatings();
+                    return rating;
+                }
+
+                //add the most similar user to the dictionary
+                User mostSimilarUser = similarities.Last().Key;
+                similarityDic.Add(user, mostSimilarUser);
+                if (mostSimilarUser.GetRating(itemId) == 0) //if the most similar user didn't rate the item, return the average rating of that item
+                {
+                    rating = item.GetAverageRatings();
+                    return rating;
+                }
+            }
+            
+            //if we didn't find any similar centroid, the average rating of the user is return
+            if (similarityDic[user] == null)
+            {
                 return user.GetAverageRatings();
             }
 
-            User mostSimilarUser = similarities.Last().Key;
-
-            if (mostSimilarUser.GetRating(itemId) == 0.0)
-            {
-                //TODO - 1.why not to try the 2nd level similarity centroid? , 2.consider the return value for case the item didn't found
-                // Eyals response: 
-                //1. could work.  take into account that the centroids are far away from each other so im not sure if the 2nd centroid is really relevant.
-                // if it complicates the logic, I wouldn't focus on it, otherwise, it's worth the try...
-                // 2. item not found - i think average is also good
-                return item.GetAverageRatings(); 
-            }
-
-            return mostSimilarUser.GetRating(itemId);
+            var similarUserRating = similarityDic[user].GetRating(itemId);
+            return similarUserRating == 0 ? item.GetAverageRatings() : similarUserRating;
         }
     }
 }

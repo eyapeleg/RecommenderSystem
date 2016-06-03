@@ -372,15 +372,12 @@ namespace RecommenderSystem
             var currentUser = testUsers.getUserById(sUserId);
 
             var userItems = trainUsers.getUserById(sUserId).GetRatedItems(); //in case the user is also in the training set we want to filter out those rated items from train set
-
-            foreach (var item in trainItems)
+            var candidateItems = trainItems.Where(item => !userItems.Contains(item.GetId()) && item.GetRatingUsers().Count() >= 5);
+            foreach (var item in candidateItems)
             {
                 string itemId = item.GetId();
-                if (!userItems.Contains(itemId))
-                {
-                    double rating = predictionModel.Predict(currentUser, item);
-                    results.Add(itemId, rating);
-                }   
+                double rating = predictionModel.Predict(currentUser, item);
+                results.Add(itemId, rating);
             }
             return results.OrderByDescending(item => item.Value).Select(item => item.Key).Take(cRecommendations).ToList();
         }
