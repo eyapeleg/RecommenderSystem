@@ -54,6 +54,15 @@ namespace RecommenderSystem
 
         }
 
+        public HashSet<string> GetTestUsers(){
+            return new HashSet<string>(this.testUsers.Select(user => user.GetId()));
+        }
+
+        public HashSet<string> GetTestUserItems(string sUserId)
+        {
+            return new HashSet<string>(this.testUsers.getUserById(sUserId).GetRatedItems());
+        }
+
         public void Load(string sFileName)
         {
             Tuple<Users, Items> data = dataLoaderEngine.Load(sFileName);
@@ -97,7 +106,7 @@ namespace RecommenderSystem
             predictionEngine.addModel(PredictionMethod.Pearson, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new PearsonMethod()));
             predictionEngine.addModel(PredictionMethod.Random, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new RandomMethod()));
 
-            itemBasedEngine = new ItemBasedEngine(testItems); //TODO - check that we need to use test items...
+            itemBasedEngine = new ItemBasedEngine(trainItems); //TODO - check that we need to use test items...
         }
 
         public string getTestUserId()
@@ -290,11 +299,11 @@ namespace RecommenderSystem
             foreach (var user in testUsers)
 	        {
                 string userId = user.GetId();
-
+                //Console.Out.WriteLine("userId: " + userId);
 		        foreach (var method in lMethods)
                 {
                     var recommended = Recommend(method, userId, maxLength);
-                    
+                    //Console.Out.WriteLine("   method: " + method.ToString());
                     foreach (var len in lLengths)
                     {
                         var userRatedItems = user.GetRatedItems();
@@ -409,10 +418,10 @@ namespace RecommenderSystem
 
         private List<string> GetTopItemsCp(string sUserId, int cRecommendations)
         {
-            List<Item> givenItems = testUsers
+            List<Item> givenItems = trainUsers
                                     .getUserById(sUserId)
                                     .GetRatedItems()
-                                    .Select(itemId => testItems.GetItemById(itemId))
+                                    .Select(itemId => trainItems.GetItemById(itemId))
                                     .ToList();
 
             return itemBasedEngine
@@ -424,10 +433,10 @@ namespace RecommenderSystem
 
         private List<string> GetTopItemsJaccard(string sUserId, int cRecommendations)
         {
-            List<Item> givenItems = testUsers
+            List<Item> givenItems = trainUsers
                         .getUserById(sUserId)
                         .GetRatedItems()
-                        .Select(itemId => testItems.GetItemById(itemId))
+                        .Select(itemId => trainItems.GetItemById(itemId))
                         .ToList();
 
             return itemBasedEngine
