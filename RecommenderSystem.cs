@@ -97,7 +97,7 @@ namespace RecommenderSystem
             predictionEngine.addModel(PredictionMethod.Pearson, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new PearsonMethod()));
             predictionEngine.addModel(PredictionMethod.Random, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new RandomMethod()));
 
-            itemBasedEngine = new ItemBasedEngine(testItems); //TODO - check that we need to use test items...
+            itemBasedEngine = new ItemBasedEngine(trainItems); //TODO - check that we need to use test items...
         }
 
         public string getTestUserId()
