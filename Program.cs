@@ -12,6 +12,7 @@ namespace RecommenderSystem
         static void Assignment3()
         {
             RecommenderSystem rs = new RecommenderSystem();
+
             rs.Load("ratings.dat", 0.97);
             //rs.TrainBaseModel(10);
             //rs.TrainStereotypes(10);
@@ -31,12 +32,14 @@ namespace RecommenderSystem
             //List<string> lRecommendationsCosine = rs.Recommend(RecommenderSystem.RecommendationMethod.Cosine, "2", 5);
             //List<string> lRecommendationsBaseModel = rs.Recommend(RecommenderSystem.RecommendationMethod.BaseModel, "2", 5);
             //List<string> lRecommendationsSt = rs.Recommend(RecommenderSystem.RecommendationMethod.Stereotypes, "2", 5);
+
             //
             List<RecommenderSystem.RecommendationMethod> lMethods = new List<RecommenderSystem.RecommendationMethod>();
-            //lMethods.Add(RecommenderSystem.RecommendationMethod.BaseModel);
-            //lMethods.Add(RecommenderSystem.RecommendationMethod.Pearson);
-            //lMethods.Add(RecommenderSystem.RecommendationMethod.NNPearson);
-            //lMethods.Add(RecommenderSystem.RecommendationMethod.Popularity);
+
+
+            //List<RecommenderSystem.RecommendationMethod> lMethods = new List<RecommenderSystem.RecommendationMethod>();
+
+
             lMethods.Add(RecommenderSystem.RecommendationMethod.Jaccard);
             lMethods.Add(RecommenderSystem.RecommendationMethod.CP);
             //

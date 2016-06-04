@@ -71,21 +71,24 @@ namespace RecommenderSystem
             return similarity;
         }
        
-        public List<KeyValuePair<User, double>> calculateSimilarity(ISimilarityMethod predictionMethod, User thisUser, List<User> candidateUsers, bool revertSimilarities = false)
+        public List<KeyValuePair<User, double>> calculateSimilarity(ISimilarityMethod predictionMethod, User thisUser, List<User> candidateUsers, bool revertSimilarities = false, bool isStereotype = false)
         {
             if (predictionMethod == null || thisUser == null)
                 throw new ArgumentNullException("IPredictionMethod predictionMethod, User thisUser must both be not null!");
 
-            if (!similarityDic.ContainsKey(predictionMethod))
+            if (!isStereotype)
             {
-                similarityDic.Add(predictionMethod, new Dictionary<User,List<KeyValuePair<User,double>>>());
-            }
+                if (!similarityDic.ContainsKey(predictionMethod))
+                {
+                    similarityDic.Add(predictionMethod, new Dictionary<User, List<KeyValuePair<User, double>>>());
+                }
 
-            if (similarityDic[predictionMethod].ContainsKey(thisUser))
-            {
-                return similarityDic[predictionMethod][thisUser];
+                if (similarityDic[predictionMethod].ContainsKey(thisUser))
+                {
+                    return similarityDic[predictionMethod][thisUser];
+                }
             }
-
+            
             logger.debug("calcualting similarity for user " + "[" + thisUser.GetId() + "]");
             Stopwatch timer = Stopwatch.StartNew();
             UsersSimilarity similarUsers = new UsersSimilarity(MAX_SIMILAR_USERS);
@@ -99,14 +102,14 @@ namespace RecommenderSystem
                    List<string> thatUserList = thatUser.GetRatedItems();
                    List<string> commonItemsList = thatUserList.Intersect(thisUserList).ToList(); //check if both users rated at least one common item 
 
-                    if (commonItemsList.Count > commonItemsThreshold && thatUserList.Count > 0 && thisUserList.Count > 0)
+                    if (commonItemsList.Count >= commonItemsThreshold && thatUserList.Count > 0 && thisUserList.Count > 0)
                     {
                         var similarity = predictionMethod.calculateSimilarity(thisUser, thatUser, commonItemsList);
                         if (revertSimilarities == true)
                         {
                             similarity *= -1;
                         }
-                        if (similarity > similarityThreshold) //in some cases the users rate their common item the same as their average then we can get here zero
+                        if (similarity > 0) //in some cases the users rate their common item the same as their average then we can get here zero
                         {
                             similarUsers.add(thatUser, similarity);
                             similarUsersCount++;
@@ -118,7 +121,10 @@ namespace RecommenderSystem
             timer.Stop();
             logger.debug("Similarity calculation time for user" + " [" + thisUser.GetId() + "] " + timer.Elapsed);
 
-            similarityDic[predictionMethod].Add(thisUser, similarUsers.AsList()); //Eyal return descending sorted list here
+            if(!isStereotype)
+            {
+                similarityDic[predictionMethod].Add(thisUser, similarUsers.AsList()); //Eyal return descending sorted list here
+            }
 
             return similarUsers.AsList();
         }

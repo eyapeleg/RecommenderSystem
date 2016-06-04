@@ -63,9 +63,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engines\ItemBasedEngine.cs" />
-    <Compile Include="Model\ItemBased\BasedItem.cs" />
-    <Compile Include="Model\ItemBased\BasedItems.cs" />
-    <Compile Include="PredictionModels\ConditionalProbabilityModel.cs" />
     <Compile Include="RecommenderSystem.cs" />
     <Compile Include="SimilarityMethods\BaseModelMethod.cs" />
     <Compile Include="Common\DataUtils.cs" />
