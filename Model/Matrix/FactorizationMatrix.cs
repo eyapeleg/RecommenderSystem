@@ -7,7 +7,7 @@ using System.Text;
 
 namespace RecommenderSystem
 {
-    public class MatrixFactorization 
+    public class FactorizationMatrix 
     {
         private Matrix<User> p;
         private Matrix<Item> q;
@@ -18,7 +18,7 @@ namespace RecommenderSystem
         private static readonly double yRate = 0.05; //Double.Parse(ConfigurationManager.AppSettings["yRate"]);
         private static readonly double lambdaRate = 0.05; //Double.Parse(ConfigurationManager.AppSettings["lambdaRate"]);
 
-        public MatrixFactorization(double miu, 
+        public FactorizationMatrix(double miu, 
                                         Dictionary<User, double> buVector,
                                         Dictionary<Item, double> biVector,
                                         Matrix<User> p,
@@ -31,14 +31,14 @@ namespace RecommenderSystem
             this.q = q;
         }
 
-        public static MatrixFactorization newRandomMatrix(Users users, Items items, int K, double miu)
+        public static FactorizationMatrix newRandomMatrix(Users users, Items items, int K, double miu)
         {
             RandomGenerator randomGenerator = new RandomGenerator();
             Dictionary<User, double> buVector = randomGenerator.newRandomVector<Users, User>(users, 0.1, -0.05);
             Dictionary<Item, double> biVector = randomGenerator.newRandomVector<Items, Item>(items, 0.1, -0.05);
             Matrix<User> p = randomGenerator.newRandomMatrix<Users, User>(users, 0.1, -0.05, K);
             Matrix<Item> q = randomGenerator.newRandomMatrix<Items, Item>(items, 0.1, -0.05, K);
-            MatrixFactorization model = new MatrixFactorization(miu, buVector, biVector, p, q);
+            FactorizationMatrix model = new FactorizationMatrix(miu, buVector, biVector, p, q);
             return model;
         }
 

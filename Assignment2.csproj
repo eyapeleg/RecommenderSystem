@@ -88,7 +88,7 @@
     <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Logger\InfoLogger.cs" />
     <Compile Include="Engines\PredictionEngine.cs" />
-    <Compile Include="Model\Matrix\MatrixFactorization.cs" />
+    <Compile Include="Model\Matrix\FactorizationMatrix.cs" />
     <Compile Include="SimilarityMethods\JaccardMethod.cs" />
     <Compile Include="SimilarityMethods\CosineMethod.cs" />
     <Compile Include="Engines\DataLoaderEngine.cs" />
