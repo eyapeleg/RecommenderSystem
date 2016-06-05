@@ -299,11 +299,11 @@ namespace RecommenderSystem
             foreach (var user in testUsers)
 	        {
                 string userId = user.GetId();
-                //Console.Out.WriteLine("userId: " + userId);
+                Console.Out.WriteLine("userId: " + userId);
 		        foreach (var method in lMethods)
                 {
                     var recommended = Recommend(method, userId, maxLength);
-                    //Console.Out.WriteLine("   method: " + method.ToString());
+                    Console.Out.WriteLine("   method: " + method.ToString());
                     foreach (var len in lLengths)
                     {
                         var userRatedItems = user.GetRatedItems();

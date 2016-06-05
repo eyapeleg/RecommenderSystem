@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.Concurrent;
 
 namespace RecommenderSystem
 {
@@ -9,12 +13,13 @@ namespace RecommenderSystem
     {
         private Items items;
         private int MIN_NUMBER_OF_USERS = 10;
-		private Dictionary<Tuple<Item,Item>, int> intersectionCounts;
+        private double PROBABILITY_THRESHOLD = 0.15;
+		private ConcurrentDictionary<Tuple<Item,Item>, int> intersectionCounts;
 		
 
         public ItemBasedEngine(Items items){
             this.items = items;
-			this.intersectionCounts = new Dictionary<Tuple<Item,Item>, int>();
+            this.intersectionCounts = new ConcurrentDictionary<Tuple<Item, Item>, int>();
         }
 
 
@@ -30,30 +35,30 @@ namespace RecommenderSystem
 
         private List<KeyValuePair<Item, double>> getProbabilities(List<Item> givenItems, Func<Item,Item,double> probabilityFunction)
         {
-            List<KeyValuePair<Item, double>> probabilities = new List<KeyValuePair<Item, double>>();
-            foreach (Item item in items)
-            {
-                if (itemNotValid(givenItems, item))
-                {
-                    continue;
-                }
+            List<KeyValuePair<Item, double>> probabilities =
+            items.AsParallel()
+                .Where(item => itemValid(givenItems, item))
+                .Select(item =>{
+                    double itemProbability = calculateProbability(givenItems, probabilityFunction, item);
+                    return new KeyValuePair<Item,double>(item, itemProbability);})
+                .ToList();
 
-                double itemProbability = calculateProbability(givenItems, probabilityFunction, item);
-                probabilities.Add(new KeyValuePair<Item, double>(item, itemProbability));
-            }
-            return probabilities.OrderByDescending(kv => kv.Value).ToList();
+            return probabilities
+                .OrderByDescending(kv => kv.Value)
+                .ToList();
         }
 
         private double calculateProbability(List<Item> givenItems, Func<Item, Item, double> probabilityFunction, Item item)
         {
             return givenItems
+                //.AsParallel()
                 .Select(givenItem => probabilityFunction(item, givenItem))
                 .Max();
          }
 
-        private bool itemNotValid(List<Item> givenItems, Item item)
+        private bool itemValid(List<Item> givenItems, Item item)
         {
-            return item.GetRatingUsers().Count() < MIN_NUMBER_OF_USERS || givenItems.Contains(item);
+            return item.GetRatingUsers().Count() > MIN_NUMBER_OF_USERS && !givenItems.Contains(item);
         }
 
 
@@ -86,7 +91,7 @@ namespace RecommenderSystem
 
             return (double)numerator / (double)denominator;
         }
-		
+
 		private int getIntersectCount(Item item1, Item item2){
 			Tuple<Item, Item> itemTuple;
 			
@@ -102,7 +107,7 @@ namespace RecommenderSystem
 				List<string> item2Users = item2.GetRatingUsers();
 				
 				int count = item1Users.Intersect(item2Users).Count();
-				intersectionCounts.Add(itemTuple, count);
+				intersectionCounts.TryAdd(itemTuple, count);
 			}
 			
 			return intersectionCounts[itemTuple];
