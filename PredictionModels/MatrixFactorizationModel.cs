@@ -16,7 +16,7 @@ namespace RecommenderSystem
         private Items trainItems;
         private Users validationUsers;
         private Items validationItems;
-        private MatrixFactorization mf;
+        private FactorizationMatrix mf;
         private int cFeatures;
 
         public MatrixFactorizationModel(Users trainUsers, Items trainItems, Users validationUsers, Items validationItems, int cFeatures, double miu)
@@ -32,7 +32,7 @@ namespace RecommenderSystem
         public void Train()
         {
             Console.WriteLine("***************** Train Matrix Factorization Model *********************");
-            mf = MatrixFactorization.newRandomMatrix(trainUsers, trainItems, cFeatures, miu);
+            mf = FactorizationMatrix.newRandomMatrix(trainUsers, trainItems, cFeatures, miu);
 
             double error;
             double actualRating;

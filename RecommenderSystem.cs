@@ -276,21 +276,24 @@ namespace RecommenderSystem
             return result;
         }
 
-        public Dictionary<int, Dictionary<RecommendationMethod, Dictionary<string, double>>> ComputePrecisionRecall(List<RecommendationMethod> lMethods, List<int> lLengths, int cTrials)
+        public Dictionary<int, Dictionary<string, Dictionary<RecommendationMethod, double>>> ComputePrecisionRecall(List<RecommendationMethod> lMethods, List<int> lLengths, int cTrials)
         {
             string precisionString = RecommendationMeasure.Precision.ToString();
             string recallString = RecommendationMeasure.Recall.ToString();
 
-            Dictionary<int, Dictionary<RecommendationMethod, Dictionary<string, double>>> ans = new Dictionary<int, Dictionary<RecommendationMethod, Dictionary<string, double>>>();
+            Dictionary<int, Dictionary<string, Dictionary<RecommendationMethod, double>>> ans = new Dictionary<int, Dictionary<string, Dictionary<RecommendationMethod, double>>>();
             int maxLength = lLengths.Max();
 
             //intialize values
             foreach (var len in lLengths)
             {
-                ans.Add(len, new Dictionary<RecommendationMethod, Dictionary<string, double>>());
+                ans.Add(len, new Dictionary<string, Dictionary<RecommendationMethod, double>>());
+                ans[len].Add(precisionString, new Dictionary<RecommendationMethod, double>());
+                ans[len].Add(recallString, new Dictionary<RecommendationMethod, double>());
                 foreach (var method in lMethods)
                 {
-                    ans[len].Add(method, new Dictionary<string, double> { { precisionString, 0 }, { recallString, 0 } });
+                    ans[len][precisionString].Add(method, 0);
+                    ans[len][recallString].Add(method, 0);
                 }
             }
 
@@ -314,8 +317,8 @@ namespace RecommenderSystem
                         double precision = tp / (tp + fp);
                         double recall = tp / (tp + fn);
 
-                        ans[len][method][precisionString] += precision;
-                        ans[len][method][recallString] += recall;
+                        ans[len][precisionString][method] += precision;
+                        ans[len][recallString][method] += recall;
                     }
                 }
                 counterTest++;
@@ -326,8 +329,8 @@ namespace RecommenderSystem
             {
                 foreach (var method in lMethods)
                 {
-                    ans[len][method][precisionString] = ans[len][method][precisionString] / testUsers.Count();
-                    ans[len][method][recallString] = ans[len][method][recallString] / testUsers.Count();
+                    ans[len][precisionString][method] = ans[len][precisionString][method] / testUsers.Count();
+                    ans[len][recallString][method] = ans[len][recallString][method] / testUsers.Count();
                 }
             }
 
