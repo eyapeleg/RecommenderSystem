@@ -12,10 +12,10 @@ namespace RecommenderSystem
     public class ItemBasedEngine
     {
         private Items items;
-        private int MIN_NUMBER_OF_USERS = 20;
+        private int MIN_NUMBER_OF_USERS = 30;
         private double PROBABILITY_THRESHOLD = 0.15;
 		private ConcurrentDictionary<Tuple<Item,Item>, int> intersectionCounts;
-        private Boolean engineStartedToCompute;
+        private Boolean stopBackgroundThread;
 		
 
         public ItemBasedEngine(Items items){
@@ -27,13 +27,13 @@ namespace RecommenderSystem
 
         public List<KeyValuePair<Item, double>> getConditionalProbability(List<Item> givenItems)
         {
-            engineStartedToCompute = true;
+            stopBackgroundThread = true;
             return getProbabilities(givenItems, cp);
         }
 
         public List<KeyValuePair<Item, double>> getJaccardProbability(List<Item> givenItems)
         {
-            engineStartedToCompute = true;
+            stopBackgroundThread = true;
             return getProbabilities(givenItems, jaccard);
         }
 
@@ -64,7 +64,6 @@ namespace RecommenderSystem
         {
             return item.GetRatingUsers().Count() > MIN_NUMBER_OF_USERS && !givenItems.Contains(item);
         }
-
 
         private double cp(Item item, Item givenItem) 
         {
@@ -117,26 +116,8 @@ namespace RecommenderSystem
 			return intersectionCounts[itemTuple];
 		}
 
+ 
         /*public async void calculateIntersectionInBackground()
-        {
-            Parallel.ForEach(items, (itemI, loopStateI)=>
-            {
-                if (engineStartedToCompute == true)
-                    loopStateI.Break();
-
-                Parallel.ForEach(items, (itemJ,loopStateJ) =>
-                {
-                    if (!itemI.Equals(itemJ))
-                    {
-                        getIntersectCount(itemI, itemJ);
-                        if (engineStartedToCompute == true)
-                            loopStateJ.Break();
-                    }
-                });
-            });
-        }*/
-
-        public async void calculateIntersectionInBackground()
         {
             await Task.Run(() =>
             {
@@ -145,17 +126,59 @@ namespace RecommenderSystem
                     if (engineStartedToCompute == true)
                         break;
 
+                    if (itemI.GetRatingUsers().Count < MIN_NUMBER_OF_USERS)
+                        continue;
+
                     Parallel.ForEach(items, (itemJ, loopStateJ) =>
                     {
                         if (!itemI.Equals(itemJ))
                         {
-                            getIntersectCount(itemI, itemJ);
                             if (engineStartedToCompute == true)
                                 loopStateJ.Break();
+
+                            if (itemJ.GetRatingUsers().Count < MIN_NUMBER_OF_USERS)
+                                return;
+
+                            getIntersectCount(itemI, itemJ);
+                            
                         }
                 });
             }
          });
-        }    
+        }*/
+        public void stopCalculateIntersectionInBackground()
+        {
+            this.stopBackgroundThread = true;
+        }
+
+        public async void calculateIntersectionInBackground()
+        {
+            await Task.Run(() =>
+            {
+                foreach (Item itemI in items)
+                {
+                    if (stopBackgroundThread == true)
+                        break;
+
+                    if (itemI.GetRatingUsers().Count < MIN_NUMBER_OF_USERS)
+                        continue;
+
+                    foreach (Item itemJ in items)
+                    {
+                        if (itemI.CompareTo(itemJ)<0)
+                        {
+                            if (stopBackgroundThread == true)
+                                break;
+
+                            if (itemJ.GetRatingUsers().Count < MIN_NUMBER_OF_USERS)
+                                return;
+
+                            getIntersectCount(itemI, itemJ);
+
+                        }
+                    }
+                }
+            });
+        }
     }
 }

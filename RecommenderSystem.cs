@@ -236,6 +236,7 @@ namespace RecommenderSystem
         public List<string> Recommend(RecommendationMethod sAlgorithm, string sUserId, int cRecommendations)
         {
             List<string> result = new List<string>();
+            this.itemBasedEngine.stopCalculateIntersectionInBackground();
 
             switch (sAlgorithm)
             {
