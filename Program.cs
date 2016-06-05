@@ -17,9 +17,9 @@ namespace RecommenderSystem
             //rs.TrainBaseModel(10);
             //rs.TrainStereotypes(10);
 
-            string testUserId = rs.getTestUserId();
-            List<string> lRecommendationsCp = rs.Recommend(RecommenderSystem.RecommendationMethod.CP, testUserId, 5);
-            List<string> lRecommendationsJaccard = rs.Recommend(RecommenderSystem.RecommendationMethod.Jaccard, testUserId, 5);
+            //string testUserId = rs.getTestUserId();
+            //List<string> lRecommendationsCp = rs.Recommend(RecommenderSystem.RecommendationMethod.CP, testUserId, 5);
+            //List<string> lRecommendationsJaccard = rs.Recommend(RecommenderSystem.RecommendationMethod.Jaccard, testUserId, 5);
 
             //List<string> lRecommendations = rs.Recommend(RecommenderSystem.RecommendationMethod.Pearson, "6", 5);
             //Console.Write("Recommended movies for user 6 ");
@@ -36,7 +36,7 @@ namespace RecommenderSystem
             //
             List<RecommenderSystem.RecommendationMethod> lMethods = new List<RecommenderSystem.RecommendationMethod>();
             //List<RecommenderSystem.RecommendationMethod> lMethods = new List<RecommenderSystem.RecommendationMethod>();
-            //lMethods.Add(RecommenderSystem.RecommendationMethod.Jaccard);
+            lMethods.Add(RecommenderSystem.RecommendationMethod.Jaccard);
             lMethods.Add(RecommenderSystem.RecommendationMethod.CP);
             //
             List<int> lLengths = new List<int>();

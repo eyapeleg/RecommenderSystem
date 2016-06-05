@@ -60,9 +60,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Assignment2.csproj">
+    <ProjectReference Include="..\Assignment3.csproj">
       <Project>{a5718205-d535-42b4-95e0-e7ec030f5b61}</Project>
-      <Name>Assignment2</Name>
+      <Name>Assignment3</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
