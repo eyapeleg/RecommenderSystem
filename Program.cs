@@ -18,8 +18,8 @@ namespace RecommenderSystem
             //rs.TrainStereotypes(10);
 
             string testUserId = rs.getTestUserId();
-            //List<string> lRecommendationsCp = rs.Recommend(RecommenderSystem.RecommendationMethod.CP, testUserId, 5);
-            //List<string> lRecommendationsJaccard = rs.Recommend(RecommenderSystem.RecommendationMethod.Jaccard, testUserId, 5);
+            List<string> lRecommendationsCp = rs.Recommend(RecommenderSystem.RecommendationMethod.CP, testUserId, 5);
+            List<string> lRecommendationsJaccard = rs.Recommend(RecommenderSystem.RecommendationMethod.Jaccard, testUserId, 5);
 
             //List<string> lRecommendations = rs.Recommend(RecommenderSystem.RecommendationMethod.Pearson, "6", 5);
             //Console.Write("Recommended movies for user 6 ");
@@ -35,12 +35,8 @@ namespace RecommenderSystem
 
             //
             List<RecommenderSystem.RecommendationMethod> lMethods = new List<RecommenderSystem.RecommendationMethod>();
-
-
             //List<RecommenderSystem.RecommendationMethod> lMethods = new List<RecommenderSystem.RecommendationMethod>();
-
-
-            lMethods.Add(RecommenderSystem.RecommendationMethod.Jaccard);
+            //lMethods.Add(RecommenderSystem.RecommendationMethod.Jaccard);
             lMethods.Add(RecommenderSystem.RecommendationMethod.CP);
             //
             List<int> lLengths = new List<int>();
@@ -51,15 +47,15 @@ namespace RecommenderSystem
             lLengths.Add(20);
 
             DateTime dtStart = DateTime.Now;
-            Dictionary<int, Dictionary<RecommenderSystem.RecommendationMethod, Dictionary<string, double>>> dResults = rs.ComputePrecisionRecall(lMethods, lLengths, 1000);
+            Dictionary<int, Dictionary<string, Dictionary<RecommenderSystem.RecommendationMethod, double>>> dResults = rs.ComputePrecisionRecall(lMethods, lLengths, 1000);
             Console.WriteLine("Precision-recall scores for all methods are:");
             foreach (int iLength in lLengths)
             {
-                foreach (RecommenderSystem.RecommendationMethod sMethod in lMethods)
+                foreach (string sMetric in dResults[iLength].Keys)
                 {
-                    foreach (string sMetric in dResults[iLength][sMethod].Keys)
+                    foreach (RecommenderSystem.RecommendationMethod sMethod in dResults[iLength][sMetric].Keys)
                     {
-                        Console.WriteLine(iLength + "," + sMethod + "," + sMetric + " = " + Math.Round(dResults[iLength][sMethod][sMetric], 4));
+                        Console.WriteLine(iLength + "," + sMethod + "," + sMetric + " = " + Math.Round(dResults[iLength][sMetric][sMethod], 4));
                     }
                 }
             }
