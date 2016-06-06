@@ -13,7 +13,8 @@ namespace RecommenderSystem
     {
         private Items items;
         private int MIN_NUMBER_OF_USERS = 30;
-        private double PROBABILITY_THRESHOLD = 0.15;
+        private double PROBABILITY_THRESHOLD = 0.30;
+        private int MAX_NUM_RESULTS = 50;
 		private ConcurrentDictionary<Tuple<Item,Item>, int> intersectionCounts;
         private Boolean stopBackgroundThread;
 		
@@ -39,15 +40,27 @@ namespace RecommenderSystem
 
         private List<KeyValuePair<Item, double>> getProbabilities(List<Item> givenItems, Func<Item,Item,double> probabilityFunction)
         {
-            List<KeyValuePair<Item, double>> probabilities =
-            items.AsParallel()
-                .Where(item => itemValid(givenItems, item))
-                .Select(item =>{
-                    double itemProbability = calculateProbability(givenItems, probabilityFunction, item);
-                    return new KeyValuePair<Item,double>(item, itemProbability);})
-                //.Where(kv => kv.Value > PROBABILITY_THRESHOLD)
-                .ToList();
+            
+            ConcurrentDictionary<Item, double> probabilities = new ConcurrentDictionary<Item,double>(); ;
+            int positiveProbabilitiesCount=0;
 
+            Parallel.ForEach(items , (item, loopState) =>
+            {
+                if (positiveProbabilitiesCount > MAX_NUM_RESULTS)
+                {
+                    loopState.Break();
+                }
+                if (itemValid(givenItems, item))
+                {
+                    double itemProbability = calculateProbability(givenItems, probabilityFunction, item);
+                    if (itemProbability > PROBABILITY_THRESHOLD)
+                    {
+                        Interlocked.Increment(ref positiveProbabilitiesCount);
+                    }
+                    probabilities.TryAdd(item, itemProbability);
+                }
+            });
+                
             return probabilities
                 .OrderByDescending(kv => kv.Value)
                 .ToList();
