@@ -169,5 +169,12 @@ namespace RecommenderSystem
             var similarUserRating = similarityDic[user].GetRating(itemId);
             return similarUserRating == 0 ? item.GetAverageRatings() : similarUserRating;
         }
+
+        public Dictionary<string, double> getCandidateItems(User currentUser)
+        {
+            var centroids = stereotypes.getStereotypesCentroids();
+            var similarities = similarityEngine.calculateSimilarity(similarityMethod, currentUser, centroids, false, true);
+            return similarities.Count != 0 ? similarities.Last().Key.GetItemsRatings() : centroids.FirstOrDefault().GetItemsRatings();
+        }
     }
 }

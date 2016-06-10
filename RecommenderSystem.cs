@@ -253,7 +253,7 @@ namespace RecommenderSystem
                     result = GetTopItems(predictionEngine.getModel(PredictionMethod.BaseModel), sUserId, cRecommendations);
                     break;
                 case (RecommendationMethod.Stereotypes):
-                    result = GetTopItems(predictionEngine.getModel(PredictionMethod.Stereotypes), sUserId, cRecommendations);
+                    result = GetTopItemsStereotypes(sUserId, cRecommendations);
                     break;
                 case (RecommendationMethod.NNPearson):
                     result = GetTopItemsBasedNN(new PearsonMethod(), sUserId, cRecommendations);
@@ -304,11 +304,11 @@ namespace RecommenderSystem
             foreach (var user in testUsers)
 	        {
                 string userId = user.GetId();
-                Console.Out.WriteLine("userId: " + userId);
+                //Console.Out.WriteLine("userId: " + userId);
 		        foreach (var method in lMethods)
                 {
                     var recommended = Recommend(method, userId, maxLength);
-                    Console.Out.WriteLine("   method: " + method.ToString());
+                    //Console.Out.WriteLine("   method: " + method.ToString());
                     foreach (var len in lLengths)
                     {
                         var userRatedItems = user.GetRatedItems();
@@ -384,6 +384,20 @@ namespace RecommenderSystem
             var orderByPrediction = candidateItemsDic.OrderByDescending(item => item.Value);
 
             return orderByPrediction.Select(item => item.Key).Take(cRecommendations).ToList();
+        }
+
+        private List<string> GetTopItemsStereotypes(string sUserId, int cRecommendations)
+        {
+            var currentUser = testUsers.getUserById(sUserId);
+
+            var currentItems = trainUsers.getUserById(sUserId).GetRatedItems(); //in case the user is also in the training set we want to filter out those rated items from train set
+            StereotypesModel model = (StereotypesModel)predictionEngine.getModel(PredictionMethod.Stereotypes);
+            var candidateItems = model.getCandidateItems(currentUser);
+
+            Dictionary<string, double> result = candidateItems.Where(item => !currentItems.Contains(item.Key)).ToDictionary(item => item.Key, item => item.Value);
+
+            var orderedList = result.OrderByDescending(item => item.Value);
+            return orderedList.Select(item => item.Key).Take(cRecommendations).ToList();
         }
 
         private List<string> GetTopItemsBasedNN(ISimilarityMethod similarityMethod, string sUserId, int cRecommendations)
