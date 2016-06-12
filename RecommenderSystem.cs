@@ -115,7 +115,8 @@ namespace RecommenderSystem
             predictionEngine.addModel(PredictionMethod.Random, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new RandomMethod()));
 
             itemBasedEngine = new ItemBasedEngine(trainItems); //TODO - check that we need to use test items...
-            itemBasedEngine.calculateIntersectionInBackground();
+            itemBasedEngine.calculateIntersectionInLoad();
+            itemBasedEngine.calculateIntersectionInBackgroundSingleThread();
         }
 
         public string getTestUserId()
@@ -331,7 +332,11 @@ namespace RecommenderSystem
                 {
 
                     var recommended = Recommend(method, userId, maxLength);
+<<<<<<< HEAD
+                   // Console.Out.WriteLine("   method: " + method.ToString());
+=======
                     //Console.Out.WriteLine("   method: " + method.ToString());
+>>>>>>> cd360a59ce4c9308ef75729902a1ee34ff214822
                     foreach (var len in lLengths)
                     {
                         var userRatedItems = user.GetRatedItems();

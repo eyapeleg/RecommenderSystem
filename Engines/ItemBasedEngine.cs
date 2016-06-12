@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 using System.Collections.Concurrent;
 
 namespace RecommenderSystem
@@ -12,7 +13,7 @@ namespace RecommenderSystem
     public class ItemBasedEngine
     {
         private Items items;
-        private int MIN_NUMBER_OF_USERS = 30;
+        private int MIN_NUMBER_OF_USERS = 25;
         private double PROBABILITY_THRESHOLD = 0.30;
         private int MAX_NUM_RESULTS = 50;
 		private ConcurrentDictionary<Tuple<Item,Item>, int> intersectionCounts;
@@ -22,7 +23,6 @@ namespace RecommenderSystem
         public ItemBasedEngine(Items items){
             this.items = items;
             this.intersectionCounts = new ConcurrentDictionary<Tuple<Item, Item>, int>();
-
         }
 
 
@@ -80,7 +80,6 @@ namespace RecommenderSystem
 
         private double cp(Item item, Item givenItem) 
         {
-            int MIN_NUMBER_OF_USERS = 10;
             List<string> itemUseres = item.GetRatingUsers();
             List<string> givenItemUsers = givenItem.GetRatingUsers();
 
@@ -95,7 +94,6 @@ namespace RecommenderSystem
 
         private double jaccard(Item item, Item givenItem)
         {
-            int MIN_NUMBER_OF_USERS = 10;
             List<string> itemUseres = item.GetRatingUsers();
             List<string> givenItemUsers = givenItem.GetRatingUsers();
 
@@ -129,42 +127,8 @@ namespace RecommenderSystem
 			return intersectionCounts[itemTuple];
 		}
 
- 
-        /*public async void calculateIntersectionInBackground()
-        {
-            await Task.Run(() =>
-            {
-                foreach (Item itemI in items)
-                {
-                    if (engineStartedToCompute == true)
-                        break;
 
-                    if (itemI.GetRatingUsers().Count < MIN_NUMBER_OF_USERS)
-                        continue;
-
-                    Parallel.ForEach(items, (itemJ, loopStateJ) =>
-                    {
-                        if (!itemI.Equals(itemJ))
-                        {
-                            if (engineStartedToCompute == true)
-                                loopStateJ.Break();
-
-                            if (itemJ.GetRatingUsers().Count < MIN_NUMBER_OF_USERS)
-                                return;
-
-                            getIntersectCount(itemI, itemJ);
-                            
-                        }
-                });
-            }
-         });
-        }*/
-        public void stopCalculateIntersectionInBackground()
-        {
-            this.stopBackgroundThread = true;
-        }
-
-        public async void calculateIntersectionInBackground()
+        public async void calculateIntersectionInBackgroundMultiThread()
         {
             await Task.Run(() =>
             {
@@ -173,8 +137,33 @@ namespace RecommenderSystem
                     if (stopBackgroundThread == true)
                         break;
 
-                    if (itemI.GetRatingUsers().Count < MIN_NUMBER_OF_USERS)
-                        continue;
+                    Parallel.ForEach(items, (itemJ, loopStateJ) =>
+                    {
+                        if (!itemI.Equals(itemJ))
+                        {
+                            if (stopBackgroundThread == true)
+                                loopStateJ.Break();
+
+                            getIntersectCount(itemI, itemJ);
+                        }
+                });
+            }
+         });
+        }
+
+        public void stopCalculateIntersectionInBackground()
+        {
+            this.stopBackgroundThread = true;
+        }
+
+        public async void calculateIntersectionInBackgroundSingleThread()
+        {
+            await Task.Run(() =>
+            {
+                foreach (Item itemI in items)
+                {
+                    if (stopBackgroundThread == true)
+                        break;
 
                     foreach (Item itemJ in items)
                     {
@@ -183,15 +172,37 @@ namespace RecommenderSystem
                             if (stopBackgroundThread == true)
                                 break;
 
-                            if (itemJ.GetRatingUsers().Count < MIN_NUMBER_OF_USERS)
-                                return;
-
                             getIntersectCount(itemI, itemJ);
 
                         }
                     }
                 }
             });
+        }
+
+        public void calculateIntersectionInLoad()
+        {
+            int MIN_NUMBER_OF_USERS = 50;
+            Stopwatch timer = Stopwatch.StartNew();
+
+            foreach (Item itemI in items){
+  
+                if (itemI.GetRatingUsers().Count < MIN_NUMBER_OF_USERS)
+                    continue;
+
+                foreach (Item itemJ in items)
+                {
+                    if (itemI.CompareTo(itemJ) < 0)
+                    {
+                        if (itemJ.GetRatingUsers().Count < MIN_NUMBER_OF_USERS)
+                            continue;
+
+                        getIntersectCount(itemI, itemJ);
+                    }
+                }
+            }
+            TimeSpan elapsed = timer.Elapsed;
+            Console.Out.WriteLine("calculating intersection completed in: " + elapsed.ToString("mm':'ss':'fff"));
         }
     }
 }
