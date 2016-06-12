@@ -5,6 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Threading;
 using System.Configuration;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace RecommenderSystem
@@ -49,13 +50,20 @@ namespace RecommenderSystem
             dataLoaderEngine = new DataLoaderEngine(logger);
             predictionEngine = new PredictionEngine();
 
-            MAX_SIMILAR_USERS = 30;
+            MAX_SIMILAR_USERS = 20; //Todo - Eyal to change the sort dictionary in descending order
             NUM_OF_TRIALS = 1000;
 
         }
 
-        public HashSet<string> GetTestUsers(){
-            return new HashSet<string>(this.testUsers.Select(user => user.GetId()));
+        public HashSet<string> GetTestUsers()
+        {
+            HashSet<string> results = new HashSet<string>();
+
+            foreach (var user in testUsers.Where(user => user != null))
+            {
+                results.Add(user.GetId());
+            }
+            return results;
         }
 
         public HashSet<string> GetTestUserItems(string sUserId)
@@ -238,6 +246,12 @@ namespace RecommenderSystem
             List<string> result = new List<string>();
             this.itemBasedEngine.stopCalculateIntersectionInBackground();
 
+            //for new users we return the most popular items
+            if (trainUsers.getUserById(sUserId) == null)
+            {
+                return GetPopularItems(sUserId, cRecommendations);
+            }
+
             switch (sAlgorithm)
             {
                 case (RecommendationMethod.Popularity):
@@ -282,6 +296,7 @@ namespace RecommenderSystem
         {
             string precisionString = RecommendationMeasure.Precision.ToString();
             string recallString = RecommendationMeasure.Recall.ToString();
+            Dictionary<RecommendationMethod, double> time = new Dictionary<RecommendationMethod, double>();
 
             Dictionary<int, Dictionary<string, Dictionary<RecommendationMethod, double>>> ans = new Dictionary<int, Dictionary<string, Dictionary<RecommendationMethod, double>>>();
             int maxLength = lLengths.Max();
@@ -294,19 +309,27 @@ namespace RecommenderSystem
                 ans[len].Add(recallString, new Dictionary<RecommendationMethod, double>());
                 foreach (var method in lMethods)
                 {
+                    if (!time.ContainsKey(method))
+                    {
+                        time.Add(method, 0);
+                    }
                     ans[len][precisionString].Add(method, 0);
                     ans[len][recallString].Add(method, 0);
                 }
             }
 
+
             int counterTest = 0;
             //for each test user, get recommened list of size N and calcualte measures: Precision, Recall
             foreach (var user in testUsers)
-	        {
+            {
+                DateTime dtStart = DateTime.Now;
+
                 string userId = user.GetId();
                 //Console.Out.WriteLine("userId: " + userId);
 		        foreach (var method in lMethods)
                 {
+
                     var recommended = Recommend(method, userId, maxLength);
                     //Console.Out.WriteLine("   method: " + method.ToString());
                     foreach (var len in lLengths)
@@ -322,9 +345,15 @@ namespace RecommenderSystem
                         ans[len][precisionString][method] += precision;
                         ans[len][recallString][method] += recall;
                     }
+                    time[method] = time[method] + Math.Round((DateTime.Now - dtStart).TotalSeconds, 0);
                 }
                 counterTest++;
 	        }
+
+            foreach (var method in time)
+            {
+                Console.WriteLine("Execution time for method {0} was {1} ", method.Key, method.Value);
+            }
 
             //for each size of list, calculate the precision and recall
             foreach (var len in lLengths)
@@ -403,16 +432,30 @@ namespace RecommenderSystem
         private List<string> GetTopItemsBasedNN(ISimilarityMethod similarityMethod, string sUserId, int cRecommendations)
         {
             Dictionary<string, double> itemScore = new Dictionary<string, double>();
+            Dictionary<string, double> candidateUsers = new Dictionary<string, double>();
             int k = 20; //number of NN
 
-            //Select an item only if one of the neighbors has rated it
-            User currentUser = testUsers.getUserById(sUserId);
-            var NNList = trainUsers.Where(user => !user.Equals(currentUser));
-            var NNListDic = NNList.ToDictionary(user => user, user => similarityEngine.calculateSimilarity(similarityMethod, currentUser, user));
-            var NNListOrderedDic = NNListDic.OrderByDescending(user => user.Value);
-            var NNTopK = NNListOrderedDic.Take(k);
+            //Select the NN only if they rate the same items as the current user
+            User currentUser = trainUsers.getUserById(sUserId);
 
-            //For each item that rated by one of the neighbors, calculate the normalized rating score
+            var currentUserItems = currentUser.GetRatedItems();
+            foreach (var item in currentUserItems)
+            {
+                var selectedItem = trainItems.GetItemById(item);
+                if (selectedItem != null)
+                {
+                    foreach (var user in selectedItem.GetRatingUsers())
+                    {
+                        if (!user.Equals(sUserId) && !candidateUsers.ContainsKey(user))
+                        {
+                            candidateUsers.Add(user, 0);
+                        }
+                    }
+                }
+            }
+
+            //calculate similarity between current user and any candidate user
+            var NNTopK = similarityEngine.calculateSimilarity(similarityMethod, currentUser, candidateUsers.Keys.ToList());
             foreach (var user in NNTopK)
             {
                 double weight = user.Value;
@@ -428,11 +471,10 @@ namespace RecommenderSystem
                         itemScore[item] += weight;
                     }
                 }
-
             }
 
             var orderedItemScore = itemScore.OrderByDescending(item => item.Value);
-            return orderedItemScore.Select(item => item.Key).Take(cRecommendations).ToList(); ;
+            return orderedItemScore.Select(item => item.Key).Take(cRecommendations).ToList(); 
         }
 
         private List<string> GetTopItemsCp(string sUserId, int cRecommendations)
