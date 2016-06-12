@@ -65,7 +65,7 @@ namespace RecommenderSystem
 
         public double getBu(User user)
         {
-            if (!buVector.ContainsKey(user))
+            if (user == null || !buVector.ContainsKey(user))
                 throw new UserNotFoundException("User [" + user.GetId() + "] not found in the DB!");
 
             return buVector[user];
