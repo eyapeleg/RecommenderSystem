@@ -20,6 +20,7 @@ namespace RecommenderSystem
         private Users users;
         private Items items;
         DataUtils dataUtils = new DataUtils();
+        private Dictionary<string, int> popularItems; 
 
         //TODO: decide how to formalize that part
         private Users trainUsers;
@@ -113,6 +114,13 @@ namespace RecommenderSystem
             predictionEngine.addModel(PredictionMethod.Cosine, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new CosineMethod()));
             predictionEngine.addModel(PredictionMethod.Pearson, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new PearsonMethod()));
             predictionEngine.addModel(PredictionMethod.Random, new CollaborativeFilteringModel(trainUsers, trainItems, similarityEngine, new RandomMethod()));
+
+            popularItems = new Dictionary<string, int>();
+            foreach (var item in trainItems)
+            {
+                popularItems.Add(item.GetId(), item.GetRatingUsers().Count);
+            }
+            popularItems = popularItems.OrderByDescending(item => item.Value).ToDictionary(item => item.Key, item => item.Value);
 
             itemBasedEngine = new ItemBasedEngine(trainItems); //TODO - check that we need to use test items...
             itemBasedEngine.calculateIntersectionInLoad();
@@ -390,18 +398,18 @@ namespace RecommenderSystem
         {
             Dictionary<string, int> result = new Dictionary<string, int>();
 
+            List<string> userRatedItems = trainUsers.getUserById(sUserId).GetRatedItems();
             // take only items that has not rated by the user and order them by popularity 
-            foreach (var item in trainItems)
+            foreach (var popularItem in popularItems)
             {
-                var ratingUsers = item.GetRatingUsers();
-                if (!ratingUsers.Contains(sUserId))
+                if (!userRatedItems.Contains(popularItem.Key))
                 {
-                    result.Add(item.GetId(), ratingUsers.Count);
+                    result.Add(popularItem.Key, popularItem.Value);
                 }
+                if (result.Count >= cRecommendations) break;
             }
 
-            var orderedList = result.OrderByDescending(item => item.Value);
-            return orderedList.Select(item => item.Key).Take(cRecommendations).ToList();
+            return result.Keys.ToList();
         }
 
         private List<string> GetTopItems(IPredictionModel predictionModel, string sUserId, int cRecommendations)
