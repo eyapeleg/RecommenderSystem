@@ -404,7 +404,7 @@ namespace RecommenderSystem
 
         private List<string> GetTopItems(IPredictionModel predictionModel, string sUserId, int cRecommendations)
         {
-            var currentUser = testUsers.getUserById(sUserId);
+            var currentUser = trainUsers.getUserById(sUserId);
 
             var currentItems = trainUsers.getUserById(sUserId).GetRatedItems(); //in case the user is also in the training set we want to filter out those rated items from train set
             var candidateItems = trainItems.GetAllItemsIds().Except(currentItems); //select items that current user is not yet rated
@@ -417,7 +417,7 @@ namespace RecommenderSystem
 
         private List<string> GetTopItemsStereotypes(string sUserId, int cRecommendations)
         {
-            var currentUser = testUsers.getUserById(sUserId);
+            var currentUser = trainUsers.getUserById(sUserId);
 
             var currentItems = trainUsers.getUserById(sUserId).GetRatedItems(); //in case the user is also in the training set we want to filter out those rated items from train set
             StereotypesModel model = (StereotypesModel)predictionEngine.getModel(PredictionMethod.Stereotypes);
@@ -437,7 +437,6 @@ namespace RecommenderSystem
 
             //Select the NN only if they rate the same items as the current user
             User currentUser = trainUsers.getUserById(sUserId);
-
             var currentUserItems = currentUser.GetRatedItems();
             foreach (var item in currentUserItems)
             {
