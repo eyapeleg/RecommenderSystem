@@ -324,19 +324,16 @@ namespace RecommenderSystem
             //for each test user, get recommened list of size N and calcualte measures: Precision, Recall
             foreach (var user in testUsers)
             {
+                if (counterTest > cTrials) break;
+
                 DateTime dtStart = DateTime.Now;
 
                 string userId = user.GetId();
                 //Console.Out.WriteLine("userId: " + userId);
 		        foreach (var method in lMethods)
                 {
-
                     var recommended = Recommend(method, userId, maxLength);
-<<<<<<< HEAD
-                   // Console.Out.WriteLine("   method: " + method.ToString());
-=======
-                    //Console.Out.WriteLine("   method: " + method.ToString());
->>>>>>> cd360a59ce4c9308ef75729902a1ee34ff214822
+
                     foreach (var len in lLengths)
                     {
                         var userRatedItems = user.GetRatedItems();
