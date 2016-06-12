@@ -397,8 +397,14 @@ namespace RecommenderSystem
         private List<string> GetPopularItems(string sUserId, int cRecommendations)
         {
             Dictionary<string, int> result = new Dictionary<string, int>();
+            List<string> userRatedItems = new List<string>();
+            User currentUser = trainUsers.getUserById(sUserId);
 
-            List<string> userRatedItems = trainUsers.getUserById(sUserId).GetRatedItems();
+            if(currentUser != null)
+            {
+                userRatedItems = currentUser.GetRatedItems();
+            }
+
             // take only items that has not rated by the user and order them by popularity 
             foreach (var popularItem in popularItems)
             {
